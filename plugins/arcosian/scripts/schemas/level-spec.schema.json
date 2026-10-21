@@ -1,0 +1,246 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Level specification (.gamestudio/levels/*.level.json)",
+  "description": "One level: mechanics used, layout (a grid, a typed puzzle layout, or a generator reference), goals, limits, obstacles, difficulty target, solver / bot results and its role in the teach-test-twist-reward rhythm. puzzle_solver.py solves layout.type sliding, sokoban, sort and lights_out; layout.type match3 is the suggested input shape for match3_sim.py.",
+  "type": "object",
+  "required": ["schema_version", "level_id"],
+  "additionalProperties": true,
+  "$defs": {
+    "cell": {
+      "type": ["string", "integer", "number", "null"],
+      "description": "One grid cell: a short code (\"#\" wall, \".\" floor, \"r\" red), a number, or null for no cell."
+    },
+    "matrix": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "array", "items": { "$ref": "#/$defs/cell" } },
+      "description": "Row-major grid: an array of rows, each an array of cells; row 0 is the top row."
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Row-major grid as strings, one character per cell; row 0 is the top row."
+    },
+    "grid_array": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": ["array", "string"], "items": { "$ref": "#/$defs/cell" } },
+      "description": "Bare grid: rows as arrays of cells or as strings. Equivalent to {\"type\": \"grid\", \"grid\": ...}."
+    },
+    "layout_grid": {
+      "type": "object",
+      "description": "Generic tile grid with a legend (board games, tower-defense paths, custom puzzles).",
+      "required": ["type"],
+      "anyOf": [{ "required": ["grid"] }, { "required": ["rows"] }],
+      "properties": {
+        "type": { "const": "grid", "description": "Layout discriminator." },
+        "grid": { "$ref": "#/$defs/matrix", "description": "Cells as a matrix." },
+        "rows": { "$ref": "#/$defs/rows", "description": "Cells as strings, one character per cell." },
+        "legend": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Meaning of each cell code, e.g. {\"#\": \"wall\", \"P\": \"enemy path\", \".\": \"buildable\"}."
+        }
+      }
+    },
+    "layout_sliding": {
+      "type": "object",
+      "description": "Sliding-tile puzzle (15-puzzle family). 0 is the blank; a move slides an adjacent tile into the blank.",
+      "required": ["type", "grid"],
+      "properties": {
+        "type": { "const": "sliding", "description": "Layout discriminator." },
+        "grid": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "type": "array", "minItems": 2, "items": { "type": "integer", "minimum": 0 } },
+          "description": "Start state as rows of integers, 0 = blank; all rows the same length."
+        },
+        "goal": {
+          "type": "array",
+          "items": { "type": "array", "items": { "type": "integer", "minimum": 0 } },
+          "description": "Goal state; default is 1..N-1 in reading order with the blank last."
+        }
+      }
+    },
+    "layout_sokoban": {
+      "type": "object",
+      "description": "Sokoban puzzle in the common XSB text notation.",
+      "required": ["type", "rows"],
+      "properties": {
+        "type": { "const": "sokoban", "description": "Layout discriminator." },
+        "rows": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "type": "string", "pattern": "^[#@+$*. _-]*$" },
+          "description": "Rows using '#' wall, '@' player, '+' player on goal, '$' box, '*' box on goal, '.' goal, ' ' / '-' / '_' floor. Exactly one player; boxes = goals."
+        }
+      }
+    },
+    "layout_sort": {
+      "type": "object",
+      "description": "Sort puzzle (ball / water / nut sort). Each tube is a stack listed bottom to top. A move takes the top run of same-colour items from one tube onto an empty tube or onto a top item of the same colour, within capacity. Solved when every non-empty tube holds capacity items of one colour.",
+      "required": ["type", "capacity", "tubes"],
+      "properties": {
+        "type": { "const": "sort", "description": "Layout discriminator." },
+        "capacity": { "type": "integer", "minimum": 1, "maximum": 16, "description": "Items per tube when full (4 is the genre standard)." },
+        "tubes": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1, "maxLength": 32 },
+            "description": "One tube, bottom item first. Empty array = empty tube. Length must not exceed capacity."
+          },
+          "description": "All tubes including empty ones. Each colour should appear exactly capacity times."
+        },
+        "pour": {
+          "type": "string",
+          "enum": ["max", "single"],
+          "default": "max",
+          "description": "Move rule: \"max\" moves as many matching top items as fit (water-sort standard), \"single\" moves one item per move (ball-sort variant)."
+        },
+        "colors": { "type": "array", "items": { "type": "string" }, "uniqueItems": true, "description": "Optional list of colour codes used, for validation and rendering." }
+      }
+    },
+    "layout_lights_out": {
+      "type": "object",
+      "description": "Lights Out: pressing a cell toggles it and its orthogonal neighbours; solved when all cells are 0.",
+      "required": ["type", "grid"],
+      "properties": {
+        "type": { "const": "lights_out", "description": "Layout discriminator." },
+        "grid": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "array", "minItems": 1, "items": { "type": "integer", "enum": [0, 1] } },
+          "description": "Start state, 1 = lit."
+        }
+      }
+    },
+    "layout_match3": {
+      "type": "object",
+      "description": "Match-3 board for match3_sim.py.",
+      "required": ["type"],
+      "anyOf": [{ "required": ["grid"] }, { "required": ["rows"] }, { "required": ["width", "height"] }],
+      "properties": {
+        "type": { "const": "match3", "description": "Layout discriminator." },
+        "width": { "type": "integer", "minimum": 3, "maximum": 16, "description": "Board width in cells (when the board is fully random)." },
+        "height": { "type": "integer", "minimum": 3, "maximum": 16, "description": "Board height in cells." },
+        "rows": { "$ref": "#/$defs/rows", "description": "Board as strings: '.' random tile, '#' hole, letters for fixed colours or obstacle codes defined in legend." },
+        "grid": { "$ref": "#/$defs/matrix", "description": "Board as a matrix of cell codes." },
+        "colors": { "type": "integer", "minimum": 3, "maximum": 8, "description": "Number of tile colours; each extra colour lowers match odds sharply (5 or 6 is typical)." },
+        "legend": { "type": "object", "additionalProperties": { "type": "string" }, "description": "Meaning of non-colour codes, e.g. {\"B\": \"box (1 hp)\", \"I\": \"ice\"}." }
+      }
+    },
+    "layout_generator": {
+      "type": "object",
+      "description": "Layout produced on demand by a generator; the seed makes it reproducible.",
+      "required": ["type", "generator"],
+      "properties": {
+        "type": { "const": "generator", "description": "Layout discriminator." },
+        "generator": { "type": "string", "minLength": 1, "description": "Generator reference, e.g. \"pcg.py wfc\" or an engine-side generator id." },
+        "seed": { "type": "integer", "description": "Seed for deterministic generation." },
+        "params": { "type": "object", "additionalProperties": true, "description": "Generator parameters, e.g. {\"w\": 9, \"h\": 12}." }
+      }
+    },
+    "layout_custom": {
+      "type": "object",
+      "description": "Anything else; tools that do not know the format skip it.",
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "custom", "description": "Layout discriminator." },
+        "format": { "type": "string", "description": "Name of the custom format and the tool that reads it." },
+        "data": { "description": "Format-specific payload." }
+      }
+    },
+    "layout_object": {
+      "type": "object",
+      "description": "Typed layout; the type field selects the variant and its required fields.",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["grid", "sliding", "sokoban", "sort", "lights_out", "match3", "generator", "custom"],
+          "description": "Layout variant."
+        }
+      },
+      "allOf": [
+        { "if": { "properties": { "type": { "const": "grid" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/layout_grid" } },
+        { "if": { "properties": { "type": { "const": "sliding" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/layout_sliding" } },
+        { "if": { "properties": { "type": { "const": "sokoban" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/layout_sokoban" } },
+        { "if": { "properties": { "type": { "const": "sort" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/layout_sort" } },
+        { "if": { "properties": { "type": { "const": "lights_out" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/layout_lights_out" } },
+        { "if": { "properties": { "type": { "const": "match3" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/layout_match3" } },
+        { "if": { "properties": { "type": { "const": "generator" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/layout_generator" } },
+        { "if": { "properties": { "type": { "const": "custom" } }, "required": ["type"] }, "then": { "$ref": "#/$defs/layout_custom" } }
+      ]
+    },
+    "goal": {
+      "type": ["object", "string"],
+      "description": "A win condition: a description string or an object.",
+      "properties": {
+        "type": { "type": "string", "description": "Goal kind, e.g. \"sort_all\", \"collect\", \"clear\", \"survive_waves\", \"reach\", \"score\"." },
+        "target": { "type": ["string", "null"], "description": "What to collect / clear / reach (item or obstacle code), if any." },
+        "count": { "type": "number", "minimum": 0, "description": "How many (items, waves, points)." }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "level-spec", "description": "Optional self-identification for validate_json.py --auto." },
+    "level_id": { "$ref": "common.schema.json#/$defs/id", "description": "Level id, e.g. \"w1_l012\" or \"bonus_005\"; also the level_id analytics parameter." },
+    "mechanic_refs": { "$ref": "common.schema.json#/$defs/id_list", "description": "Ids of contract mechanics this level uses; a level should introduce at most one new mechanic." },
+    "layout": {
+      "type": ["array", "object"],
+      "description": "Level layout: a bare grid (array of rows) or a typed layout object whose type is grid, sliding, sokoban, sort, lights_out, match3, generator or custom.",
+      "if": { "type": "array" },
+      "then": { "$ref": "#/$defs/grid_array" },
+      "else": { "$ref": "#/$defs/layout_object" }
+    },
+    "goals": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/goal" },
+      "description": "Win conditions; all must be met unless notes say otherwise."
+    },
+    "moves_or_time_limit": {
+      "type": ["integer", "object", "null"],
+      "minimum": 0,
+      "description": "Limit: an integer move limit, an object {\"moves\": n} and/or {\"time_sec\": s}, or null for unlimited.",
+      "properties": {
+        "moves": { "type": "integer", "minimum": 0, "description": "Move limit." },
+        "time_sec": { "type": "number", "exclusiveMinimum": 0, "description": "Time limit in seconds." }
+      }
+    },
+    "obstacles": {
+      "type": "array",
+      "items": { "type": ["object", "string"] },
+      "description": "Obstacles and blockers: codes or objects such as {\"type\": \"ice\", \"cells\": [[2,3]], \"hp\": 2}."
+    },
+    "difficulty_target": {
+      "type": "object",
+      "description": "Designed difficulty, compared against solver and bot results.",
+      "additionalProperties": true,
+      "properties": {
+        "win_rate": { "$ref": "common.schema.json#/$defs/ratio", "description": "Target first-attempt win rate of an average player." },
+        "attempts_p50": { "type": "number", "minimum": 1, "description": "Target median attempts to win." }
+      }
+    },
+    "solver": {
+      "type": "object",
+      "description": "Results written by puzzle_solver.py / match3_sim.py. Leave fields null until a tool has run.",
+      "additionalProperties": true,
+      "properties": {
+        "solvable": { "type": ["boolean", "null"], "description": "Whether a solution exists under the move limit (null = not yet checked)." },
+        "min_moves": { "type": ["integer", "null"], "minimum": 0, "description": "Length of the shortest solution found." },
+        "bot_win_rate": { "oneOf": [{ "$ref": "common.schema.json#/$defs/ratio" }, { "type": "null" }], "description": "Win rate of the reference bot within the limit, as a ratio." },
+        "runs": { "type": ["integer", "null"], "minimum": 0, "description": "Number of bot runs behind bot_win_rate." }
+      }
+    },
+    "teach": {
+      "type": "string",
+      "enum": ["teach", "test", "twist", "reward"],
+      "description": "Role in the rhythm: teach (introduce safely), test (check mastery), twist (combine or subvert), reward (easy, generous breather)."
+    },
+    "notes": { "type": "string", "description": "Design intent, the expected solution path and known issues." }
+  }
+}

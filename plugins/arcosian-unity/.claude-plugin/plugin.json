@@ -1,0 +1,23 @@
+{
+  "name": "arcosian-unity",
+  "version": "0.3.0",
+  "description": "Unity adapter for arcosian: a Unity-aware C# language server for Claude Code (csharp-ls on the Editor's project files, or on the engine-free assemblies when Unity has not written them), the official Unity CLI (unity mcp / command / eval), CoplayDev unity-mcp notes, and a skill on editor control, tests, play mode, screenshots, builds and the SceneBuilder pattern.",
+  "author": {
+    "name": "samsamurai301",
+    "url": "https://github.com/samsamurai301"
+  },
+  "homepage": "https://github.com/samsamurai301/arcosian/tree/main/plugins/arcosian-unity",
+  "repository": "https://github.com/samsamurai301/arcosian",
+  "license": "MIT",
+  "keywords": [
+    "unity",
+    "unity-cli",
+    "mcp",
+    "csharp",
+    "lsp",
+    "game-development"
+  ],
+  "dependencies": [
+    "arcosian"
+  ]
+}

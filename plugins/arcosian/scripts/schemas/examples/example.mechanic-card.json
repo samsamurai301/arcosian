@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "id": "merge_two",
+  "name": "Merge-two upgrade",
+  "category": "merge",
+  "player_fantasy": "Turning clutter into power: two small things become one mighty thing under your thumb.",
+  "verbs": [
+    { "id": "drag_merge", "input": "drag", "description": "Drag an item onto an identical item to fuse them into the next tier." }
+  ],
+  "rules": [
+    "Two items of the same family and tier merge into one item of tier + 1 on the target cell.",
+    "Merging frees exactly one cell.",
+    "Items at max_tier cannot merge.",
+    "An invalid drop returns the item to its origin cell without penalty."
+  ],
+  "parameters": [
+    { "key": "tier_power_multiplier", "value": 1.9, "min": 1.6, "max": 2.4, "unit": "x", "note": "Power of tier n+1 relative to tier n. Below 2.0 a merge trades total power for space and focus; well below about 1.8 players learn not to merge." },
+    { "key": "max_tier", "value": 7, "min": 5, "max": 9, "unit": "tiers", "note": "Reaching tier n from tier-1 items takes 2^(n-1) of them: 64 for tier 7." },
+    { "key": "board_cells", "value": 30, "min": 25, "max": 36, "unit": "cells", "note": "Board pressure is what makes merge decisions interesting; too many cells removes the tension." }
+  ],
+  "dynamics": [
+    "Board pressure: a full board forces merges even when holding pairs for later would be better.",
+    "Holding pattern: experienced players keep matching pairs unmerged to time power spikes with boss waves.",
+    "Family focus: players bias toward one family to get more merge chances, trading coverage for depth.",
+    "Snowballing: each merge frees a cell, so a good streak accelerates; a bad spawn streak clogs the board."
+  ],
+  "aesthetics": ["challenge", "sensation", "expression", "submission"],
+  "feedback": [
+    "Target cell highlights while dragging; invalid targets dim",
+    "Merge burst in the family colour with a tier-scaled pop",
+    "Pitch of the merge sound rises with tier",
+    "Light haptic on merge, medium from tier 5"
+  ],
+  "failure_modes": [
+    "Board clog from unlucky spawns: detect with bot runs reporting the share of runs with a full board and no legal merge; fix with bag spawning or a shuffle power-up.",
+    "Merge feels like a downgrade when the multiplier is too low: detect when persona playtesters hesitate to merge; check DPS per cell before and after.",
+    "Thumb hides the target cell on small screens: detect mis-drops above 5% in telemetry; fix by offsetting the dragged item upward.",
+    "Tiers unreadable at a glance: detect wrong-merge attempts; fix with tier pips and silhouette growth, not colour alone."
+  ],
+  "mobile_fit": {
+    "one_hand": true,
+    "session_fit": "short",
+    "notes": "Every merge is atomic, so interruptions never lose state; works in portrait with one thumb; needs cells of at least 48 pt."
+  },
+  "references": ["Threes!", "2048", "Merge Dragons!", "Rush Royale", "Merge Mansion"],
+  "combos": ["spawn_bag", "lane_defense"]
+}

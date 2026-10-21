@@ -1,0 +1,26 @@
+# Runs the arcosian gates on every PR. Copy to .github/workflows/plugin-quality.yml.
+# Assumes the arcosian plugin is vendored or checked out at ./plugins/arcosian (adjust GS_ROOT).
+name: studio-quality
+on:
+  pull_request:
+
+env:
+  GS_ROOT: plugins/arcosian
+
+jobs:
+  gs-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Validate every ontology document
+        run: python3 "$GS_ROOT/scripts/gs.py" validate --all
+      - name: Compliance pre-flight
+        run: python3 "$GS_ROOT/scripts/compliance_preflight.py" --json > compliance.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: compliance-report
+          path: compliance.json

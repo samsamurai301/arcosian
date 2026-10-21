@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "godot-satelliteoflove": {
+      "command": "npx",
+      "args": ["-y", "@satelliteoflove/godot-mcp@4.1.11"],
+      "env": {
+        "GODOT_PATH": "${user_config.godot_bin}"
+      }
+    }
+  }
+}

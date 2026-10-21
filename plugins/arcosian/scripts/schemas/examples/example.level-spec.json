@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "level_id": "bonus_005",
+  "mechanic_refs": ["rune_sort"],
+  "layout": {
+    "type": "sort",
+    "capacity": 4,
+    "pour": "max",
+    "colors": ["ember", "moss", "tide", "sun", "dusk"],
+    "tubes": [
+      ["moss", "tide", "sun", "sun"],
+      ["ember", "ember", "dusk", "moss"],
+      ["sun", "sun", "dusk", "tide"],
+      ["ember", "tide", "moss", "dusk"],
+      ["tide", "moss", "dusk", "ember"],
+      [],
+      []
+    ]
+  },
+  "goals": [
+    { "type": "sort_all", "target": null, "count": 5 }
+  ],
+  "moves_or_time_limit": { "moves": 30 },
+  "obstacles": [],
+  "difficulty_target": { "win_rate": 0.9, "attempts_p50": 1 },
+  "solver": {
+    "solvable": true,
+    "min_moves": 13,
+    "bot_win_rate": 0.97,
+    "runs": 200,
+    "algo": "bfs",
+    "states_visited": 1012,
+    "bot": "greedy (prefers pours onto matching tops and tube completions, random tie-break), seed 1, 30-move limit"
+  },
+  "teach": "reward",
+  "notes": "First Rune Sort the player sees (after level 4). 5 colours x 4 runes, 2 empty tubes. Move limit 30 is about 2.3x the 13-move optimum, so it plays as a breather; winning bot runs had a median of 16 moves. Tube 1 opens with a sun pair on top, inviting an obvious first pour into an empty tube."
+}

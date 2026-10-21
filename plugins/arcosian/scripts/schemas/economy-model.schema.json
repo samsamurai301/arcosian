@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Economy model (.gamestudio/economy/*.economy.json)",
+  "description": "A Machinations-style resource-flow model that economy_sim.py runs as a Monte Carlo simulation over player archetypes: resources (pools with caps), nodes (sources, sinks, converters, gates, pools) fired by triggers, a level difficulty curve, purchasable offers and the targets the sim checks. Resource ids should match contract economy.currencies ids.",
+  "type": "object",
+  "required": ["schema_version", "resources", "nodes"],
+  "additionalProperties": true,
+  "$defs": {
+    "trigger": {
+      "type": "string",
+      "enum": ["per_session", "per_minute", "per_level_attempt", "per_level_win", "per_level_loss", "daily", "weekly", "on_purchase", "on_ad"],
+      "description": "When a node fires: per_session (session start), per_minute (of play), per_level_attempt, per_level_win, per_level_loss, daily (first session of a day), weekly, on_purchase (after an offer is bought), on_ad (after a rewarded ad is watched)."
+    }
+  },
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "economy-model", "description": "Optional self-identification for validate_json.py --auto." },
+    "name": { "type": "string", "description": "Optional model name/version label, e.g. \"v1 soft-launch baseline\"." },
+    "days": { "type": "integer", "minimum": 1, "maximum": 3650, "description": "Simulated horizon in days (economy_sim.py --days overrides). 30-90 covers early-game balance; use 180+ for content-runway questions." },
+    "archetypes": {
+      "type": "array",
+      "description": "Player archetypes simulated in parallel; shares should sum to 1.0.",
+      "items": {
+        "type": "object",
+        "description": "A player archetype: behaviour parameters for the simulator.",
+        "required": ["id", "share"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/id", "description": "Archetype id, e.g. \"casual_free\", \"engaged_free\", \"payer\"." },
+          "share": { "$ref": "common.schema.json#/$defs/ratio", "description": "Share of the player population (all shares sum to 1.0)." },
+          "sessions_per_day": { "type": "number", "exclusiveMinimum": 0, "description": "Average sessions per active day." },
+          "session_minutes": { "type": "number", "exclusiveMinimum": 0, "description": "Average session length in minutes." },
+          "skill": { "$ref": "common.schema.json#/$defs/ratio", "description": "Relative skill 0-1; 0.5 plays at the designed base_win_rate, higher wins more often." },
+          "spend_propensity": { "$ref": "common.schema.json#/$defs/ratio", "description": "Probability of buying an offer when its trigger fires." },
+          "ad_accept_rate": { "$ref": "common.schema.json#/$defs/ratio", "description": "Probability of accepting an optional rewarded ad when offered." }
+        }
+      }
+    },
+    "resources": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Resources (pools) tracked per simulated player.",
+      "items": {
+        "type": "object",
+        "description": "One resource and its starting state.",
+        "required": ["id"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/id", "description": "Resource id, e.g. \"coins\"; node inputs/outputs and offer contents use it." },
+          "initial": { "type": "number", "minimum": 0, "description": "Starting balance for a new player." },
+          "cap": { "type": ["number", "null"], "minimum": 0, "description": "Maximum balance (overflow is lost and reported), or null for uncapped." }
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Flow nodes. A node fires on its trigger, with optional probability and condition, consuming inputs and producing outputs.",
+      "items": {
+        "type": "object",
+        "description": "One flow node.",
+        "required": ["id", "kind", "trigger"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/id", "description": "Node id, e.g. \"level_win_reward\"." },
+          "kind": {
+            "type": "string",
+            "enum": ["source", "sink", "converter", "gate", "pool"],
+            "description": "source (creates resources from nothing), sink (destroys them), converter (inputs to outputs), gate (fires only when inputs are affordable / condition holds, e.g. unlocks), pool (accumulates for later release, e.g. a piggy bank)."
+          },
+          "trigger": { "$ref": "#/$defs/trigger", "description": "When the node fires." },
+          "inputs": { "$ref": "common.schema.json#/$defs/resource_amounts", "description": "Resources consumed per firing; the node is skipped when the player cannot afford them." },
+          "outputs": { "$ref": "common.schema.json#/$defs/resource_amounts", "description": "Resources produced per firing." },
+          "probability": { "$ref": "common.schema.json#/$defs/ratio", "description": "Chance the node fires when triggered (default 1.0). Use it for drop rates and voluntary behaviour such as spending." },
+          "condition": {
+            "type": "string",
+            "description": "Optional guard expression, e.g. \"day >= 2\" or \"stars >= 3\". Keep to comparisons of resource ids and simulator variables (day, level, session) joined by and/or; economy_sim.py defines the exact grammar it evaluates."
+          },
+          "note": { "type": "string", "description": "Design intent of the node." }
+        }
+      }
+    },
+    "levels": {
+      "type": "object",
+      "description": "Level progression used by the per_level_* triggers.",
+      "additionalProperties": true,
+      "properties": {
+        "count": { "$ref": "common.schema.json#/$defs/non_negative_integer", "description": "Number of levels available (content runway)." },
+        "base_win_rate": { "$ref": "common.schema.json#/$defs/ratio", "description": "First-attempt win rate of an average-skill player before the difficulty curve applies." },
+        "difficulty_curve": {
+          "type": "object",
+          "description": "Shape of difficulty over levels (difficulty_curve.py generates and analyses these).",
+          "additionalProperties": true,
+          "properties": {
+            "type": { "type": "string", "enum": ["linear", "sawtooth", "stepped", "custom"], "description": "Curve family." },
+            "params": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "Curve parameters, e.g. {\"base\": 0.85, \"floor\": 0.45, \"period\": 10, \"hard_every\": 10} matching difficulty_curve.py options, or {\"win_rates\": [...]} for custom."
+            }
+          }
+        }
+      }
+    },
+    "offers": {
+      "type": "array",
+      "description": "Purchasable offers the simulator may present.",
+      "items": {
+        "type": "object",
+        "description": "One offer.",
+        "required": ["id", "price_usd"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/id", "description": "Offer id; should match a contract monetization.iap id." },
+          "price_usd": { "$ref": "common.schema.json#/$defs/usd", "description": "Price in USD." },
+          "contents": { "$ref": "common.schema.json#/$defs/resource_amounts", "description": "Resources granted." },
+          "trigger": { "type": "string", "description": "When the offer is shown: a node trigger name (e.g. \"per_level_loss\") or a condition such as \"level >= 6\"." }
+        }
+      }
+    },
+    "targets": {
+      "type": "object",
+      "description": "Health targets the simulation is checked against.",
+      "additionalProperties": true,
+      "properties": {
+        "days_to_complete_content": { "type": "number", "exclusiveMinimum": 0, "description": "Days a median engaged player should need to finish all levels; shorter means content runs out." },
+        "max_soft_currency_hoard_days": { "type": "number", "minimum": 0, "description": "Soft currency balance should never exceed this many days of typical income; larger hoards mean sinks are too weak." },
+        "payer_conversion": { "$ref": "common.schema.json#/$defs/ratio", "description": "Expected share of players who buy at least once over the horizon." }
+      }
+    }
+  }
+}

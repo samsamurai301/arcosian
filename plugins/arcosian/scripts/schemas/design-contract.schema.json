@@ -1,0 +1,420 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Design contract (.gamestudio/contract.json)",
+  "description": "The one-page truth of the game: fantasy, verbs, mechanics, loops, economy, progression, content, FTUE, UX, art and audio direction, monetization, live-ops, analytics targets, technical budgets, scope, risks and kill criteria. Owned by the principal agent; every other document must stay consistent with it. Only schema_version and meta.title are required so a contract can grow section by section; design-review flags empty sections.",
+  "type": "object",
+  "required": ["schema_version", "meta"],
+  "additionalProperties": true,
+  "$defs": {
+    "currency": {
+      "type": "object",
+      "description": "A currency or countable resource the player owns.",
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id", "description": "Currency id, e.g. \"coins\". Economy-model resources use the same ids." },
+        "kind": {
+          "type": "string",
+          "enum": ["soft", "hard", "premium", "energy", "event", "xp", "material"],
+          "description": "soft (earned freely, high volume), hard (scarce, earnable and purchasable), premium (purchase-only), energy (gates play time; use sparingly), event (expires with a live event), xp (progress, never spent), material (crafting or upgrade input)."
+        },
+        "sources": { "$ref": "common.schema.json#/$defs/string_list", "description": "Where the currency comes from (faucets), e.g. \"level win\", \"daily login\", \"IAP\"." },
+        "sinks": { "$ref": "common.schema.json#/$defs/string_list", "description": "Where it goes (drains), e.g. \"golem upgrades\", \"continues\". A currency without a sink inflates." },
+        "cap": { "type": ["number", "null"], "minimum": 0, "description": "Maximum balance, or null for uncapped. Caps on energy and event currencies stop hoarding." }
+      }
+    },
+    "track": {
+      "type": "object",
+      "description": "A progression track: a counter that grows along a curve and unlocks content at thresholds.",
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id", "description": "Track id, e.g. \"player_level\", \"keep_restoration\"." },
+        "type": {
+          "type": "string",
+          "description": "Track kind. Suggested: player_level, chapter, collection, character_level, mastery, battle_pass, prestige, story."
+        },
+        "curve": {
+          "type": "object",
+          "description": "Cost or requirement curve of the track. progression_calc.py evaluates the standard formulas.",
+          "additionalProperties": true,
+          "properties": {
+            "formula": {
+              "type": "string",
+              "description": "Curve family: linear, poly, exp, logistic, piecewise (names used by progression_calc.py), or an explicit expression in n, e.g. \"100 * 1.15^(n-1)\"."
+            },
+            "params": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "Curve parameters, e.g. {\"base\": 100, \"growth\": 1.15}."
+            }
+          }
+        },
+        "unlocks": {
+          "type": "array",
+          "description": "Content unlocked along the track, in ascending order of at.",
+          "items": {
+            "type": "object",
+            "description": "One unlock threshold.",
+            "required": ["at", "unlock"],
+            "properties": {
+              "at": { "type": ["number", "string"], "description": "Track value at which the unlock happens (e.g. 5), or a condition string." },
+              "unlock": { "type": "string", "minLength": 1, "description": "What becomes available (feature, mechanic, world, currency)." }
+            }
+          }
+        }
+      }
+    },
+    "ftue_step": {
+      "type": "object",
+      "description": "One onboarding beat. Each beat teaches by doing within max_seconds.",
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id", "description": "Step id; becomes the step parameter of the tutorial analytics event." },
+        "goal": { "type": "string", "description": "What the player achieves in this beat." },
+        "teaches": { "$ref": "common.schema.json#/$defs/text_or_list", "description": "Verb or mechanic ids (or plain concepts) this beat teaches." },
+        "max_seconds": { "type": "number", "exclusiveMinimum": 0, "description": "Time budget for the beat; playtests flag beats that exceed it." }
+      }
+    },
+    "iap_product": {
+      "type": "object",
+      "description": "An in-app purchase product.",
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id", "description": "Product id (later mapped to store product ids)." },
+        "type": {
+          "type": "string",
+          "enum": ["currency_pack", "starter_pack", "bundle", "offer", "remove_ads", "battle_pass", "subscription", "cosmetic", "consumable", "non_consumable", "other"],
+          "description": "Merchandising type. Store billing type follows: remove_ads and permanent cosmetics are non-consumable, subscription is auto-renewing, the rest are usually consumable."
+        },
+        "price_tier": { "type": ["number", "string"], "description": "Reference price in USD (e.g. 4.99) or a store price-tier label. Localised prices come from the store." },
+        "contents": {
+          "type": ["object", "array", "string"],
+          "additionalProperties": { "type": "number" },
+          "items": { "type": "string" },
+          "description": "What the player receives: a resource map {\"gems\": 300}, a list of items, or a description."
+        }
+      }
+    },
+    "ad_placement": {
+      "type": ["string", "object"],
+      "description": "A rewarded-ad placement: an id string or an object with details.",
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id", "description": "Placement id, e.g. \"results_double_coins\"." },
+        "location": { "type": "string", "description": "Screen or moment where the offer appears." },
+        "reward": { "type": ["string", "object"], "additionalProperties": { "type": "number" }, "description": "What watching grants, e.g. {\"coins\": 40} or \"revive with 1 heart\"." },
+        "cap_per_day": { "type": "integer", "minimum": 0, "description": "Maximum views per player per day for this placement." }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "description": "A project risk with its mitigation.",
+      "required": ["risk"],
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id", "description": "Risk id, e.g. \"R1\"." },
+        "risk": { "type": "string", "minLength": 1, "description": "What could go wrong, stated as a cause and an effect." },
+        "likelihood": { "$ref": "common.schema.json#/$defs/likelihood_impact", "description": "How likely it is." },
+        "impact": { "$ref": "common.schema.json#/$defs/likelihood_impact", "description": "How bad it would be." },
+        "mitigation": { "type": "string", "description": "What we do now to reduce it, and the trigger for the fallback plan." }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "design-contract", "description": "Optional self-identification for validate_json.py --auto." },
+    "meta": {
+      "type": "object",
+      "description": "Identity and positioning of the game.",
+      "required": ["title"],
+      "additionalProperties": true,
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 100, "description": "Working title." },
+        "logline": { "type": "string", "maxLength": 300, "description": "One sentence: who you are, what you do, why it is fun." },
+        "genre": { "type": "string", "description": "Market genre, e.g. \"puzzle\", \"hybrid-casual\", \"strategy\"." },
+        "subgenre": { "type": "string", "description": "Market subgenre, e.g. \"merge tower defense\", \"match-3 with renovation meta\"." },
+        "platforms": { "$ref": "common.schema.json#/$defs/platform_list", "description": "Target platforms." },
+        "orientation": { "$ref": "common.schema.json#/$defs/orientation", "description": "Screen orientation." },
+        "engine": { "$ref": "common.schema.json#/$defs/engine", "description": "Engine; must match config.json." },
+        "target_audience": { "$ref": "common.schema.json#/$defs/target_audience", "description": "Who the game is for." },
+        "session_length_target_sec": { "type": "number", "minimum": 10, "maximum": 7200, "description": "Intended typical session length in seconds; mobile casual usually 60-300." },
+        "monetization_model": { "$ref": "common.schema.json#/$defs/monetization_model", "description": "Primary business model." },
+        "analogy": { "type": "string", "description": "Positioning as \"X meets Y\" (see skill analogy-engine), e.g. \"Rush Royale meets Royal Match\"." },
+        "comparables": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/comparable" },
+          "description": "Reference games with what we borrow and what we change."
+        },
+        "pillars": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 5,
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true,
+          "description": "3-5 design pillars: short, opinionated statements used to accept or reject every feature."
+        }
+      }
+    },
+    "player_fantasy": { "type": "string", "description": "The fantasy the player lives, in the second person (\"You are...\"). Every mechanic should serve it." },
+    "verbs": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/verb" },
+      "description": "Player verbs; keep the core set at 1-3 for casual mobile."
+    },
+    "mechanics": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/mechanic" },
+      "description": "Mechanics: verbs bound to rules and tunable parameters."
+    },
+    "loops": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/loop" },
+      "description": "Loop graphs. Expect at least a core loop and a meta loop."
+    },
+    "economy": {
+      "type": "object",
+      "description": "Currencies and the pointer to the simulated economy model.",
+      "additionalProperties": true,
+      "properties": {
+        "currencies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/currency" },
+          "description": "Every currency or countable resource; keep the count low (3-4 is typical for casual)."
+        },
+        "model_ref": { "$ref": "common.schema.json#/$defs/path", "description": "Path to the economy model, e.g. \".gamestudio/economy/v1.economy.json\" (economy-model.schema.json)." }
+      }
+    },
+    "progression": {
+      "type": "object",
+      "description": "Progression tracks and the difficulty model.",
+      "additionalProperties": true,
+      "properties": {
+        "tracks": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/track" },
+          "description": "Progression tracks."
+        },
+        "difficulty": {
+          "type": "object",
+          "description": "How challenge evolves and adapts.",
+          "additionalProperties": true,
+          "properties": {
+            "model": { "type": "string", "description": "Curve shape and rationale, e.g. \"sawtooth: 9 levels ramp then 1 hard level, period 10\" (difficulty_curve.py patterns: linear, sawtooth, stepped)." },
+            "target_win_rate": { "$ref": "common.schema.json#/$defs/ratio", "description": "Average first-attempt win rate the curve aims for, as a ratio." },
+            "dda": {
+              "type": ["boolean", "string", "object"],
+              "description": "Dynamic difficulty adjustment: false for none, or a description / object with trigger, adjustment and bounds. Must never be tied to spending."
+            }
+          }
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "description": "Content volume and production method.",
+      "additionalProperties": true,
+      "properties": {
+        "levels": {
+          "type": "object",
+          "description": "Level content plan.",
+          "additionalProperties": true,
+          "properties": {
+            "target_count": { "$ref": "common.schema.json#/$defs/non_negative_integer", "description": "Levels needed for the current scope tier." },
+            "generation": { "type": "string", "enum": ["handmade", "procedural", "hybrid"], "description": "handmade, procedural (generator plus solver validation), or hybrid (generated then curated)." },
+            "spec_ref": { "$ref": "common.schema.json#/$defs/path", "description": "Folder or file with level specs, e.g. \".gamestudio/levels/\" (level-spec.schema.json)." }
+          }
+        },
+        "worlds": {
+          "type": ["integer", "array"],
+          "minimum": 0,
+          "items": { "type": ["string", "object"] },
+          "description": "World / chapter count, or a list of world names or objects."
+        },
+        "characters": {
+          "type": ["integer", "array"],
+          "minimum": 0,
+          "items": { "type": ["string", "object"] },
+          "description": "Character count, or a list of character names or objects."
+        }
+      }
+    },
+    "ftue": {
+      "type": "object",
+      "description": "First-time user experience plan.",
+      "additionalProperties": true,
+      "properties": {
+        "aha_seconds_target": { "type": "number", "exclusiveMinimum": 0, "description": "Seconds from first launch to the first moment of real fun. Practitioner guidance treats more than about 90 s as a retention risk." },
+        "steps": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ftue_step" },
+          "description": "Onboarding beats in order."
+        }
+      }
+    },
+    "ux": {
+      "type": "object",
+      "description": "UX plan: HUD, screens, accessibility. Free-form, detailed in the UX docs.",
+      "additionalProperties": true,
+      "properties": {
+        "hud": { "type": ["string", "array", "object"], "description": "HUD elements and their placement (thumb zone, safe areas)." },
+        "screens": { "type": ["array", "object", "string"], "description": "Screen list or flow, e.g. [\"home\", \"battle\", \"results\", \"keep\", \"shop\", \"settings\"]." },
+        "accessibility": { "type": ["array", "object", "string"], "description": "Accessibility commitments, e.g. colour-blind-safe palette, text scaling, reduced motion, haptics toggle." }
+      }
+    },
+    "art_direction": {
+      "type": "object",
+      "description": "Visual direction summary; details live in the style bible.",
+      "additionalProperties": true,
+      "properties": {
+        "style": { "type": "string", "description": "Style in a few words, e.g. \"chunky hand-painted 2D, soft outlines, top-down 3/4\"." },
+        "palette": {
+          "type": ["string", "array"],
+          "items": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$" },
+          "description": "Palette as hex colours (\"#RRGGBB\") or a verbal description string."
+        },
+        "references": { "$ref": "common.schema.json#/$defs/string_list", "description": "Reference images (paths/URLs) or games for the look." },
+        "bible_ref": { "$ref": "common.schema.json#/$defs/path", "description": "Path to the style bible document." }
+      }
+    },
+    "audio_direction": {
+      "type": "object",
+      "description": "Audio direction summary; details live in the audio bible.",
+      "additionalProperties": true,
+      "properties": {
+        "music": { "type": ["string", "object"], "description": "Music direction: genre, tempo, instrumentation, adaptivity." },
+        "sfx": { "type": ["string", "object"], "description": "SFX direction: palette, priority rules, UI sound language." },
+        "voice": { "type": ["string", "object", "null"], "description": "Voice direction, or null for no voice." },
+        "bible_ref": { "$ref": "common.schema.json#/$defs/path", "description": "Path to the audio bible document." }
+      }
+    },
+    "monetization": {
+      "type": "object",
+      "description": "IAP catalogue, ad rules, pass, and the ethics rules that constrain them all.",
+      "additionalProperties": true,
+      "properties": {
+        "iap": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/iap_product" },
+          "description": "In-app purchase products."
+        },
+        "ads": {
+          "type": "object",
+          "description": "Ad placements and pacing.",
+          "additionalProperties": true,
+          "properties": {
+            "rewarded": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/ad_placement" },
+              "description": "Opt-in rewarded placements."
+            },
+            "interstitial": {
+              "type": ["object", "null"],
+              "description": "Interstitial pacing, or null for none.",
+              "additionalProperties": true,
+              "properties": {
+                "min_interval_sec": { "type": "number", "minimum": 0, "description": "Minimum seconds between two interstitials." },
+                "first_after_sec": { "type": "number", "minimum": 0, "description": "No interstitial before this many seconds of cumulative play (protects the FTUE)." }
+              }
+            }
+          }
+        },
+        "pass": { "type": ["object", "string", "boolean", "null"], "description": "Season / battle pass design, or null / false for none." },
+        "ethics": { "$ref": "common.schema.json#/$defs/string_list", "description": "Binding monetization ethics rules, e.g. odds disclosure, no fake urgency, protections for minors." }
+      }
+    },
+    "liveops": {
+      "type": "object",
+      "description": "Live-operations plan.",
+      "additionalProperties": true,
+      "properties": {
+        "cadence": { "type": ["string", "object"], "description": "Rhythm of events and updates, e.g. \"weekend event weekly, 4-week season, content drop monthly\"." },
+        "events": { "type": "array", "items": { "type": ["string", "object"] }, "description": "Event types (names or objects with id, type, duration, reward)." }
+      }
+    },
+    "analytics": {
+      "type": "object",
+      "description": "KPI targets and the event taxonomy pointer.",
+      "additionalProperties": true,
+      "properties": {
+        "kpi_targets": {
+          "type": "object",
+          "description": "Targets the game must hit to graduate tiers. Retention and conversion are ratios (0.40 = 40%).",
+          "additionalProperties": true,
+          "properties": {
+            "d1": { "$ref": "common.schema.json#/$defs/ratio", "description": "Day-1 retention target." },
+            "d7": { "$ref": "common.schema.json#/$defs/ratio", "description": "Day-7 retention target." },
+            "d30": { "$ref": "common.schema.json#/$defs/ratio", "description": "Day-30 retention target." },
+            "session_len_sec": { "type": "number", "minimum": 0, "description": "Target average session length in seconds." },
+            "sessions_per_day": { "type": "number", "minimum": 0, "description": "Target sessions per daily active user." },
+            "arpdau_usd": { "$ref": "common.schema.json#/$defs/usd", "description": "Target average revenue per daily active user, USD (IAP plus ads)." },
+            "payer_conversion": { "$ref": "common.schema.json#/$defs/ratio", "description": "Target share of users who ever pay." }
+          }
+        },
+        "taxonomy_ref": { "$ref": "common.schema.json#/$defs/path", "description": "Path to the event taxonomy, e.g. \".gamestudio/analytics/events.taxonomy.json\"." }
+      }
+    },
+    "technical": {
+      "type": "object",
+      "description": "Technical constraints and budgets.",
+      "additionalProperties": true,
+      "properties": {
+        "architecture": {
+          "type": "string",
+          "default": "sim-core+presentation",
+          "description": "Architecture style. Default \"sim-core+presentation\": deterministic, engine-independent simulation plus a presentation layer."
+        },
+        "deterministic": { "type": "boolean", "description": "Whether the simulation is deterministic given a seed and input stream (needed for scripted playthroughs and replays)." },
+        "min_spec": {
+          "type": "object",
+          "description": "Minimum supported device.",
+          "additionalProperties": true,
+          "properties": {
+            "ram_gb": { "type": "number", "exclusiveMinimum": 0, "description": "Minimum device RAM in GB." },
+            "gpu_class": { "type": "string", "description": "Minimum GPU class, e.g. \"Mali-G52 / Adreno 610 class\"." },
+            "os_min": {
+              "type": "object",
+              "description": "Minimum OS versions.",
+              "additionalProperties": true,
+              "properties": {
+                "ios": { "type": "string", "pattern": "^\\d+(\\.\\d+){0,2}$", "description": "Minimum iOS version, e.g. \"15.0\"." },
+                "android_api": { "type": "integer", "minimum": 1, "maximum": 99, "description": "Minimum Android API level (minSdkVersion), e.g. 24." }
+              }
+            }
+          }
+        },
+        "perf_budgets": {
+          "type": "object",
+          "description": "Performance budgets on the reference device tier; the perf gate compares perf reports against them.",
+          "additionalProperties": true,
+          "properties": {
+            "fps_target": { "type": "integer", "minimum": 15, "maximum": 240, "description": "Target frame rate (30 or 60 typical; higher only with an explicit battery decision)." },
+            "frame_ms_p95": { "type": "number", "exclusiveMinimum": 0, "description": "95th-percentile frame time budget in ms (16.6 for 60 fps, 33.3 for 30 fps)." },
+            "memory_mb": { "type": "number", "exclusiveMinimum": 0, "description": "Peak resident memory budget in MB on the reference device." },
+            "download_mb": { "type": "number", "exclusiveMinimum": 0, "description": "Install download size budget in MB." },
+            "cold_start_sec": { "type": "number", "exclusiveMinimum": 0, "description": "Cold start to interactive budget in seconds." }
+          }
+        },
+        "backend": { "type": "string", "enum": ["none", "firebase", "nakama", "playfab", "custom"], "description": "Backend services choice." },
+        "multiplayer": { "type": "string", "enum": ["none", "async", "realtime"], "description": "Multiplayer model." }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "description": "Scope for the current tier as explicit must / should / won't lists.",
+      "additionalProperties": true,
+      "properties": {
+        "tier": { "$ref": "common.schema.json#/$defs/tier", "description": "Tier this scope applies to." },
+        "must": { "$ref": "common.schema.json#/$defs/string_list", "description": "Must-haves; the tier fails without them." },
+        "should": { "$ref": "common.schema.json#/$defs/string_list", "description": "Should-haves; first to be cut." },
+        "wont": { "$ref": "common.schema.json#/$defs/string_list", "description": "Explicitly out of scope for this tier." }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/risk" },
+      "description": "Top risks with mitigations."
+    },
+    "kill_criteria": {
+      "$ref": "common.schema.json#/$defs/string_list",
+      "description": "Measurable conditions under which the project stops or pivots, e.g. \"D1 < 0.30 after two FTUE iterations in soft launch\"."
+    }
+  }
+}

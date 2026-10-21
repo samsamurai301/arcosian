@@ -1,0 +1,41 @@
+# Contributing to Arcosian
+
+Thanks for helping. Arcosian is MIT-licensed, and contributions are accepted under the same licence.
+
+## Layout
+
+| Path | What it holds |
+|---|---|
+| `plugins/arcosian/` | Core plugin: skills, agents, workflows, Python tools and schemas, hooks, the `studio-gateway` MCP server, templates, docs |
+| `plugins/arcosian-*/` | Adapters: engines (Godot, Unity, Blender), asset and audio vendors, commerce services |
+| `evals/arcosian/` | Cases for `claude plugin eval` |
+| `docs/BLUEPRINT.md` | The design contract every component follows |
+| `docs/research/` | The research the design is based on |
+
+## Conventions
+
+- **Python**: standard library only, compatible with Python 3.9.
+- **Node**: no npm dependencies (gateway, language-server bridges, hook launcher).
+- **Paths**: reference plugin files as `${CLAUDE_PLUGIN_ROOT}/...`; hooks use exec form (`node` plus `run-python.mjs`), so they need no shell on any system.
+- **Packages**: pin anything an MCP server runs through `npx` or `uvx` to an exact version.
+- **Facts that change** (prices, versions, policies): put them in the skill's "Volatile facts" section with a source and date.
+- **Secrets**: never in files, examples included; ask for them through a sensitive `userConfig` option.
+- **Writing**: plain, specific English; procedures, decision tables and worked examples over general advice.
+
+## Checks before a pull request
+
+```bash
+python3 plugins/arcosian/hooks/tests/test_hooks.py
+node plugins/arcosian/mcp/studio-gateway/test/run-tests.mjs
+python3 plugins/arcosian/scripts/audit_plugin.py --root plugins/arcosian
+for f in plugins/arcosian/scripts/*.py plugins/arcosian/skills/*/scripts/*.py; do python3 "$f" --selftest >/dev/null || echo "FAIL $f"; done
+claude plugin validate --strict plugins/arcosian
+```
+
+With Godot 4 and csharp-ls installed, also run the language-server self-tests from a copy of each template (commands in the adapters' READMEs). CI runs all of this on macOS, Linux and Windows for every pull request.
+
+## Releases
+
+- Raise `version` in the `plugin.json` of every plugin you changed: users only receive an update when it changes.
+- Add an entry to `plugins/arcosian/docs/CHANGELOG.md` that says what changed, what was verified and what was not.
+- Never rename a published plugin; change `displayName` instead.

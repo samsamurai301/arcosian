@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "cap_usd": 50,
+  "spent_usd": 0.42,
+  "ledger": [
+    {
+      "ts": "2026-10-12T09:14:03Z",
+      "tool": "image_generate",
+      "provider": "gemini",
+      "model": "gemini-3.1-flash-image",
+      "cost_usd": 0.134,
+      "asset_ids": ["spr_golem_flint_t1", "spr_golem_flint_t1_alt"],
+      "note": "n=2 at 1K; estimated from pricing.json list price"
+    },
+    {
+      "ts": "2026-10-12T09:21:40Z",
+      "tool": "image_edit",
+      "provider": "gemini",
+      "model": "gemini-3.1-flash-image",
+      "cost_usd": 0.067,
+      "asset_ids": ["spr_golem_flint_t2"],
+      "note": "tier-2 variant from the approved tier-1 sprite"
+    },
+    {
+      "ts": "2026-10-12T10:02:11Z",
+      "tool": "image_generate",
+      "provider": "gemini",
+      "model": "gemini-3.1-flash-image",
+      "cost_usd": 0.067,
+      "asset_ids": ["bg_mossy_garden"],
+      "note": "battle background, portrait"
+    },
+    {
+      "ts": "2026-10-12T10:05:00Z",
+      "tool": "image_generate",
+      "provider": "mock",
+      "model": null,
+      "cost_usd": 0,
+      "asset_ids": ["ui_spawn_button"],
+      "note": "GS_MOCK=1 placeholder, no charge"
+    },
+    {
+      "ts": "2026-10-13T15:40:22Z",
+      "tool": "audio_sfx",
+      "provider": "elevenlabs",
+      "model": "eleven_text_to_sound_v2",
+      "cost_usd": 0.002,
+      "asset_ids": ["sfx_merge_clack_t1"],
+      "note": "1.0 s at the per-minute list price"
+    },
+    {
+      "ts": "2026-10-13T16:02:57Z",
+      "tool": "audio_music",
+      "provider": "elevenlabs",
+      "model": "music_v2",
+      "cost_usd": 0.15,
+      "asset_ids": ["mus_battle_loop"],
+      "note": "60 s instrumental at the per-minute list price"
+    }
+  ]
+}

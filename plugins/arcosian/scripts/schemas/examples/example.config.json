@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "title": "Pebble Keep",
+    "slug": "pebble-keep"
+  },
+  "engine": "godot",
+  "engine_version": "4.5",
+  "platforms": ["ios", "android"],
+  "orientation": "portrait",
+  "paths": {
+    "project_root": "game",
+    "assets_dir": "assets/",
+    "generated_dir": "assets/generated/"
+  },
+  "budgets": {
+    "asset_usd_cap": 50,
+    "per_call_usd_cap": 2
+  },
+  "revenue": {
+    "lifetime_gross_usd": 0,
+    "developer_annual_games_revenue_usd": 0
+  },
+  "storefronts": ["US", "CA", "GB", "DE", "NL", "PH"],
+  "licence_allowlist": ["CC0-1.0", "provider-commercial", "handmade"],
+  "compliance": {
+    "privacy_policy_url": "https://example.com/pebble-keep/privacy",
+    "accounts": false,
+    "att_usage_description": "Pebble Keep uses your device's advertising identifier to show ads that fit your interests. You can say no and play the same game.",
+    "coppa": { "child_directed": false }
+  },
+  "providers": {
+    "image": "gemini",
+    "model3d": null,
+    "music": "elevenlabs",
+    "sfx": "elevenlabs",
+    "voice": null
+  },
+  "tier": "prototype"
+}

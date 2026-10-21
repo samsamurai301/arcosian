@@ -1,0 +1,727 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Feature list with five-gate status (.gamestudio/features.json)",
+  "description": "The backlog and the machine-checkable definition of done. Each feature moves todo -> in_progress -> done and may only be done (passes true) when the five gates static, unit, playthrough, visual and perf are each \"pass\" (with evidence) or \"n/a\" (with a gate note). Hooks and gs.py additionally check that evidence files exist on disk; the schema enforces the structural rules. gates, evidence and gate_notes reject unknown keys because a typo there would silently bypass enforcement.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "features"
+  ],
+  "additionalProperties": true,
+  "$defs": {
+    "gate_name": {
+      "type": "string",
+      "enum": [
+        "static",
+        "unit",
+        "playthrough",
+        "visual",
+        "perf"
+      ],
+      "description": "One of the five gates, in pipeline order: static, unit, playthrough, visual, perf."
+    },
+    "gate_status": {
+      "enum": [
+        null,
+        "pass",
+        "fail",
+        "n/a"
+      ],
+      "description": "Gate result: null (not run yet), \"pass\", \"fail\", or \"n/a\" (does not apply; needs a gate_notes entry)."
+    },
+    "evidence_ref": {
+      "type": [
+        "string",
+        "array",
+        "null"
+      ],
+      "pattern": "^(?![/\\\\])(?![A-Za-z]:)(?!.*(^|[/\\\\])\\.\\.([/\\\\]|$)).+$",
+      "items": {
+        "$ref": "common.schema.json#/$defs/project_rel_path"
+      },
+      "uniqueItems": true,
+      "description": "Project-relative evidence path, a list of paths, or null. Paths start at the game project root, e.g. \".gamestudio/evidence/F012/playthrough.json\"; absolute paths and '..' are rejected."
+    },
+    "gates": {
+      "type": "object",
+      "description": "Result of each of the five gates. Unknown keys are rejected.",
+      "additionalProperties": false,
+      "properties": {
+        "static": {
+          "$ref": "#/$defs/gate_status",
+          "description": "Code parses/compiles, lints clean, schemas validate (Godot --check-only, Unity/Roslyn compile). Evidence: .gamestudio/evidence/<ID>/static.log."
+        },
+        "unit": {
+          "$ref": "#/$defs/gate_status",
+          "description": "Headless unit tests for the feature pass (GdUnit4 / built-in runner, Unity Test Framework). Evidence: unit.xml or unit.log."
+        },
+        "playthrough": {
+          "$ref": "#/$defs/gate_status",
+          "description": "Deterministic scripted playthrough with input injection and state assertions passes, or bot runs meet targets. Evidence: playthrough.json (playtest-report.schema.json)."
+        },
+        "visual": {
+          "$ref": "#/$defs/gate_status",
+          "description": "Screenshots or a clip cleared the critic's rubric (structural UI checks, then VLM review). Evidence: shot_*.png plus visual_review.md."
+        },
+        "perf": {
+          "$ref": "#/$defs/gate_status",
+          "description": "Within the contract's technical.perf_budgets on the reference scenario and device tier. Evidence: perf.json (perf-report.schema.json)."
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Evidence per gate. Every \"pass\" gate of a passing feature needs evidence that exists on disk. Unknown keys are rejected.",
+      "additionalProperties": false,
+      "properties": {
+        "static": {
+          "$ref": "#/$defs/evidence_ref",
+          "description": "Evidence for the static gate."
+        },
+        "unit": {
+          "$ref": "#/$defs/evidence_ref",
+          "description": "Evidence for the unit gate."
+        },
+        "playthrough": {
+          "$ref": "#/$defs/evidence_ref",
+          "description": "Evidence for the playthrough gate."
+        },
+        "visual": {
+          "$ref": "#/$defs/evidence_ref",
+          "description": "Evidence for the visual gate."
+        },
+        "perf": {
+          "$ref": "#/$defs/evidence_ref",
+          "description": "Evidence for the perf gate."
+        }
+      }
+    },
+    "gate_notes": {
+      "type": "object",
+      "description": "Free-text note per gate; mandatory for every \"n/a\" gate. Unknown keys are rejected.",
+      "additionalProperties": false,
+      "properties": {
+        "static": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the static gate is n/a, or context for a fail."
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the unit gate is n/a, or context for a fail."
+        },
+        "playthrough": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the playthrough gate is n/a, or context for a fail."
+        },
+        "visual": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the visual gate is n/a, or context for a fail."
+        },
+        "perf": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Why the perf gate is n/a, or context for a fail."
+        }
+      }
+    },
+    "feature": {
+      "type": "object",
+      "description": "One feature: a vertical slice of player-facing value or an enabling technical task, small enough to pass all gates in one build-feature run.",
+      "required": [
+        "id",
+        "title"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/feature_id",
+          "description": "Feature id, pattern ^F\\d{3,4}$ (e.g. F012). Never reuse an id."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "description": "Short imperative title, e.g. \"Spawn and merge golems\"."
+        },
+        "area": {
+          "type": "string",
+          "enum": [
+            "gameplay",
+            "meta",
+            "ui",
+            "ux",
+            "audio",
+            "art",
+            "vfx",
+            "monetization",
+            "analytics",
+            "liveops",
+            "tech",
+            "perf",
+            "release",
+            "content"
+          ],
+          "description": "Discipline area; routes the feature to the right agents."
+        },
+        "description": {
+          "type": "string",
+          "description": "What and why, from the player's point of view."
+        },
+        "acceptance": {
+          "$ref": "common.schema.json#/$defs/string_list",
+          "description": "Testable acceptance criteria; each should map to a unit test or playthrough assertion."
+        },
+        "depends_on": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/feature_id"
+          },
+          "uniqueItems": true,
+          "description": "Ids of features that must pass first; gs.py feature next only offers features whose dependencies all pass."
+        },
+        "priority": {
+          "type": "string",
+          "enum": [
+            "P0",
+            "P1",
+            "P2"
+          ],
+          "description": "P0 = required for the current tier, P1 = important, P2 = nice to have."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "todo",
+            "in_progress",
+            "blocked",
+            "done"
+          ],
+          "description": "Workflow state. \"done\" requires passes true."
+        },
+        "passes": {
+          "type": "boolean",
+          "description": "True only when every gate is \"pass\" (with existing evidence) or \"n/a\" (with a note). Set by gs.py feature pass, never by hand."
+        },
+        "gates": {
+          "$ref": "#/$defs/gates",
+          "description": "Five-gate results."
+        },
+        "evidence": {
+          "$ref": "#/$defs/evidence",
+          "description": "Evidence paths per gate."
+        },
+        "gate_notes": {
+          "$ref": "#/$defs/gate_notes",
+          "description": "Notes per gate; required for \"n/a\"."
+        },
+        "owner": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Responsible agent (e.g. \"gameplay-engineer\") or person."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Free notes: blockers, decisions, links."
+        }
+      },
+      "allOf": [
+        {
+          "description": "A feature with status \"done\" must have passes true (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "status": {
+                "const": "done"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "passes": {
+                "const": true
+              }
+            },
+            "required": [
+              "passes"
+            ]
+          }
+        },
+        {
+          "description": "passes true requires status \"done\" and every gate set to \"pass\" or \"n/a\" (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "passes": {
+                "const": true
+              }
+            },
+            "required": [
+              "passes"
+            ]
+          },
+          "then": {
+            "required": [
+              "status",
+              "gates"
+            ],
+            "properties": {
+              "status": {
+                "const": "done"
+              },
+              "gates": {
+                "required": [
+                  "static",
+                  "unit",
+                  "playthrough",
+                  "visual",
+                  "perf"
+                ],
+                "properties": {
+                  "static": {
+                    "enum": [
+                      "pass",
+                      "n/a"
+                    ]
+                  },
+                  "unit": {
+                    "enum": [
+                      "pass",
+                      "n/a"
+                    ]
+                  },
+                  "playthrough": {
+                    "enum": [
+                      "pass",
+                      "n/a"
+                    ]
+                  },
+                  "visual": {
+                    "enum": [
+                      "pass",
+                      "n/a"
+                    ]
+                  },
+                  "perf": {
+                    "enum": [
+                      "pass",
+                      "n/a"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "Gate static is \"n/a\", so gate_notes.static must explain why (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "gates": {
+                "properties": {
+                  "static": {
+                    "const": "n/a"
+                  }
+                },
+                "required": [
+                  "static"
+                ]
+              }
+            },
+            "required": [
+              "gates"
+            ]
+          },
+          "then": {
+            "required": [
+              "gate_notes"
+            ],
+            "properties": {
+              "gate_notes": {
+                "required": [
+                  "static"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "description": "Gate unit is \"n/a\", so gate_notes.unit must explain why (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "gates": {
+                "properties": {
+                  "unit": {
+                    "const": "n/a"
+                  }
+                },
+                "required": [
+                  "unit"
+                ]
+              }
+            },
+            "required": [
+              "gates"
+            ]
+          },
+          "then": {
+            "required": [
+              "gate_notes"
+            ],
+            "properties": {
+              "gate_notes": {
+                "required": [
+                  "unit"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "description": "Gate playthrough is \"n/a\", so gate_notes.playthrough must explain why (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "gates": {
+                "properties": {
+                  "playthrough": {
+                    "const": "n/a"
+                  }
+                },
+                "required": [
+                  "playthrough"
+                ]
+              }
+            },
+            "required": [
+              "gates"
+            ]
+          },
+          "then": {
+            "required": [
+              "gate_notes"
+            ],
+            "properties": {
+              "gate_notes": {
+                "required": [
+                  "playthrough"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "description": "Gate visual is \"n/a\", so gate_notes.visual must explain why (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "gates": {
+                "properties": {
+                  "visual": {
+                    "const": "n/a"
+                  }
+                },
+                "required": [
+                  "visual"
+                ]
+              }
+            },
+            "required": [
+              "gates"
+            ]
+          },
+          "then": {
+            "required": [
+              "gate_notes"
+            ],
+            "properties": {
+              "gate_notes": {
+                "required": [
+                  "visual"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "description": "Gate perf is \"n/a\", so gate_notes.perf must explain why (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "gates": {
+                "properties": {
+                  "perf": {
+                    "const": "n/a"
+                  }
+                },
+                "required": [
+                  "perf"
+                ]
+              }
+            },
+            "required": [
+              "gates"
+            ]
+          },
+          "then": {
+            "required": [
+              "gate_notes"
+            ],
+            "properties": {
+              "gate_notes": {
+                "required": [
+                  "perf"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "description": "Feature passes and gate static is \"pass\", so evidence.static must name the evidence file(s) (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "passes": {
+                "const": true
+              },
+              "gates": {
+                "properties": {
+                  "static": {
+                    "const": "pass"
+                  }
+                },
+                "required": [
+                  "static"
+                ]
+              }
+            },
+            "required": [
+              "passes",
+              "gates"
+            ]
+          },
+          "then": {
+            "required": [
+              "evidence"
+            ],
+            "properties": {
+              "evidence": {
+                "required": [
+                  "static"
+                ],
+                "properties": {
+                  "static": {
+                    "type": [
+                      "string",
+                      "array"
+                    ],
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "Feature passes and gate unit is \"pass\", so evidence.unit must name the evidence file(s) (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "passes": {
+                "const": true
+              },
+              "gates": {
+                "properties": {
+                  "unit": {
+                    "const": "pass"
+                  }
+                },
+                "required": [
+                  "unit"
+                ]
+              }
+            },
+            "required": [
+              "passes",
+              "gates"
+            ]
+          },
+          "then": {
+            "required": [
+              "evidence"
+            ],
+            "properties": {
+              "evidence": {
+                "required": [
+                  "unit"
+                ],
+                "properties": {
+                  "unit": {
+                    "type": [
+                      "string",
+                      "array"
+                    ],
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "Feature passes and gate playthrough is \"pass\", so evidence.playthrough must name the evidence file(s) (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "passes": {
+                "const": true
+              },
+              "gates": {
+                "properties": {
+                  "playthrough": {
+                    "const": "pass"
+                  }
+                },
+                "required": [
+                  "playthrough"
+                ]
+              }
+            },
+            "required": [
+              "passes",
+              "gates"
+            ]
+          },
+          "then": {
+            "required": [
+              "evidence"
+            ],
+            "properties": {
+              "evidence": {
+                "required": [
+                  "playthrough"
+                ],
+                "properties": {
+                  "playthrough": {
+                    "type": [
+                      "string",
+                      "array"
+                    ],
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "Feature passes and gate visual is \"pass\", so evidence.visual must name the evidence file(s) (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "passes": {
+                "const": true
+              },
+              "gates": {
+                "properties": {
+                  "visual": {
+                    "const": "pass"
+                  }
+                },
+                "required": [
+                  "visual"
+                ]
+              }
+            },
+            "required": [
+              "passes",
+              "gates"
+            ]
+          },
+          "then": {
+            "required": [
+              "evidence"
+            ],
+            "properties": {
+              "evidence": {
+                "required": [
+                  "visual"
+                ],
+                "properties": {
+                  "visual": {
+                    "type": [
+                      "string",
+                      "array"
+                    ],
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "description": "Feature passes and gate perf is \"pass\", so evidence.perf must name the evidence file(s) (BLUEPRINT section 6).",
+          "if": {
+            "properties": {
+              "passes": {
+                "const": true
+              },
+              "gates": {
+                "properties": {
+                  "perf": {
+                    "const": "pass"
+                  }
+                },
+                "required": [
+                  "perf"
+                ]
+              }
+            },
+            "required": [
+              "passes",
+              "gates"
+            ]
+          },
+          "then": {
+            "required": [
+              "evidence"
+            ],
+            "properties": {
+              "evidence": {
+                "required": [
+                  "perf"
+                ],
+                "properties": {
+                  "perf": {
+                    "type": [
+                      "string",
+                      "array"
+                    ],
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "$ref": "common.schema.json#/$defs/schema_version",
+      "description": "Ontology version; always \"1.0\"."
+    },
+    "$schema_name": {
+      "const": "features",
+      "description": "Optional self-identification for validate_json.py --auto."
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/feature"
+      },
+      "description": "All features, in any order (tools sort by priority and dependencies). Feature ids must be unique (JSON Schema cannot check this across items; gs.py and the hooks are expected to)."
+    }
+  }
+}

@@ -1,0 +1,300 @@
+{
+  "schema_version": "1.0",
+  "features": [
+    {
+      "id": "F001",
+      "title": "Deterministic sim core: board, seeded RNG, spawn bag",
+      "area": "tech",
+      "description": "Engine-independent simulation of the 5x6 board, pebbles, spawn bag and tick loop, reproducible from a seed and an input stream.",
+      "acceptance": [
+        "Same seed and inputs produce an identical state hash after 10,000 ticks",
+        "Spawn bag yields each of 5 families exactly once per 5 spawns",
+        "Sim has no engine node or scene dependencies"
+      ],
+      "depends_on": [],
+      "priority": "P0",
+      "status": "done",
+      "passes": true,
+      "gates": { "static": "pass", "unit": "pass", "playthrough": "n/a", "visual": "n/a", "perf": "pass" },
+      "evidence": {
+        "static": ".gamestudio/evidence/F001/static.log",
+        "unit": ".gamestudio/evidence/F001/unit.xml",
+        "playthrough": null,
+        "visual": null,
+        "perf": ".gamestudio/evidence/F001/perf.json"
+      },
+      "gate_notes": {
+        "playthrough": "No player-facing flow; the sim is exercised end to end by F002 and F003 playthroughs.",
+        "visual": "Pure logic module with nothing rendered.",
+        "perf": "Headless benchmark: 10,000 ticks at max board load within budget on the low-tier device."
+      },
+      "owner": "lead-engineer"
+    },
+    {
+      "id": "F002",
+      "title": "Spawn and merge golems",
+      "area": "gameplay",
+      "description": "Tap Spawn to wake a tier-1 golem; drag onto an identical golem to merge into the next tier.",
+      "acceptance": [
+        "Spawn disabled when the board is full or pebbles are short",
+        "Merging two identical golems yields one golem of tier + 1 on the target cell",
+        "Invalid drops return the golem to its cell"
+      ],
+      "depends_on": ["F001"],
+      "priority": "P0",
+      "status": "done",
+      "passes": true,
+      "gates": { "static": "pass", "unit": "pass", "playthrough": "pass", "visual": "pass", "perf": "pass" },
+      "evidence": {
+        "static": ".gamestudio/evidence/F002/static.log",
+        "unit": ".gamestudio/evidence/F002/unit.xml",
+        "playthrough": ".gamestudio/evidence/F002/playthrough.json",
+        "visual": [".gamestudio/evidence/F002/shot_01.png", ".gamestudio/evidence/F002/visual_review.md"],
+        "perf": ".gamestudio/evidence/F002/perf.json"
+      },
+      "owner": "gameplay-engineer"
+    },
+    {
+      "id": "F003",
+      "title": "Snail waves on the path",
+      "area": "gameplay",
+      "description": "Ten waves of snails crawl around the board; golems auto-attack; leaks cost hearts.",
+      "acceptance": [
+        "Wave 10 spawns the boss, which costs 3 hearts if it leaks",
+        "Golems target the snail nearest the gate within range",
+        "Snail HP grows 12% per wave"
+      ],
+      "depends_on": ["F001"],
+      "priority": "P0",
+      "status": "done",
+      "passes": true,
+      "gates": { "static": "pass", "unit": "pass", "playthrough": "pass", "visual": "pass", "perf": "pass" },
+      "evidence": {
+        "static": ".gamestudio/evidence/F003/static.log",
+        "unit": ".gamestudio/evidence/F003/unit.xml",
+        "playthrough": ".gamestudio/evidence/F003/playthrough.json",
+        "visual": [".gamestudio/evidence/F003/shot_01.png", ".gamestudio/evidence/F003/visual_review.md"],
+        "perf": ".gamestudio/evidence/F003/perf.json"
+      },
+      "owner": "gameplay-engineer"
+    },
+    {
+      "id": "F004",
+      "title": "Hearts, win/lose and results screen",
+      "area": "ui",
+      "description": "Track hearts, end the run on win or loss, show coins and stars earned.",
+      "acceptance": [
+        "Run ends at 0 hearts with the loss screen",
+        "Win grants 1 star and 40 coins and shows both on the results screen",
+        "Results screen buttons sit in the bottom thumb zone"
+      ],
+      "depends_on": ["F002", "F003"],
+      "priority": "P0",
+      "status": "in_progress",
+      "passes": false,
+      "gates": { "static": "pass", "unit": "pass", "playthrough": "fail", "visual": null, "perf": null },
+      "evidence": {
+        "static": ".gamestudio/evidence/F004/static.log",
+        "unit": ".gamestudio/evidence/F004/unit.xml",
+        "playthrough": ".gamestudio/evidence/F004/playthrough.json",
+        "visual": null,
+        "perf": null
+      },
+      "gate_notes": {
+        "playthrough": "Step 14: stars not credited when the last snail dies on the same tick the boss leaks; fix the tie-break order in the sim."
+      },
+      "owner": "gameplay-engineer"
+    },
+    {
+      "id": "F005",
+      "title": "FTUE: guided first three levels",
+      "area": "ux",
+      "description": "Teach spawn, merge and the keep in under 90 seconds with hand-pointer prompts and no text walls.",
+      "acceptance": [
+        "Aha moment (first merge kill) within 45 s for the scripted novice persona",
+        "Every FTUE beat stays within its max_seconds",
+        "tutorial_begin / tutorial_step / tutorial_complete events fire in order"
+      ],
+      "depends_on": ["F002", "F003", "F004"],
+      "priority": "P0",
+      "status": "todo",
+      "passes": false,
+      "gates": { "static": null, "unit": null, "playthrough": null, "visual": null, "perf": null },
+      "owner": "ux-designer"
+    },
+    {
+      "id": "F006",
+      "title": "Rune Sort bonus levels",
+      "area": "content",
+      "description": "Every 5th level is a sort puzzle that pays runes; levels come from level specs validated by puzzle_solver.py.",
+      "acceptance": [
+        "Loads layout.type sort level specs",
+        "Pour rule matches the spec's pour field",
+        "Every shipped bonus level is solver-verified within its move limit"
+      ],
+      "depends_on": ["F001"],
+      "priority": "P1",
+      "status": "in_progress",
+      "passes": false,
+      "gates": { "static": "pass", "unit": "pass", "playthrough": null, "visual": null, "perf": null },
+      "evidence": {
+        "static": ".gamestudio/evidence/F006/static.log",
+        "unit": ".gamestudio/evidence/F006/unit.xml"
+      },
+      "owner": "level-designer"
+    },
+    {
+      "id": "F007",
+      "title": "Keep restoration meta (stars to tasks)",
+      "area": "meta",
+      "description": "Spend stars on visible restoration tasks; completing an area unlocks a golem family.",
+      "acceptance": [
+        "Area 1 has 5 tasks totalling 12 stars",
+        "Completing area 1 unlocks the Moss family and grants 5 gems"
+      ],
+      "depends_on": ["F004"],
+      "priority": "P1",
+      "status": "todo",
+      "passes": false,
+      "owner": "game-designer"
+    },
+    {
+      "id": "F008",
+      "title": "Economy v1 wired to the economy model",
+      "area": "meta",
+      "description": "Coins, gems, stars and runes granted and spent exactly as in .gamestudio/economy/v1.economy.json.",
+      "acceptance": [
+        "Every grant and spend goes through one EconomyService and emits earn/spend events",
+        "economy_sim.py 30-day run meets the model targets"
+      ],
+      "depends_on": ["F004", "F007"],
+      "priority": "P1",
+      "status": "blocked",
+      "passes": false,
+      "gates": { "static": null, "unit": null, "playthrough": null, "visual": null, "perf": null },
+      "owner": "systems-designer",
+      "notes": "Blocked: the balance pass shows coins hoarding past 5 days of income for engaged_free players; waiting on a sink decision."
+    },
+    {
+      "id": "F009",
+      "title": "Combat juice and VFX pass",
+      "area": "vfx",
+      "description": "Merge bursts, snail pops, pebble fly-to-counter, screen shake with the reduced-motion toggle respected.",
+      "acceptance": [
+        "Every player-touched action has visual and audio feedback within 100 ms",
+        "Reduced-motion mode disables screen shake and flashes",
+        "Within perf budgets at wave 10 with a full board"
+      ],
+      "depends_on": ["F002", "F003"],
+      "priority": "P1",
+      "status": "in_progress",
+      "passes": false,
+      "gates": { "static": "pass", "unit": "n/a", "playthrough": "pass", "visual": "pass", "perf": "fail" },
+      "evidence": {
+        "static": ".gamestudio/evidence/F009/static.log",
+        "unit": null,
+        "playthrough": ".gamestudio/evidence/F009/playthrough.json",
+        "visual": [".gamestudio/evidence/F009/shot_01.png", ".gamestudio/evidence/F009/shot_02.png", ".gamestudio/evidence/F009/visual_review.md"],
+        "perf": ".gamestudio/evidence/F009/perf.json"
+      },
+      "gate_notes": {
+        "unit": "Presentation-only feature; behaviour is asserted by the playthrough and visual gates.",
+        "perf": "Peak memory 489 MB > 450 MB budget: uncompressed particle atlases; see perf.json."
+      },
+      "owner": "technical-artist"
+    },
+    {
+      "id": "F010",
+      "title": "Analytics taxonomy and engine stubs",
+      "area": "analytics",
+      "description": "Event taxonomy from the contract plus generated GDScript stubs behind one Analytics service.",
+      "acceptance": [
+        "events.taxonomy.json validates",
+        "Stubs generated by event_taxonomy.py compile",
+        "Debug builds assert required parameters"
+      ],
+      "depends_on": ["F001"],
+      "priority": "P1",
+      "status": "done",
+      "passes": true,
+      "gates": { "static": "pass", "unit": "pass", "playthrough": "n/a", "visual": "n/a", "perf": "n/a" },
+      "evidence": {
+        "static": ".gamestudio/evidence/F010/static.log",
+        "unit": ".gamestudio/evidence/F010/unit.xml",
+        "playthrough": null,
+        "visual": null,
+        "perf": null
+      },
+      "gate_notes": {
+        "playthrough": "No gameplay change; event firing is covered by unit tests with a fake transport.",
+        "visual": "No UI.",
+        "perf": "Events are batched and sent off the main thread; no measurable frame cost by design."
+      },
+      "owner": "data-analyst"
+    },
+    {
+      "id": "F011",
+      "title": "Rewarded ad: double coins on results",
+      "area": "monetization",
+      "description": "Optional rewarded ad on the win results screen doubles coins, capped at 10 per day.",
+      "acceptance": [
+        "Offer is never shown on a loss screen",
+        "Daily cap enforced across app restarts",
+        "Ad failure grants nothing and shows a calm retry message"
+      ],
+      "depends_on": ["F004", "F008"],
+      "priority": "P2",
+      "status": "todo",
+      "passes": false,
+      "owner": "monetization-designer"
+    },
+    {
+      "id": "F012",
+      "title": "Starter pack IAP",
+      "area": "monetization",
+      "description": "One-time starter pack offered from level 6, with receipt validation.",
+      "acceptance": [
+        "Offered at most once per day, never during a run",
+        "Contents match the contract and the economy model"
+      ],
+      "depends_on": ["F008"],
+      "priority": "P2",
+      "status": "todo",
+      "passes": false,
+      "owner": "monetization-designer"
+    },
+    {
+      "id": "F013",
+      "title": "Music loop and merge SFX set",
+      "area": "audio",
+      "description": "Battle loop with an intensity layer for waves 8-10 plus a 7-step merge clack set rising in pitch by tier.",
+      "acceptance": [
+        "Music loops without an audible seam",
+        "Integrated loudness about -16 LUFS with true peak at or below -1 dBTP",
+        "All audio assets have approved manifest entries"
+      ],
+      "depends_on": ["F002"],
+      "priority": "P1",
+      "status": "in_progress",
+      "passes": false,
+      "gates": { "static": "pass", "unit": null, "playthrough": null, "visual": null, "perf": null },
+      "evidence": { "static": ".gamestudio/evidence/F013/static.log" },
+      "owner": "audio-director"
+    },
+    {
+      "id": "F014",
+      "title": "Android and iOS exports with CI",
+      "area": "release",
+      "description": "Headless Godot exports for Android (AAB) and iOS (Xcode project) on CI, with every gate run per commit.",
+      "acceptance": [
+        "CI produces a signed internal-test AAB",
+        "CI runs static, unit and playthrough gates on every push"
+      ],
+      "depends_on": ["F001"],
+      "priority": "P1",
+      "status": "todo",
+      "passes": false,
+      "owner": "release-manager"
+    }
+  ]
+}

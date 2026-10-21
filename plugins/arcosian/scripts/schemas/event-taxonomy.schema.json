@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Analytics event taxonomy (.gamestudio/analytics/*.taxonomy.json)",
+  "description": "The analytics contract: every event the game sends, its trigger, typed parameters and the KPIs it feeds. event_taxonomy.py generates a first draft from the contract and emits engine stubs from this file. Names are snake_case and kept within the limits common to Firebase / GA4 (names up to 40 characters, starting with a letter, no reserved prefixes firebase_, google_, ga_; at most 25 parameters per event); verify current platform limits before launch.",
+  "type": "object",
+  "required": ["schema_version", "events"],
+  "additionalProperties": true,
+  "$defs": {
+    "param_name": {
+      "type": "string",
+      "pattern": "^(?!firebase_|google_|ga_)[a-z][a-z0-9_]{0,39}$",
+      "description": "snake_case parameter name, starts with a letter, at most 40 characters, no reserved prefixes."
+    },
+    "param": {
+      "type": "object",
+      "description": "One event parameter.",
+      "required": ["name", "type"],
+      "additionalProperties": true,
+      "properties": {
+        "name": { "$ref": "#/$defs/param_name", "description": "Parameter name, e.g. \"level_id\"." },
+        "type": {
+          "type": "string",
+          "enum": ["string", "int", "float", "bool", "timestamp"],
+          "description": "Value type. Use string for ids and enums, int for counts and money in minor units, float for durations and ratios, timestamp for epoch milliseconds."
+        },
+        "required": { "type": "boolean", "description": "Whether every occurrence must carry the parameter (stubs assert it in debug builds)." },
+        "description": { "type": "string", "description": "Meaning, unit and allowed values." },
+        "enum": { "type": "array", "items": { "type": ["string", "integer"] }, "description": "Optional closed list of allowed values (keeps cardinality low)." }
+      }
+    }
+  },
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "event-taxonomy", "description": "Optional self-identification for validate_json.py --auto." },
+    "naming": { "type": "string", "const": "snake_case", "default": "snake_case", "description": "Naming convention for events and parameters; always \"snake_case\"." },
+    "common_params": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/param" },
+      "description": "Parameters attached to every event by the analytics wrapper (e.g. session_id, build, ab_cohort). They count toward the per-event parameter limit."
+    },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Every event the game sends. Event names must be unique.",
+      "items": {
+        "type": "object",
+        "description": "One analytics event.",
+        "required": ["name", "category"],
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^(?!firebase_|google_|ga_)[a-z][a-z0-9_]{0,39}$",
+            "description": "Event name in snake_case (object_action order recommended, e.g. \"level_start\"). Prefer GA4 recommended game event names where they fit (level_start, level_end, tutorial_begin, tutorial_complete, earn_virtual_currency, spend_virtual_currency)."
+          },
+          "category": {
+            "type": "string",
+            "enum": ["lifecycle", "ftue", "progression", "economy", "monetization", "ads", "social", "liveops", "tech", "ux"],
+            "description": "Event family; dashboards group by it."
+          },
+          "trigger": { "type": "string", "description": "Exact moment the event fires, precise enough to implement and test, e.g. \"results screen shown after the last wave\"." },
+          "params": {
+            "type": "array",
+            "maxItems": 25,
+            "items": { "$ref": "#/$defs/param" },
+            "description": "Event-specific parameters (common_params come on top)."
+          },
+          "kpis": {
+            "$ref": "common.schema.json#/$defs/string_list",
+            "description": "KPIs or funnels this event feeds, e.g. \"d1\", \"ftue_funnel\", \"level_win_rate\", \"arpdau_usd\"."
+          },
+          "sampling": { "$ref": "common.schema.json#/$defs/ratio", "description": "Optional client-side sampling rate for high-volume events (1.0 = every occurrence)." }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "name": "arcosian",
+  "owner": {
+    "name": "samsamurai301"
+  },
+  "description": "Arcosian: a principal game developer and full studio for Claude Code, plus optional adapters for engines, asset vendors and commerce services.",
+  "plugins": [
+    {
+      "name": "arcosian",
+      "source": "./plugins/arcosian",
+      "description": "Core plugin: codex, ontology, agents, workflows, tools, gateway, templates and five-gate enforcement.",
+      "category": "development",
+      "tags": [
+        "game-development",
+        "mobile",
+        "design",
+        "liveops"
+      ]
+    },
+    {
+      "name": "arcosian-godot",
+      "source": "./plugins/arcosian-godot",
+      "description": "Adapter: Godot's GDScript language server for Claude Code (errors after edits, go to definition, references) plus Godot 4 MCP bridges for runtime verification, input injection and headless export.",
+      "category": "development",
+      "tags": [
+        "godot",
+        "gdscript",
+        "lsp",
+        "mcp"
+      ]
+    },
+    {
+      "name": "arcosian-unity",
+      "source": "./plugins/arcosian-unity",
+      "description": "Adapter: Unity-aware C# language server for Claude Code (csharp-ls) plus Unity CLI and Unity MCP bridges for editor control, play mode, tests and builds.",
+      "category": "development",
+      "tags": [
+        "unity",
+        "csharp",
+        "lsp",
+        "mcp"
+      ]
+    },
+    {
+      "name": "arcosian-blender",
+      "source": "./plugins/arcosian-blender",
+      "description": "Adapter: Blender MCP for 3D cleanup, retopology, baking and previews.",
+      "category": "development",
+      "tags": [
+        "blender",
+        "3d",
+        "mcp"
+      ]
+    },
+    {
+      "name": "arcosian-vendors",
+      "source": "./plugins/arcosian-vendors",
+      "description": "Adapter: official vendor MCP servers for art, 3D and audio generation (Scenario, PixelLab, Meshy, ElevenLabs, ComfyUI and others).",
+      "category": "development",
+      "tags": [
+        "assets",
+        "audio",
+        "mcp"
+      ]
+    },
+    {
+      "name": "arcosian-commerce",
+      "source": "./plugins/arcosian-commerce",
+      "description": "Adapter: RevenueCat, Firebase, Adjust and app-store MCP servers for monetization, analytics and release.",
+      "category": "development",
+      "tags": [
+        "monetization",
+        "analytics",
+        "release",
+        "mcp"
+      ]
+    }
+  ]
+}

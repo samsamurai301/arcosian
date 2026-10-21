@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {"hooks": [{"type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run-python.mjs", "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/session_start.py"], "timeout": 10, "statusMessage": "Loading Arcosian project state"}]}
+    ],
+    "PreToolUse": [
+      {"matcher": "Bash|PowerShell", "hooks": [{"type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run-python.mjs", "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/pre_tool_guard.py"], "timeout": 10, "statusMessage": "Checking command against release and secret guards"}]},
+      {"matcher": "Write|Edit|MultiEdit", "hooks": [{"type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run-python.mjs", "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/pre_tool_guard.py"], "timeout": 10, "statusMessage": "Checking feature list against the five gates"}]}
+    ],
+    "PostToolUse": [
+      {"matcher": "Write|Edit|MultiEdit", "hooks": [{"type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run-python.mjs", "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/post_tool_check.py"], "timeout": 40, "statusMessage": "Checking edited file"}]}
+    ],
+    "Stop": [
+      {"hooks": [{"type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run-python.mjs", "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/stop_gate.py"], "timeout": 10, "statusMessage": "Verifying done features pass their gates"}]}
+    ],
+    "SubagentStop": [
+      {"hooks": [{"type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run-python.mjs", "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/stop_gate.py"], "timeout": 10, "statusMessage": "Verifying done features pass their gates"}]}
+    ],
+    "TaskCompleted": [
+      {"hooks": [{"type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run-python.mjs", "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/task_gate.py"], "timeout": 10, "statusMessage": "Checking task feature gates"}]}
+    ],
+    "PreCompact": [
+      {"hooks": [{"type": "command", "command": "node", "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/scripts/run-python.mjs", "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/pre_compact.py"], "timeout": 10, "statusMessage": "Snapshotting project state"}]}
+    ]
+  }
+}

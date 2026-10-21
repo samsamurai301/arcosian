@@ -1,0 +1,357 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "title": "Pebble Keep",
+    "logline": "Merge stone golems on a tiny garden board to stop a comedic snail horde from reaching the keep gate, in one-thumb runs of about three minutes.",
+    "genre": "hybrid-casual",
+    "subgenre": "merge tower defense with renovation meta",
+    "platforms": ["ios", "android"],
+    "orientation": "portrait",
+    "engine": "godot",
+    "target_audience": {
+      "age_min": 13,
+      "segments": ["casual puzzle and merge players 25-45", "lapsed tower-defense fans who want short sessions", "commute and second-screen players"],
+      "motivations": ["strategy", "completion", "design", "challenge"]
+    },
+    "session_length_target_sec": 240,
+    "monetization_model": "hybrid",
+    "analogy": "Rush Royale meets Royal Match",
+    "comparables": [
+      {
+        "title": "Rush Royale",
+        "borrow": ["merge two identical units to climb tiers", "spawn currency earned from kills"],
+        "change": ["solo PvE instead of PvP", "merges keep the family (deterministic), only the spawn is random", "portrait one-thumb board instead of a split battlefield"]
+      },
+      {
+        "title": "Royal Match",
+        "borrow": ["one star per win spent on visible renovation tasks", "short, fast levels with a clear end"],
+        "change": ["we restore a garden keep that also unlocks golem families, so the meta feeds the core", "bonus sort puzzles replace rescue mini-levels as reward beats"]
+      },
+      {
+        "title": "Kingdom Rush",
+        "borrow": "path telegraphing and wave readability",
+        "change": "no build menus or placement slots: merging is the only upgrade decision"
+      }
+    ],
+    "pillars": [
+      "One thumb, three minutes: every run fits a queue at the coffee shop",
+      "Every merge is a visible power spike",
+      "Readable chaos: 30 golems and 40 snails must stay legible on a 5.4-inch phone",
+      "The keep grows with you: every win changes something you can see"
+    ]
+  },
+  "player_fantasy": "You are the young keeper of a crumbling garden keep, waking stone golems and fusing them into ever mightier guardians to hold off a slow but endless army of mischievous snails.",
+  "verbs": [
+    { "id": "tap_spawn", "input": "tap", "description": "Spend pebbles to wake a tier-1 golem on a random empty cell." },
+    { "id": "drag_merge", "input": "drag", "description": "Drag a golem onto an identical golem to fuse them into the next tier." },
+    { "id": "tap_pour", "input": "tap", "description": "In Rune Sort bonus levels, tap a tube then a target tube to move the top runes." }
+  ],
+  "mechanics": [
+    {
+      "id": "spawn_bag",
+      "name": "Spawn from a shuffled bag",
+      "category": "chance",
+      "verbs": ["tap_spawn"],
+      "rules": [
+        "Spawn places a tier-1 golem on a random empty cell; it is disabled when the board is full or pebbles are short.",
+        "The family is drawn from a shuffled bag holding each of the 5 deck families once; the bag refills when empty (no long droughts).",
+        "Spawn cost starts at spawn_cost_base and rises by spawn_cost_step per spawn in the run, up to spawn_cost_cap."
+      ],
+      "parameters": [
+        { "key": "starting_pebbles", "value": 30, "min": 10, "max": 60, "unit": "pebbles", "note": "Enough for two spawns before the first kill." },
+        { "key": "spawn_cost_base", "value": 10, "min": 5, "max": 20, "unit": "pebbles", "note": "Lets the first spawn happen within 2 s of wave 1." },
+        { "key": "spawn_cost_step", "value": 5, "min": 0, "max": 10, "unit": "pebbles", "note": "Pushes players toward merging instead of filling the board." },
+        { "key": "spawn_cost_cap", "value": 60, "min": 30, "max": 100, "unit": "pebbles" }
+      ],
+      "feedback": ["golem drops in with a dust puff and a stone clack", "Spawn button pulses once when it becomes affordable"],
+      "mobile_notes": "Spawn button bottom-centre, at least 88x88 pt, reachable by either thumb; no other control in the bottom 120 pt."
+    },
+    {
+      "id": "merge_two",
+      "name": "Merge-two upgrade",
+      "category": "merge",
+      "verbs": ["drag_merge"],
+      "rules": [
+        "Dropping a golem on another of the same family and tier merges them into one golem of tier + 1 on the target cell.",
+        "Tier 7 is the maximum; tier-7 golems cannot merge.",
+        "Dropping on an invalid target returns the golem to its cell with no penalty."
+      ],
+      "parameters": [
+        { "key": "tier_damage_multiplier", "value": 1.9, "min": 1.6, "max": 2.4, "unit": "x", "note": "Below 2.0 a merge trades raw DPS for a free cell; far below that the trade feels bad and players stop merging (confirm in playtests)." },
+        { "key": "max_tier", "value": 7, "min": 5, "max": 9, "unit": "tiers" },
+        { "key": "board_cells", "value": 30, "min": 25, "max": 36, "unit": "cells", "note": "5 x 6 board; 36 cells breaks readability on small phones." }
+      ],
+      "feedback": ["merge burst particles in the family colour", "clack pitch rises one semitone per tier", "light haptic tick on merge, medium on tier 5+"],
+      "mobile_notes": ["Drag starts after 6 px of movement", "the held golem renders 40 pt above the finger so the thumb never hides the target cell"]
+    },
+    {
+      "id": "lane_defense",
+      "name": "Snail path defense",
+      "category": "combat",
+      "verbs": [],
+      "rules": [
+        "Snails crawl along a fixed path around the board toward the keep gate.",
+        "Golems auto-attack the snail nearest the gate within their range.",
+        "A snail reaching the gate costs 1 heart (the wave-10 boss costs 3); at 0 hearts the run is lost.",
+        "Each defeated snail drops pebbles_per_snail pebbles."
+      ],
+      "parameters": [
+        { "key": "hearts", "value": 3, "min": 1, "max": 5, "unit": "hearts" },
+        { "key": "waves_per_level", "value": 10, "min": 8, "max": 15, "unit": "waves", "note": "10 waves of about 18 s each gives the 3-minute run." },
+        { "key": "snail_hp_growth_per_wave", "value": 12, "min": 8, "max": 20, "unit": "% per wave" },
+        { "key": "pebbles_per_snail", "value": 3, "min": 1, "max": 6, "unit": "pebbles" }
+      ],
+      "feedback": ["snails pop with a comedic squish and drop glinting pebbles that fly to the counter", "the gate shakes and a heart cracks when a snail gets through"],
+      "mobile_notes": "The path stays outside the board so fingers never cover enemies; the gate sits top-centre, away from the thumb."
+    },
+    {
+      "id": "rune_sort",
+      "name": "Rune Sort bonus level",
+      "category": "sort",
+      "verbs": ["tap_pour"],
+      "rules": [
+        "Every 5th level is a Rune Sort bonus: no hearts, no snails, only a generous move limit.",
+        "Tap a tube, then a target: the top run of same-colour runes moves onto an empty tube or a matching top, as many as fit.",
+        "Solved when every non-empty tube holds 4 runes of one colour; leftover moves add bonus runes."
+      ],
+      "parameters": [
+        { "key": "capacity", "value": 4, "min": 3, "max": 5, "unit": "runes per tube" },
+        { "key": "move_limit", "value": 30, "min": 20, "max": 40, "unit": "moves", "note": "About 2x the solver minimum keeps the level a reward beat." },
+        { "key": "runes_reward", "value": 15, "min": 10, "max": 30, "unit": "runes" }
+      ],
+      "feedback": ["runes glow and chime when a tube completes", "completed tubes cork with a satisfying pop"],
+      "mobile_notes": "Tubes in one row of up to 7, each at least 44 pt wide; tap-tap instead of drag to support one-handed play."
+    }
+  ],
+  "loops": [
+    {
+      "id": "core",
+      "name": "Spawn, merge, defend",
+      "type": "core",
+      "period": "seconds",
+      "description": "Kills pay pebbles, pebbles buy spawns, spawns create merge opportunities, merges create power spikes that kill faster.",
+      "steps": [
+        { "id": "s1", "action": "tap Spawn to wake a tier-1 golem", "reward": null, "next": "s2" },
+        { "id": "s2", "action": "drag a golem onto an identical golem to merge", "reward": "a stronger golem and a merge burst", "next": "s3" },
+        { "id": "s3", "action": "watch golems auto-attack the snail wave", "reward": { "pebbles": 3 }, "next": ["s1", "s4"] },
+        { "id": "s4", "action": "survive the wave-10 boss", "reward": { "coins": 40, "stars": 1 }, "next": "loop:meta_restore" }
+      ]
+    },
+    {
+      "id": "meta_restore",
+      "name": "Restore the keep",
+      "type": "meta",
+      "period": "session",
+      "description": "Stars become visible renovation; completed areas unlock golem families, which make the core loop richer.",
+      "steps": [
+        { "id": "m1", "action": "win levels to earn stars and coins", "reward": { "stars": 1, "coins": 40 }, "next": "m2" },
+        { "id": "m2", "action": "spend stars on keep restoration tasks", "reward": "a restored piece of the keep and a short story beat", "next": "m3" },
+        { "id": "m3", "action": "complete an area", "reward": { "gems": 5 }, "next": "m4" },
+        { "id": "m4", "action": "upgrade golem families with coins and runes", "reward": "permanent family damage boost", "next": "m1" }
+      ]
+    },
+    {
+      "id": "rune_bonus",
+      "name": "Rune Sort breather",
+      "type": "meta",
+      "period": "session",
+      "description": "Every 5th level swaps tension for a calm sort puzzle that pays the material for upgrades.",
+      "steps": [
+        { "id": "b1", "action": "reach a 5th level and enter Rune Sort", "reward": null, "next": "b2" },
+        { "id": "b2", "action": "sort runes into single-colour tubes", "reward": { "runes": 15 }, "next": "b3" },
+        { "id": "b3", "action": "spend runes on a family upgrade", "reward": "permanent family damage boost", "next": "loop:core" }
+      ]
+    },
+    {
+      "id": "revive",
+      "name": "Second chance",
+      "type": "monetization",
+      "period": "minutes",
+      "description": "One optional continue per run, by rewarded ad or a fixed gem price shown up front.",
+      "steps": [
+        { "id": "r1", "action": "lose the last heart", "reward": null, "next": "r2" },
+        { "id": "r2", "action": "choose: watch an ad, pay 9 gems, or accept the loss", "reward": "revive with 1 heart (once per run)", "next": "loop:core" }
+      ]
+    },
+    {
+      "id": "snail_rally",
+      "name": "Snail Rally weekend",
+      "type": "liveops",
+      "period": "weekly",
+      "description": "Weekend collection event: shells from every run fill a progress track with odds-disclosed chests.",
+      "steps": [
+        { "id": "e1", "action": "play any level during the weekend", "reward": { "shells": 10 }, "next": "e2" },
+        { "id": "e2", "action": "fill event track milestones", "reward": "event chests (odds shown)", "next": "e1" }
+      ]
+    }
+  ],
+  "economy": {
+    "currencies": [
+      { "id": "coins", "kind": "soft", "sources": ["level win", "level loss (consolation)", "daily chest", "rewarded double-coins"], "sinks": ["golem family upgrades"], "cap": null },
+      { "id": "gems", "kind": "hard", "sources": ["IAP", "keep area completion", "Keep Pass"], "sinks": ["revive", "golem skins", "coin packs"], "cap": null },
+      { "id": "stars", "kind": "material", "sources": ["level win"], "sinks": ["keep restoration tasks"], "cap": null },
+      { "id": "runes", "kind": "material", "sources": ["Rune Sort bonus levels", "starter pack"], "sinks": ["golem family upgrades"], "cap": 999 },
+      { "id": "shells", "kind": "event", "sources": ["any run during Snail Rally"], "sinks": ["event track milestones"], "cap": 500 }
+    ],
+    "model_ref": ".gamestudio/economy/v1.economy.json"
+  },
+  "progression": {
+    "tracks": [
+      {
+        "id": "keep_restoration",
+        "type": "chapter",
+        "curve": { "formula": "linear", "params": { "base": 12, "growth": 4 } },
+        "unlocks": [
+          { "at": 1, "unlock": "Moss golem family" },
+          { "at": 2, "unlock": "Rune Sort bonus levels" },
+          { "at": 3, "unlock": "Ember golem family" },
+          { "at": 5, "unlock": "World 2: Tidepool Terraces" }
+        ]
+      },
+      {
+        "id": "family_level",
+        "type": "character_level",
+        "curve": { "formula": "exp", "params": { "base": 100, "growth": 1.6, "runes_per_level": 10 } },
+        "unlocks": [
+          { "at": 3, "unlock": "family perk 1" },
+          { "at": 6, "unlock": "family perk 2" },
+          { "at": 10, "unlock": "golden family skin (cosmetic)" }
+        ]
+      }
+    ],
+    "difficulty": {
+      "model": "sawtooth: 9-level ramp, hard level every 10th (period 10); Rune Sort every 5th level is a reward beat",
+      "target_win_rate": 0.72,
+      "dda": {
+        "trigger": "2 consecutive losses on the same level",
+        "adjustment": "snail HP -8% on the next attempt, at most 2 steps (-16%)",
+        "bounds": "never on the first attempt of a hard level; never linked to spending"
+      }
+    }
+  },
+  "content": {
+    "levels": { "target_count": 60, "generation": "hybrid", "spec_ref": ".gamestudio/levels/" },
+    "worlds": ["Mossy Garden", "Tidepool Terraces", "Ember Quarry"],
+    "characters": ["Flint", "Moss", "Ember", "Tide", "Quartz", "Gran Pebble (keeper and narrator)"]
+  },
+  "ftue": {
+    "aha_seconds_target": 45,
+    "steps": [
+      { "id": "ftue_spawn", "goal": "wake the first golem", "teaches": ["tap_spawn"], "max_seconds": 8 },
+      { "id": "ftue_merge", "goal": "merge two tier-1 golems", "teaches": ["drag_merge"], "max_seconds": 12 },
+      { "id": "ftue_power", "goal": "see the merged golem pop the first wave", "teaches": "merging is the source of power", "max_seconds": 20 },
+      { "id": "ftue_star", "goal": "win level 1 and place the first star in the keep", "teaches": ["meta_restore"], "max_seconds": 90 }
+    ]
+  },
+  "ux": {
+    "hud": ["wave progress bar top", "hearts top-right", "pebble counter top-left", "Spawn button bottom-centre in the thumb zone"],
+    "screens": ["home_keep", "battle", "results", "family_upgrades", "shop", "settings"],
+    "accessibility": [
+      "colour-blind-safe family colours plus unique silhouettes and tier pips",
+      "text scale 100-150%",
+      "reduced-motion toggle (disables screen shake and flashes)",
+      "haptics toggle",
+      "fully playable one-handed in portrait"
+    ]
+  },
+  "art_direction": {
+    "style": "chunky hand-painted 2D, soft dark outlines, top-down 3/4 view, silhouettes readable at 64 px",
+    "palette": ["#2E4A3F", "#7FB069", "#E6AA68", "#CA3C25", "#4F86C6", "#F4F1DE"],
+    "references": ["Kingdom Rush (path readability)", "Royal Match (UI clarity and polish)"],
+    "bible_ref": "docs/style-bible.md"
+  },
+  "audio_direction": {
+    "music": "light folk-orchestral loop, 100-110 BPM, ukulele and pizzicato strings; an intensity layer fades in for waves 8-10",
+    "sfx": "stone clacks for merges rising in pitch by tier, comedic squish for snail pops, soft wooden UI ticks",
+    "voice": null,
+    "bible_ref": "docs/audio-bible.md"
+  },
+  "monetization": {
+    "iap": [
+      { "id": "starter_pack", "type": "starter_pack", "price_tier": 1.99, "contents": { "gems": 80, "coins": 1500, "runes": 30 } },
+      { "id": "gems_s", "type": "currency_pack", "price_tier": 4.99, "contents": { "gems": 300 } },
+      { "id": "gems_m", "type": "currency_pack", "price_tier": 9.99, "contents": { "gems": 650 } },
+      { "id": "piggy_break", "type": "offer", "price_tier": 2.99, "contents": { "gems": 150 } },
+      { "id": "remove_ads", "type": "remove_ads", "price_tier": 3.99, "contents": "removes interstitials; rewarded ads stay optional" },
+      { "id": "keep_pass", "type": "battle_pass", "price_tier": 4.99, "contents": "28-day Keep Pass premium track: cosmetic skins, coins, runes" }
+    ],
+    "ads": {
+      "rewarded": [
+        { "id": "results_double_coins", "location": "results screen after a win", "reward": { "coins": 40 }, "cap_per_day": 10 },
+        { "id": "revive_continue", "location": "out-of-hearts dialog", "reward": "revive with 1 heart, once per run", "cap_per_day": 5 },
+        { "id": "daily_chest", "location": "home keep", "reward": { "coins": 100 }, "cap_per_day": 1 }
+      ],
+      "interstitial": { "min_interval_sec": 240, "first_after_sec": 1200 }
+    },
+    "pass": { "id": "keep_pass", "duration_days": 28, "free_track": true, "premium_price_usd": 4.99, "note": "cosmetics and resources only; no exclusive power" },
+    "ethics": [
+      "No interstitials before level 10 or 20 minutes of cumulative play, and never during a run",
+      "Every chest shows its drop odds before it is opened; no paid random boxes",
+      "No fake countdowns or false scarcity in offers",
+      "Revive price is fixed and shown before the choice; never escalates within a run",
+      "Players identified as minors by the age gate get non-personalised ads and no targeted offers",
+      "Difficulty adjustment never depends on spending"
+    ]
+  },
+  "liveops": {
+    "cadence": "Snail Rally every weekend; 28-day Keep Pass seasons; 10 new levels every 2 weeks after soft launch",
+    "events": [
+      { "id": "snail_rally", "type": "weekend_collection", "duration_days": 3, "reward": "shells fill a milestone track with odds-disclosed chests" },
+      { "id": "keep_pass", "type": "season", "duration_days": 28 }
+    ]
+  },
+  "analytics": {
+    "kpi_targets": {
+      "d1": 0.40,
+      "d7": 0.15,
+      "d30": 0.05,
+      "session_len_sec": 300,
+      "sessions_per_day": 4,
+      "arpdau_usd": 0.10,
+      "payer_conversion": 0.02
+    },
+    "taxonomy_ref": ".gamestudio/analytics/events.taxonomy.json"
+  },
+  "technical": {
+    "architecture": "sim-core+presentation",
+    "deterministic": true,
+    "min_spec": {
+      "ram_gb": 3,
+      "gpu_class": "Mali-G52 / Adreno 610 class",
+      "os_min": { "ios": "15.0", "android_api": 24 }
+    },
+    "perf_budgets": {
+      "fps_target": 60,
+      "frame_ms_p95": 16.6,
+      "memory_mb": 450,
+      "download_mb": 150,
+      "cold_start_sec": 5
+    },
+    "backend": "firebase",
+    "multiplayer": "none"
+  },
+  "scope": {
+    "tier": "prototype",
+    "must": [
+      "deterministic sim core with seeded spawn bag",
+      "spawn, merge and snail waves with 3 golem families",
+      "10 handmade levels and 2 Rune Sort bonus levels",
+      "results screen with stars and coins",
+      "scripted playthrough and perf gate on a low-tier Android device"
+    ],
+    "should": ["keep restoration screen with 1 area", "family upgrades", "first-pass juice (VFX, SFX, haptics)"],
+    "wont": ["PvP", "IAP and ads integration", "live events", "cloud save", "more than 1 world"]
+  },
+  "risks": [
+    { "id": "R1", "risk": "Merge tower defense is crowded, so a me-too pitch fails creative tests and CPI is high.", "likelihood": "high", "impact": "high", "mitigation": "Lead every creative with the visible keep renovation and the snail humour; run a 5-creative CPI test before the slice." },
+    { "id": "R2", "risk": "Random spawns feel unfair and cause rage quits.", "likelihood": "medium", "impact": "high", "mitigation": "Shuffled bag spawning (no droughts); bot runs report the worst 5% of spawn sequences." },
+    { "id": "R3", "risk": "30 golems and 40 snails become unreadable on small phones.", "likelihood": "medium", "impact": "medium", "mitigation": "Silhouette and tier-pip rules in the style bible; visual gate on a 5.4-inch screenshot set." },
+    { "id": "R4", "risk": "AI-generated art drifts off style across batches.", "likelihood": "medium", "impact": "medium", "mitigation": "Style lock with reference images; nothing ships without an approved manifest entry." }
+  ],
+  "kill_criteria": [
+    "Prototype: fewer than 6 of 10 persona playtests choose a second run unprompted after two iterations",
+    "Soft launch: D1 below 0.30 after two FTUE iterations",
+    "Soft launch: D7/D1 below 0.30",
+    "Creative test: best of 5 creatives misses the CPI ceiling set in the soft-launch plan"
+  ]
+}

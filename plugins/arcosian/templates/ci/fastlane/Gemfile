@@ -1,0 +1,4 @@
+source "https://rubygems.org"
+
+# Pin with ~> so patch updates flow but minors do not. Verify the current release before bumping.
+gem "fastlane", "~> 2.240"

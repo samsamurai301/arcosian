@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "feature_id": "F009",
+  "build": "0.2.0+8e41d07 (release export, Android arm64)",
+  "device": {
+    "name": "Galaxy A15",
+    "tier": "low",
+    "os": "Android 14"
+  },
+  "scenario": "w1_l010 hard level, wave 10 boss, full 30-golem board, all VFX on, reduced motion off",
+  "duration_sec": 120,
+  "fps": { "avg": 58.7, "p1_low": 41.0 },
+  "frame_ms": { "p50": 11.6, "p95": 15.9, "p99": 24.4 },
+  "memory_mb": { "peak": 489, "avg": 452 },
+  "draw_calls": 142,
+  "cpu_ms": 8.9,
+  "gpu_ms": 11.2,
+  "thermal": { "start": 0, "end": 1 },
+  "download_mb": 118.4,
+  "cold_start_sec": 3.9,
+  "budgets": {
+    "fps_target": 60,
+    "frame_ms_p95": 16.6,
+    "memory_mb": 450,
+    "download_mb": 150,
+    "cold_start_sec": 5
+  },
+  "violations": [
+    "memory_mb.peak 489 > budget 450: four uncompressed 2048x2048 RGBA8 particle atlases (16 MB each, 64 MB total)"
+  ],
+  "verdict": "fail",
+  "notes": "Frame times are per-frame work time (the longer of CPU and GPU time, excluding the vsync wait), sampled every frame over 120 s with vsync at 60 Hz. Memory is total PSS from Android dumpsys meminfo, sampled every 5 s. Thermal values are Android thermal status levels (0 = none, 1 = light). Fix: compress the atlases (ASTC 4x4 or ETC2 RGBA at 8 bits per pixel instead of 32), cutting 64 MB to 16 MB for an expected peak near 441 MB."
+}

@@ -1,0 +1,7 @@
+# Keep LF line endings on every platform: scripts, hooks and Godot/Unity text assets expect them.
+* text=auto eol=lf
+*.svg text eol=lf
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary

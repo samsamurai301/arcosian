@@ -1,0 +1,20 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+__MACOSX/
+.vscode/
+.idea/
+
+# Python and Node caches
+__pycache__/
+*.pyc
+node_modules/
+
+# Engine caches, if a template is opened in place
+.godot/
+plugins/arcosian/templates/unity-mobile/Library/
+plugins/arcosian/templates/unity-mobile/Temp/
+plugins/arcosian/templates/unity-mobile/Logs/
+plugins/arcosian/templates/unity-mobile/obj/
+plugins/arcosian/templates/godot-mobile/build/

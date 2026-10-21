@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "size": 5,
+  "win_tile": 1024,
+  "initial_tiles": 2,
+  "spawn_four_chance": 0.1
+}

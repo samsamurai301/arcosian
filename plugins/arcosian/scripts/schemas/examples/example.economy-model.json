@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "name": "Pebble Keep v1 - prototype baseline",
+  "days": 30,
+  "archetypes": [
+    { "id": "casual_free", "share": 0.70, "sessions_per_day": 3, "session_minutes": 4, "skill": 0.45, "spend_propensity": 0.005, "ad_accept_rate": 0.35 },
+    { "id": "engaged_free", "share": 0.25, "sessions_per_day": 5, "session_minutes": 6, "skill": 0.65, "spend_propensity": 0.03, "ad_accept_rate": 0.50 },
+    { "id": "payer", "share": 0.05, "sessions_per_day": 6, "session_minutes": 8, "skill": 0.60, "spend_propensity": 0.35, "ad_accept_rate": 0.20 }
+  ],
+  "resources": [
+    { "id": "coins", "initial": 200, "cap": null },
+    { "id": "gems", "initial": 20, "cap": null },
+    { "id": "stars", "initial": 0, "cap": null },
+    { "id": "runes", "initial": 0, "cap": 999 },
+    { "id": "family_levels", "initial": 3, "cap": 50 },
+    { "id": "restore_points", "initial": 0, "cap": null },
+    { "id": "keep_areas", "initial": 0, "cap": 12 },
+    { "id": "piggy_gems", "initial": 0, "cap": 150 }
+  ],
+  "nodes": [
+    { "id": "win_reward", "kind": "source", "trigger": "per_level_win", "outputs": { "coins": 40, "stars": 1 }, "note": "Matches the results screen in the contract." },
+    { "id": "loss_consolation", "kind": "source", "trigger": "per_level_loss", "outputs": { "coins": 10 } },
+    { "id": "rune_sort_bonus", "kind": "source", "trigger": "per_level_win", "probability": 0.2, "outputs": { "runes": 15 }, "note": "Every 5th level is a Rune Sort bonus; modelled as a 1-in-5 chance per win." },
+    { "id": "daily_chest", "kind": "source", "trigger": "daily", "outputs": { "coins": 100 } },
+    { "id": "ad_double_coins", "kind": "source", "trigger": "on_ad", "outputs": { "coins": 40 }, "note": "Rewarded ad on the win results screen, cap 10 per day in the client." },
+    { "id": "restore_task", "kind": "converter", "trigger": "per_session", "inputs": { "stars": 3 }, "outputs": { "restore_points": 3 }, "condition": "stars >= 3", "note": "Stars become restoration progress as soon as a task is affordable (stars are a sink from the player's view)." },
+    { "id": "area_complete", "kind": "gate", "trigger": "per_session", "inputs": { "restore_points": 12 }, "outputs": { "keep_areas": 1, "gems": 5 }, "condition": "restore_points >= 12", "note": "Flat 12 stars per area; the contract curve (12 + 4(n-1)) is tested in v2." },
+    { "id": "family_upgrade", "kind": "converter", "trigger": "per_session", "inputs": { "coins": 250, "runes": 10 }, "outputs": { "family_levels": 1 }, "condition": "coins >= 250 and runes >= 10", "note": "Flat approximation of the exp curve (100 * 1.6^(n-1)) for levels 2-4." },
+    { "id": "revive_gems", "kind": "sink", "trigger": "per_level_loss", "probability": 0.15, "inputs": { "gems": 9 }, "condition": "gems >= 9" },
+    { "id": "piggy_fill", "kind": "pool", "trigger": "per_level_win", "outputs": { "piggy_gems": 3 }, "note": "Piggy bank fills visibly on wins; released by the piggy_break offer." }
+  ],
+  "levels": {
+    "count": 60,
+    "base_win_rate": 0.82,
+    "difficulty_curve": {
+      "type": "sawtooth",
+      "params": { "base": 0.85, "floor": 0.45, "period": 10, "hard_every": 10 }
+    }
+  },
+  "offers": [
+    { "id": "starter_pack", "price_usd": 1.99, "contents": { "gems": 80, "coins": 1500, "runes": 30 }, "trigger": "level >= 6" },
+    { "id": "gems_s", "price_usd": 4.99, "contents": { "gems": 300 }, "trigger": "per_level_loss" },
+    { "id": "gems_m", "price_usd": 9.99, "contents": { "gems": 650 }, "trigger": "per_session" },
+    { "id": "piggy_break", "price_usd": 2.99, "contents": { "gems": 150 }, "trigger": "piggy_gems >= 150" }
+  ],
+  "targets": {
+    "days_to_complete_content": 21,
+    "max_soft_currency_hoard_days": 3,
+    "payer_conversion": 0.02
+  }
+}

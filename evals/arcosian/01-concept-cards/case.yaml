@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: 01-concept-cards
+description: Brief to three concept cards saved as valid concept JSON
+context:
+  scaffold_script: scaffold.sh

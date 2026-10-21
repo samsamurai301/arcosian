@@ -1,0 +1,139 @@
+# Godot CI: validate -> Android AAB -> iOS Xcode project -> fastlane TestFlight.
+# Copy to .github/workflows/godot-ci.yml. Project lives at repo root (project.godot).
+name: godot-ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: "4.7.2"
+  GODOT_IMAGE: barichello/godot-ci:4.7.2   # tag confirmed on Docker Hub (Oct 2026); keep it equal to GODOT_VERSION
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    container: barichello/godot-ci:4.7.2
+    steps:
+      - uses: actions/checkout@v7
+      - name: Import resources once
+        run: godot --headless --path . --import || true
+      - name: Static gate (check_all)
+        run: godot --headless --path . -s res://tools/ci/check_all.gd -- --out=$PWD/static.log
+      - name: Unit tests (JUnit)
+        run: godot --headless --path . -s res://tools/ci/run_tests.gd -- --out=$PWD/unit.xml
+      - name: Scripted playthrough (runner script mode)
+        run: >
+          godot --headless --path . -s res://tools/playtest/runner.gd --
+          --mode=script --script=res://tests/playthroughs/smoke.json
+          --out=$PWD/playthrough.json --seed=1
+      - name: Perf smoke (headless, CPU-only; informational on shared runners)
+        # CI runners are noisy and have no GPU, so this guards against gross regressions only.
+        # The real perf gate runs windowed on a device of the target tier (see the template README).
+        continue-on-error: true
+        run: >
+          godot --headless --path . -s res://tools/perf/perf_probe.gd --
+          --out=$PWD/perf.json --seconds=10
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: validation-reports
+          path: |
+            static.log
+            unit.xml
+            playthrough.json
+            perf.json
+
+  android:
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    container: barichello/godot-ci:4.7.2
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install export templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates
+          mv /root/.local/share/godot/export_templates/* ~/.local/share/godot/export_templates/ || true
+      - name: Decode upload keystore
+        run: echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/upload.keystore"
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      - name: Export AAB
+        env:
+          GODOT_ANDROID_KEYSTORE_RELEASE_PATH: ${{ runner.temp }}/upload.keystore
+          GODOT_ANDROID_KEYSTORE_RELEASE_USER: ${{ secrets.ANDROID_KEY_ALIAS }}
+          GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          mkdir -p build/android
+          godot --headless --path . --install-android-build-template --export-release "Android" "$PWD/build/android/game.aab"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: android-aab
+          path: build/android/game.aab
+
+  android-internal:
+    needs: android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: android-aab
+          path: build/android
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: fastlane
+      - name: fastlane android internal
+        working-directory: fastlane
+        env:
+          PLAY_JSON_KEY_DATA: ${{ secrets.PLAY_JSON_KEY_DATA }}
+          AAB_PATH: ${{ github.workspace }}/build/android/game.aab
+        run: bundle exec fastlane android internal
+
+  ios-export:
+    needs: validate
+    if: github.ref == 'refs/heads/main'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Godot ${{ env.GODOT_VERSION }}
+        run: |
+          curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_macos.universal.zip"
+          unzip -q godot.zip -d godot_app
+          echo "GODOT_BIN=$PWD/godot_app/Godot.app/Contents/MacOS/Godot" >> "$GITHUB_ENV"
+      - name: Install export templates
+        run: |
+          curl -fsSL -o tpz.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          T="$HOME/Library/Application Support/Godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$T"; unzip -q tpz.zip -d tpz_tmp; mv tpz_tmp/templates/* "$T/"
+      - name: Set App Store team ID in the iOS preset
+        # Godot refuses to export iOS without a team ID; the template leaves it blank on purpose.
+        env:
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+        run: sed -i '' "s/^application\/app_store_team_id=\"\"/application\/app_store_team_id=\"${APPLE_TEAM_ID}\"/" export_presets.cfg
+      - name: Export iOS Xcode project
+        run: |
+          mkdir -p build/ios
+          "$GODOT_BIN" --headless --path . --export-release "iOS" "$PWD/build/ios/game.xcodeproj"
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: fastlane
+      - name: fastlane ios beta (match readonly, gym, pilot)
+        working-directory: fastlane
+        env:
+          XCODEPROJ_PATH: ${{ github.workspace }}/build/ios/game.xcodeproj
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          APP_IDENTIFIER: ${{ vars.APP_IDENTIFIER }}
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+        run: bundle exec fastlane ios beta

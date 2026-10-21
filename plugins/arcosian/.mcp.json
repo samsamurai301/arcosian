@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "studio-gateway": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp/studio-gateway/server.mjs"],
+      "env": {
+        "GEMINI_API_KEY": "${user_config.gemini_api_key}",
+        "OPENAI_API_KEY": "${user_config.openai_api_key}",
+        "RECRAFT_API_KEY": "${user_config.recraft_api_key}",
+        "FAL_KEY": "${user_config.fal_key}",
+        "TRIPO_API_KEY": "${user_config.tripo_api_key}",
+        "MESHY_API_KEY": "${user_config.meshy_api_key}",
+        "ELEVENLABS_API_KEY": "${user_config.elevenlabs_api_key}",
+        "STABILITY_API_KEY": "${user_config.stability_api_key}",
+        "GS_ASSET_BUDGET_USD": "${user_config.asset_budget_usd}",
+        "GS_PLUGIN_ROOT": "${CLAUDE_PLUGIN_ROOT}",
+        "GS_PLUGIN_DATA": "${CLAUDE_PLUGIN_DATA}"
+      }
+    }
+  }
+}

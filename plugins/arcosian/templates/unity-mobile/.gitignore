@@ -1,0 +1,53 @@
+# Unity generated
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+crashlytics-build.log
+
+# Builds (CI artifacts live outside version control)
+[Bb]uild/
+[Bb]uilds/
+*.apk
+*.aab
+*.ipa
+*.unitypackage
+*.app
+
+# Signing material: never commit; CI injects it through environment variables
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+*.p8
+
+# Addressables build output
+/[Aa]ssets/AddressableAssetsData/*/*.bin*
+/[Aa]ssets/StreamingAssets/aa*
+ServerData/
+
+# OS
+.DS_Store
+Thumbs.db

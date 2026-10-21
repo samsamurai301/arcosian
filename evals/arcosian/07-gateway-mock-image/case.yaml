@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: 07-gateway-mock-image
+description: studio-gateway image_generate in mock mode records a manifest entry
+context:
+  scaffold_script: scaffold.sh

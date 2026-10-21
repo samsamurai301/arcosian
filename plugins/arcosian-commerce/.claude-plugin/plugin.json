@@ -1,0 +1,24 @@
+{
+  "name": "arcosian-commerce",
+  "version": "0.3.0",
+  "description": "Commerce and operations adapter for arcosian: RevenueCat hosted MCP and Firebase MCP, with Adjust and community App Store Connect / Google Play MCPs documented with risks, plus a skill that forbids review submission or price changes without explicit human approval.",
+  "author": {
+    "name": "samsamurai301",
+    "url": "https://github.com/samsamurai301"
+  },
+  "homepage": "https://github.com/samsamurai301/arcosian/tree/main/plugins/arcosian-commerce",
+  "repository": "https://github.com/samsamurai301/arcosian",
+  "license": "MIT",
+  "keywords": [
+    "revenuecat",
+    "firebase",
+    "adjust",
+    "app-store-connect",
+    "google-play",
+    "monetization",
+    "mcp"
+  ],
+  "dependencies": [
+    "arcosian"
+  ]
+}

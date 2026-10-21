@@ -1,0 +1,173 @@
+# Checks every push and pull request on macOS, Linux and Windows. Nothing here needs secrets.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: checks (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Python self-tests
+        run: |
+          root="$(pwd)"; cd "$RUNNER_TEMP"; fail=0
+          for f in "$root"/plugins/arcosian/scripts/*.py "$root"/plugins/arcosian/skills/*/scripts/*.py; do
+            if ! out=$(python "$f" --selftest 2>&1); then echo "FAIL ${f#$root/}"; echo "$out" | tail -20; fail=1; fi
+          done
+          exit $fail
+
+      - name: Hook tests
+        run: python plugins/arcosian/hooks/tests/test_hooks.py
+
+      - name: Gateway tests
+        run: node plugins/arcosian/mcp/studio-gateway/test/run-tests.mjs
+
+      - name: Node syntax and workflow scripts
+        run: |
+          find plugins -name '*.mjs' -not -path '*/node_modules/*' -print0 | xargs -0 -n1 node --check
+          for f in plugins/arcosian/workflows/*.js; do
+            node -e 'const fs=require("fs");const s=fs.readFileSync(process.argv[1],"utf8").replace("export const meta","const meta");fs.writeFileSync(process.argv[2],"(async () => {\n"+s+"\n})();\n")' "$f" "$RUNNER_TEMP/wf.mjs"
+            node --check "$RUNNER_TEMP/wf.mjs" || { echo "FAIL $f"; exit 1; }
+          done
+
+      - name: JSON files parse
+        run: |
+          python - <<'PY'
+          import json, pathlib, sys
+          bad = []
+          for p in pathlib.Path(".").rglob("*.json"):
+              if ".git" in p.parts: continue
+              try: json.loads(p.read_text(encoding="utf-8"))
+              except ValueError as e: bad.append(f"{p}: {e}")
+          print("\n".join(bad) or "all JSON parses"); sys.exit(1 if bad else 0)
+          PY
+
+      - name: Plugin audit
+        run: python plugins/arcosian/scripts/audit_plugin.py --root plugins/arcosian
+
+      - name: Hook launcher with the runner's Python
+        run: |
+          mkdir -p "$RUNNER_TEMP/bare"
+          bare="$RUNNER_TEMP/bare"; [ "$RUNNER_OS" = Windows ] && bare="$(cygpath -m "$bare")"
+          out=$(printf '{"cwd":"%s","hook_event_name":"SessionStart"}' "$bare" | node plugins/arcosian/hooks/scripts/run-python.mjs plugins/arcosian/hooks/scripts/session_start.py)
+          echo "launcher output: ${out:-<none: python3 works here>}"
+
+      - name: Hook launcher falls back to the py launcher (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          if ! command -v py >/dev/null; then echo "no py launcher on this runner; skipped"; exit 0; fi
+          pydir="$(dirname "$(command -v py)")"
+          if [ -e "$pydir/python.exe" ] || [ -e "$pydir/python3.exe" ]; then echo "py sits next to python here; fallback not testable"; exit 0; fi
+          bare="$(cygpath -m "$RUNNER_TEMP/bare")"
+          out=$(printf '{"cwd":"%s","hook_event_name":"SessionStart"}' "$bare" | PATH="$(dirname "$(command -v node)"):$pydir:/c/Windows/System32" node plugins/arcosian/hooks/scripts/run-python.mjs plugins/arcosian/hooks/scripts/session_start.py)
+          echo "$out"
+          echo "$out" | grep -q 'py -3' || { echo "expected the py -3 note"; exit 1; }
+
+      - name: Plugin manifests (claude plugin validate --strict)
+        if: runner.os == 'Linux'
+        run: |
+          for d in plugins/*/ .; do
+            npx -y @anthropic-ai/claude-code@2.1.306 plugin validate --strict "$d"
+          done
+
+      - name: CI templates parse as YAML
+        if: runner.os == 'Linux'
+        run: |
+          python -m pip install --quiet pyyaml==6.0.2
+          python -c "import sys, yaml; [yaml.safe_load(open(f, encoding='utf-8')) for f in sys.argv[1:]]; print('ok')" plugins/arcosian/templates/ci/github/*.yml plugins/arcosian/templates/ci/codemagic/*.yaml
+
+  language-servers:
+    name: language servers (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            godot_zip: Godot_v4.7.2-stable_linux.x86_64.zip
+            godot_bin: Godot_v4.7.2-stable_linux.x86_64
+          - os: windows-latest
+            godot_zip: Godot_v4.7.2-stable_win64.exe.zip
+            godot_bin: Godot_v4.7.2-stable_win64.exe   # the bridge swaps in the _console.exe twin
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Install csharp-ls 0.28.0
+        run: dotnet tool install --global csharp-ls --version 0.28.0
+
+      - name: Download Godot 4.7.2 and verify its checksum
+        run: |
+          cd "$RUNNER_TEMP"
+          base=https://github.com/godotengine/godot/releases/download/4.7.2-stable
+          curl -fsSLO "$base/${{ matrix.godot_zip }}"
+          curl -fsSLO "$base/SHA512-SUMS.txt"
+          python - "${{ matrix.godot_zip }}" <<'PY'
+          import hashlib, sys, zipfile
+          name = sys.argv[1]
+          want = next(l.split()[0] for l in open("SHA512-SUMS.txt", encoding="utf-8") if l.split() and l.split()[-1].lstrip("*") == name)
+          got = hashlib.sha512(open(name, "rb").read()).hexdigest()
+          if got != want: sys.exit(f"checksum mismatch for {name}")
+          zipfile.ZipFile(name).extractall("godot")
+          print(name, "checksum ok, extracted")
+          PY
+          chmod +x godot/* || true
+          ls godot
+
+      - name: GDScript language server self-test
+        run: |
+          ws="$(pwd)"; proj="$RUNNER_TEMP/godot proj"
+          cp -R plugins/arcosian/templates/godot-mobile "$proj"; cd "$proj"
+          GS_GODOT_BIN="$RUNNER_TEMP/godot/${{ matrix.godot_bin }}" node "$ws/plugins/arcosian-godot/lsp/lsp-selftest.mjs" \
+            --file core/sim.gd --also presentation/game.gd --definition GameState --timeout 300 \
+            -- node "$ws/plugins/arcosian-godot/lsp/gdscript-bridge.mjs"
+
+      - name: C# language server self-test (engine-free mode)
+        run: |
+          ws="$(pwd)"; proj="$RUNNER_TEMP/unity proj"
+          cp -R plugins/arcosian/templates/unity-mobile "$proj"; cd "$proj"
+          node "$ws/plugins/arcosian-unity/lsp/lsp-selftest.mjs" \
+            --file Assets/_Game/Core/Sim.cs --also Assets/_Game/Presentation/BoardView.cs --definition GameState --timeout 300 \
+            -- node "$ws/plugins/arcosian-unity/lsp/unity-csharp-lsp.mjs"
+
+      - name: Hook tests with Godot (GDScript parse checks)
+        run: |
+          bin="$RUNNER_TEMP/godot/${{ matrix.godot_bin }}"; [ "$RUNNER_OS" = Windows ] && bin="$(cygpath -m "$bin")"
+          GODOT_BIN="$bin" python plugins/arcosian/hooks/tests/test_hooks.py

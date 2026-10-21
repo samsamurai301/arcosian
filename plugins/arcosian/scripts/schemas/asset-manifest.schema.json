@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Asset manifest (.gamestudio/assets/manifest.json)",
+  "description": "Provenance for every generated or imported asset: where it is, how it was made (provider, model, prompt, seed, references), its licence, cost, review status and lineage. studio-gateway appends entries with status \"candidate\"; art-director and audio-director promote them; licence_check and compliance pre-flight read them. Rules: approved/final assets need approved_by; final assets cannot be placeholders and must carry a licence.",
+  "type": "object",
+  "required": ["schema_version", "assets"],
+  "additionalProperties": true,
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "description": "One asset file and its provenance.",
+      "required": ["id", "path"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id", "description": "Unique asset id, e.g. \"spr_golem_flint_t1\". Ledger entries and derived assets refer to it." },
+        "path": { "$ref": "common.schema.json#/$defs/path", "description": "Project-relative file path, e.g. \"assets/generated/sprites/golem_flint_t1.png\"." },
+        "kind": {
+          "type": "string",
+          "enum": ["sprite", "spritesheet", "ui", "icon", "background", "tileset", "texture", "model", "animation", "vfx", "music", "sfx", "voice", "font", "video", "other"],
+          "description": "Asset kind; drives import settings, budgets and QC checks."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["placeholder", "candidate", "approved", "rejected", "final"],
+          "description": "Review state: placeholder (stand-in), candidate (generated, not reviewed), approved (passed style review), rejected (keep for lineage, do not ship), final (approved and integrated for release)."
+        },
+        "placeholder": { "type": "boolean", "description": "True for stand-in files (mock mode, dry runs, grey boxes). Release checks refuse placeholders." },
+        "provider": { "type": ["string", "null"], "description": "Generator or source id (\"gemini\", \"elevenlabs\", \"freesound\", \"handmade\", \"mock\")." },
+        "model": { "type": ["string", "null"], "description": "Exact model id used, as sent to the provider API." },
+        "prompt": { "type": ["string", "null"], "description": "Full prompt text sent to the generator (after style-lock expansion), for reproducibility." },
+        "negative_prompt": { "type": ["string", "null"], "description": "Negative prompt, if the provider supports one." },
+        "seed": { "type": ["integer", "string", "null"], "description": "Generation seed, when the provider exposes one." },
+        "references": { "$ref": "common.schema.json#/$defs/path_list", "description": "Reference images or audio given to the generator (style refs, character sheets)." },
+        "params": { "type": "object", "additionalProperties": true, "description": "Other generation parameters (size, steps, duration_sec, loop, transparent...)." },
+        "licence": { "$ref": "common.schema.json#/$defs/licence", "description": "Licence and usage terms at generation or import time." },
+        "cost_usd": { "$ref": "common.schema.json#/$defs/usd", "description": "Actual or estimated cost of producing this asset in USD; 0 for placeholders and handmade assets." },
+        "created_at": { "$ref": "common.schema.json#/$defs/iso_datetime", "description": "When the asset was created or imported (ISO 8601, UTC)." },
+        "approved_by": { "type": ["string", "null"], "description": "Who approved it: a human reviewer for style sign-off. Required when status is approved or final." },
+        "style_ref": { "type": ["string", "null"], "description": "Style bible section or style-lock id the asset was generated against." },
+        "sha256": {
+          "type": ["string", "null"],
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Lower-case hex SHA-256 of the file; detects silent replacement and enables deduplication."
+        },
+        "derived_from": { "$ref": "common.schema.json#/$defs/id_list", "description": "Ids of source assets this was edited, upscaled, sliced or recoloured from." },
+        "notes": { "type": "string", "description": "Review notes and rationale." }
+      },
+      "allOf": [
+        {
+          "description": "Approved and final assets need a named approver (human taste checkpoint).",
+          "if": { "properties": { "status": { "enum": ["approved", "final"] } }, "required": ["status"] },
+          "then": {
+            "required": ["approved_by"],
+            "properties": { "approved_by": { "type": "string", "minLength": 1 } }
+          }
+        },
+        {
+          "description": "Final assets cannot be placeholders and must record their licence.",
+          "if": { "properties": { "status": { "const": "final" } }, "required": ["status"] },
+          "then": {
+            "required": ["licence"],
+            "properties": { "placeholder": { "const": false } }
+          }
+        }
+      ]
+    }
+  },
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "asset-manifest", "description": "Optional self-identification for validate_json.py --auto." },
+    "assets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/asset" },
+      "description": "Every asset under the project's assets_dir that was generated or imported. Ids must be unique."
+    }
+  }
+}

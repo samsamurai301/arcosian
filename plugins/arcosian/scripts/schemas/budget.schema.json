@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Asset and audio spend ledger (.gamestudio/budget.json)",
+  "description": "Spending cap and append-only ledger of paid generation calls. studio-gateway refuses any call whose estimated cost would push spent_usd above cap_usd. spent_usd should equal the sum of ledger cost_usd values (JSON Schema cannot check sums; tools should flag drift).",
+  "type": "object",
+  "required": ["schema_version", "cap_usd"],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "budget", "description": "Optional self-identification for validate_json.py --auto." },
+    "cap_usd": { "$ref": "common.schema.json#/$defs/usd", "description": "Spending cap in USD for this project (from config.budgets.asset_usd_cap or the plugin default)." },
+    "spent_usd": { "$ref": "common.schema.json#/$defs/usd", "description": "Total spent so far in USD; the sum of ledger cost_usd." },
+    "ledger": {
+      "type": "array",
+      "description": "Append-only list of charges, oldest first. Never edit or delete past entries; add a correcting entry instead.",
+      "items": {
+        "type": "object",
+        "description": "One paid (or zero-cost mock) generation call.",
+        "required": ["ts", "tool", "cost_usd"],
+        "additionalProperties": true,
+        "properties": {
+          "ts": { "$ref": "common.schema.json#/$defs/iso_datetime", "description": "When the call completed (ISO 8601, UTC)." },
+          "tool": { "type": "string", "minLength": 1, "description": "studio-gateway tool name that spent the money, e.g. \"image_generate\", \"audio_sfx\"." },
+          "provider": { "type": ["string", "null"], "description": "Provider id, e.g. \"gemini\", \"elevenlabs\"." },
+          "model": { "type": ["string", "null"], "description": "Model id used." },
+          "cost_usd": {
+            "type": "number",
+            "description": "Charged or estimated cost in USD. Normally >= 0; a negative value is only allowed for a correcting entry (refund or over-estimate) and needs a note."
+          },
+          "asset_ids": { "$ref": "common.schema.json#/$defs/id_list", "description": "Manifest asset ids produced by the call." },
+          "note": { "type": "string", "description": "Context: batch name, whether the cost is estimated or billed, corrections." }
+        }
+      }
+    }
+  }
+}

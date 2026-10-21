@@ -1,0 +1,13 @@
+# Godot
+.godot/
+.import/
+*.translation
+# Exports and signing material (never commit)
+build/
+*.aab
+*.apk
+*.ipa
+*.keystore
+*.jks
+*.p12
+*.mobileprovision

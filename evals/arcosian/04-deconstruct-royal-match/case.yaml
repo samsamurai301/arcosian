@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: 04-deconstruct-royal-match
+description: Deconstruct Royal Match into deconstruction JSON
+context:
+  scaffold_script: scaffold.sh

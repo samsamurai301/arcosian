@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "pixellab": {
+      "type": "http",
+      "url": "https://api.pixellab.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer ${user_config.pixellab_api_key}"
+      }
+    },
+    "meshy": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@meshy-ai/meshy-mcp-server@0.6.4"
+      ],
+      "env": {
+        "MESHY_API_KEY": "${user_config.meshy_api_key}"
+      }
+    },
+    "elevenlabs": {
+      "type": "http",
+      "url": "https://api.elevenlabs.io/v1/mcp"
+    },
+    "scenario": {
+      "type": "http",
+      "url": "https://mcp.scenario.com/mcp"
+    }
+  }
+}

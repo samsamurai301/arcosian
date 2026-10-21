@@ -1,0 +1,5 @@
+# Identifiers come from env so the same files serve every game.
+app_identifier(ENV["APP_IDENTIFIER"])        # iOS bundle id, e.g. com.studio.game
+package_name(ENV["APP_IDENTIFIER"])          # Android package; change if it differs from iOS
+team_id(ENV["APPLE_TEAM_ID"])                # Apple developer team id
+json_key_data_raw(ENV["PLAY_JSON_KEY_DATA"]) # Play service-account JSON content (never commit the file)

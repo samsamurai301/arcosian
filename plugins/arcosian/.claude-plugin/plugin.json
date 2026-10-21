@@ -1,0 +1,89 @@
+{
+  "name": "arcosian",
+  "displayName": "Arcosian",
+  "version": "0.3.0",
+  "description": "A principal game developer and full studio for Claude Code: a deep game-dev codex (design theory, mechanics, genres, case studies, psychology, economy, analytics, art, audio, tech, live-ops, release), a shared game ontology with schemas, 24 specialist agents, multi-agent workflows, simulators and solvers, an asset and audio gateway with budgets and provenance, Godot and Unity mobile templates, and hooks that enforce a five-gate definition of done.",
+  "author": {
+    "name": "samsamurai301",
+    "url": "https://github.com/samsamurai301"
+  },
+  "homepage": "https://github.com/samsamurai301/arcosian/tree/main/plugins/arcosian",
+  "repository": "https://github.com/samsamurai301/arcosian",
+  "license": "MIT",
+  "keywords": [
+    "game-development",
+    "mobile-games",
+    "game-design",
+    "godot",
+    "unity",
+    "liveops",
+    "monetization",
+    "asset-pipeline"
+  ],
+  "userConfig": {
+    "gemini_api_key": {
+      "type": "string",
+      "title": "Google Gemini API key",
+      "description": "Image generation (Nano Banana family), Lyria music and Gemini TTS through the studio-gateway server. Leave empty to use placeholders.",
+      "sensitive": true,
+      "required": false
+    },
+    "openai_api_key": {
+      "type": "string",
+      "title": "OpenAI API key",
+      "description": "GPT Image models for hero art, key art and store screenshots.",
+      "sensitive": true,
+      "required": false
+    },
+    "recraft_api_key": {
+      "type": "string",
+      "title": "Recraft API key",
+      "description": "Vector icons and UI, background removal and vectorization.",
+      "sensitive": true,
+      "required": false
+    },
+    "fal_key": {
+      "type": "string",
+      "title": "fal.ai key",
+      "description": "Hosted open-weight image models, LoRA training and upscaling.",
+      "sensitive": true,
+      "required": false
+    },
+    "tripo_api_key": {
+      "type": "string",
+      "title": "Tripo API key",
+      "description": "Low-poly 3D generation, rigging and retargeting.",
+      "sensitive": true,
+      "required": false
+    },
+    "meshy_api_key": {
+      "type": "string",
+      "title": "Meshy API key",
+      "description": "3D generation, remeshing, rigging and animation.",
+      "sensitive": true,
+      "required": false
+    },
+    "elevenlabs_api_key": {
+      "type": "string",
+      "title": "ElevenLabs API key",
+      "description": "Music, sound effects, voice design and dialogue.",
+      "sensitive": true,
+      "required": false
+    },
+    "stability_api_key": {
+      "type": "string",
+      "title": "Stability AI API key",
+      "description": "Stable Audio for ambiences and textured sound design (optional).",
+      "sensitive": true,
+      "required": false
+    },
+    "asset_budget_usd": {
+      "type": "number",
+      "title": "Default asset budget (USD)",
+      "description": "Default per-project spending cap for paid generation calls. A project's .gamestudio/config.json overrides it.",
+      "default": 50,
+      "min": 0,
+      "required": false
+    }
+  }
+}

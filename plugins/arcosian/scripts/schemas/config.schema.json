@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Project configuration (.gamestudio/config.json)",
+  "description": "Per-project settings for arcosian: engine, platforms, paths, spending caps, revenue figures for licence checks, storefronts, licence allowlist, preferred AI providers and production tier. Created by gs.py init; edited by producer and release-manager.",
+  "type": "object",
+  "required": ["schema_version", "project"],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "config", "description": "Optional self-identification for validate_json.py --auto." },
+    "project": {
+      "type": "object",
+      "description": "Identity of the game project.",
+      "required": ["title"],
+      "additionalProperties": true,
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 100, "description": "Working title of the game." },
+        "slug": { "$ref": "common.schema.json#/$defs/slug", "description": "Kebab-case project slug used for folders, bundle-id suffixes and analytics app names." }
+      }
+    },
+    "engine": { "$ref": "common.schema.json#/$defs/engine", "description": "Engine the project is built with; selects the template, build commands and engine codex skill." },
+    "engine_version": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d+){0,3}[A-Za-z0-9.+_-]*$",
+      "description": "Engine version string as the engine reports it, e.g. \"4.5\" or \"6000.0.32f1\". Pin it; CI and exports must use the same version."
+    },
+    "platforms": {
+      "$ref": "common.schema.json#/$defs/platform_list",
+      "minItems": 1,
+      "description": "Target platforms, normally [\"ios\", \"android\"]."
+    },
+    "orientation": { "$ref": "common.schema.json#/$defs/orientation", "description": "Locked screen orientation of the shipped game." },
+    "paths": {
+      "type": "object",
+      "description": "Where things live, relative to the repository root.",
+      "additionalProperties": true,
+      "properties": {
+        "project_root": { "type": "string", "default": ".", "description": "Engine project folder relative to the repository root (the folder holding project.godot or Assets/). Default \".\"." },
+        "assets_dir": { "type": "string", "default": "assets/", "description": "Asset root relative to project_root. Default \"assets/\"." },
+        "generated_dir": {
+          "type": "string",
+          "default": "assets/generated/",
+          "description": "Where studio-gateway writes generated files, relative to project_root. Default \"assets/generated/\". Everything here must have a manifest entry."
+        }
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "description": "Spending guards for paid generation calls. studio-gateway refuses calls whose estimated cost would exceed them.",
+      "additionalProperties": true,
+      "properties": {
+        "asset_usd_cap": { "$ref": "common.schema.json#/$defs/usd", "description": "Total project cap in USD for paid asset and audio generation. Overrides the plugin-level asset_budget_usd setting." },
+        "per_call_usd_cap": { "$ref": "common.schema.json#/$defs/usd", "description": "Maximum estimated USD cost of a single generation call; stops runaway batch or high-resolution calls." }
+      }
+    },
+    "revenue": {
+      "type": "object",
+      "description": "Revenue figures used by licence checks; some generator licences change with revenue (for example indie-game thresholds). Update before each release.",
+      "additionalProperties": true,
+      "properties": {
+        "lifetime_gross_usd": { "$ref": "common.schema.json#/$defs/usd", "description": "Gross revenue this game has earned since first commercial release, in USD." },
+        "developer_annual_games_revenue_usd": {
+          "$ref": "common.schema.json#/$defs/usd",
+          "description": "The developer's revenue from all games in the most recent financial year, in USD (check each licence's definition, e.g. net of platform fees, including affiliates)."
+        }
+      }
+    },
+    "storefronts": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[A-Z]{2}$" },
+      "uniqueItems": true,
+      "description": "Countries where the game is or will be sold, as ISO 3166-1 alpha-2 codes (\"US\", \"DE\", \"JP\"). Drives compliance pre-flight (loot-box law, age rating, privacy) and store localisation."
+    },
+    "licence_allowlist": {
+      "$ref": "common.schema.json#/$defs/string_list",
+      "description": "Licence identifiers or provider-terms labels the project accepts without review (matched against asset licence.terms), e.g. \"CC0-1.0\", \"provider-commercial\". Anything else needs review before release (licence_check, compliance pre-flight)."
+    },
+    "compliance": {
+      "type": "object",
+      "description": "Store-compliance declarations that scripts/compliance_preflight.py reads (from this object first; if it is absent, from a `compliance` object of the same shape in contract.json). Every field is optional, but the pre-flight reports a blocker for each declaration the stores require and the project has not made. Requirements change: verify them against the sources the pre-flight prints before release.",
+      "additionalProperties": true,
+      "properties": {
+        "privacy_policy_url": {
+          "type": "string",
+          "pattern": "^https://\\S+$",
+          "description": "HTTPS URL of the public privacy policy. Both stores require one; the pre-flight blocks (generic.privacy_policy) unless this, or contract meta.privacy_url, is an https URL."
+        },
+        "accounts": {
+          "type": "boolean",
+          "description": "True when players can create or sign in to an account (own backend, social login, identity-bound cloud save). When omitted the pre-flight infers true if contract technical.backend and technical.multiplayer are both not \"none\". Accounts require account_deletion."
+        },
+        "account_deletion": {
+          "anyOf": [
+            { "type": "boolean" },
+            { "type": "string", "pattern": "^https://\\S+$" }
+          ],
+          "description": "True when the game offers in-app account deletion plus a web deletion page, or the https URL of that web page. Blocks (generic.account_deletion) when accounts is true and this is false, empty or missing."
+        },
+        "att_usage_description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Purpose text of the iOS App Tracking Transparency prompt (the NSUserTrackingUsageDescription string). Needed when the game shows ads (contract monetization model ads or hybrid, or any rewarded placement); the pre-flight also accepts the key in an Info.plist or the Godot iOS preset. Request ATT before any IDFA use."
+        },
+        "odds_disclosure": {
+          "anyOf": [
+            { "type": "boolean" },
+            { "type": "string", "pattern": "^https://\\S+$" }
+          ],
+          "description": "True when the odds of every randomised paid reward are shown before purchase, or the https URL of the odds page. Blocks (generic.odds) when the contract mentions gacha, loot boxes, random rewards or pity and this is false, empty or missing."
+        },
+        "coppa": {
+          "type": "object",
+          "description": "Children's-privacy declaration. Required when contract target_audience.age_min is below 13 (blocks generic.coppa unless child_directed is true); a child-directed game with ads also gets a family-safe ad network warning.",
+          "additionalProperties": true,
+          "properties": {
+            "child_directed": {
+              "type": "boolean",
+              "description": "True when the game is directed to children under 13 (COPPA, Apple Kids category, Google Play Families): child-directed ad settings, no behavioural ads, no IDFA. The pre-flight reads only this field; record related settings alongside it."
+            }
+          }
+        }
+      }
+    },
+    "providers": {
+      "type": "object",
+      "description": "Preferred studio-gateway provider id per asset kind. Built-in ids: image auto|gemini|openai|recraft|fal; model3d tripo|meshy; music elevenlabs|lyria; sfx elevenlabs; voice elevenlabs|gemini. Adapter plugins may add more.",
+      "additionalProperties": true,
+      "properties": {
+        "image": { "type": ["string", "null"], "description": "Preferred image provider id, or null for automatic selection." },
+        "model3d": { "type": ["string", "null"], "description": "Preferred 3D model provider id." },
+        "music": { "type": ["string", "null"], "description": "Preferred music provider id. Check its game licence terms against revenue." },
+        "sfx": { "type": ["string", "null"], "description": "Preferred sound-effects provider id." },
+        "voice": { "type": ["string", "null"], "description": "Preferred voice / TTS provider id." }
+      }
+    },
+    "tier": { "$ref": "common.schema.json#/$defs/tier", "description": "Current production stage; agents scale rigour (gates, polish, compliance depth) to it." }
+  }
+}

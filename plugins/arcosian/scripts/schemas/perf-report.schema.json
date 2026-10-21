@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Performance report (.gamestudio/reports/*.perf.json, evidence perf.json)",
+  "description": "Measured performance of one build on one device for one scenario, compared with budgets (normally copied from contract technical.perf_budgets). perf_budget.py checks it against the contract; the perf gate accepts it as evidence. A \"pass\" verdict requires an empty violations list.",
+  "type": "object",
+  "required": ["schema_version", "verdict"],
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "description": "A passing perf report cannot list violations.",
+      "if": { "properties": { "verdict": { "const": "pass" } }, "required": ["verdict"] },
+      "then": { "properties": { "violations": { "maxItems": 0 } } }
+    }
+  ],
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "perf-report", "description": "Optional self-identification for validate_json.py --auto." },
+    "feature_id": { "$ref": "common.schema.json#/$defs/feature_id", "description": "Feature under test, when the report is gate evidence." },
+    "build": { "type": "string", "description": "Build identifier (version, commit, configuration: release builds only for perf evidence)." },
+    "device": {
+      "type": "object",
+      "description": "Device the measurement ran on.",
+      "additionalProperties": true,
+      "properties": {
+        "name": { "type": "string", "description": "Device model, e.g. \"Galaxy A15\" or \"iPhone 12\"; \"editor\" or \"desktop-headless\" for proxies (not valid perf evidence for release)." },
+        "tier": { "type": "string", "enum": ["low", "mid", "high"], "description": "Device tier as defined by the project's device matrix." },
+        "os": { "type": "string", "description": "OS and version, e.g. \"Android 14\", \"iOS 18.1\"." }
+      }
+    },
+    "scenario": { "type": "string", "description": "Reference scenario, e.g. \"level 30 wave 10, max golems, VFX on\"; budgets apply per scenario." },
+    "duration_sec": { "type": "number", "exclusiveMinimum": 0, "description": "Length of the measured window in seconds (60+ s recommended so thermal effects show)." },
+    "fps": {
+      "type": "object",
+      "description": "Frame rate statistics.",
+      "additionalProperties": true,
+      "properties": {
+        "avg": { "type": "number", "minimum": 0, "description": "Average frames per second." },
+        "p1_low": { "type": "number", "minimum": 0, "description": "1% low FPS (FPS equivalent of the 99th-percentile frame time); exposes hitches the average hides." }
+      }
+    },
+    "frame_ms": {
+      "type": "object",
+      "description": "Frame time percentiles in milliseconds.",
+      "additionalProperties": true,
+      "properties": {
+        "p50": { "type": "number", "minimum": 0, "description": "Median frame time, ms." },
+        "p95": { "type": "number", "minimum": 0, "description": "95th-percentile frame time, ms; compared with frame_ms_p95 budget." },
+        "p99": { "type": "number", "minimum": 0, "description": "99th-percentile frame time, ms." }
+      }
+    },
+    "memory_mb": {
+      "type": "object",
+      "description": "Resident memory in MB.",
+      "additionalProperties": true,
+      "properties": {
+        "peak": { "type": "number", "minimum": 0, "description": "Peak resident memory, MB; compared with memory_mb budget." },
+        "avg": { "type": "number", "minimum": 0, "description": "Average resident memory, MB." }
+      }
+    },
+    "draw_calls": { "type": ["number", "null"], "minimum": 0, "description": "Average draw calls per frame (or peak; say which in notes)." },
+    "cpu_ms": { "type": ["number", "null"], "minimum": 0, "description": "Average CPU (main + render thread critical path) time per frame, ms." },
+    "gpu_ms": { "type": ["number", "null"], "minimum": 0, "description": "Average GPU time per frame, ms, when the profiler exposes it." },
+    "thermal": {
+      "type": "object",
+      "description": "Thermal state at the start and end of the window: iOS-style labels (nominal, fair, serious, critical), an Android thermal status number, or degrees Celsius.",
+      "additionalProperties": true,
+      "properties": {
+        "start": { "type": ["string", "number", "null"], "description": "Thermal state at start." },
+        "end": { "type": ["string", "number", "null"], "description": "Thermal state at end; a rise to serious/critical means throttling risk in long sessions." }
+      }
+    },
+    "download_mb": { "type": ["number", "null"], "minimum": 0, "description": "Install download size of the build in MB." },
+    "cold_start_sec": { "type": ["number", "null"], "minimum": 0, "description": "Cold start to interactive, seconds." },
+    "budgets": {
+      "type": "object",
+      "description": "Budgets this report was judged against, normally contract technical.perf_budgets for the device tier (fps_target, frame_ms_p95, memory_mb, download_mb, cold_start_sec, optional draw_calls).",
+      "additionalProperties": { "type": ["number", "null"] }
+    },
+    "violations": {
+      "$ref": "common.schema.json#/$defs/string_list",
+      "description": "Human-readable budget violations, e.g. \"memory_mb.peak 512 > 450\". Must be empty for a pass."
+    },
+    "verdict": { "type": "string", "enum": ["pass", "fail"], "description": "pass only when every measured metric is within budget." },
+    "notes": { "type": "string", "description": "Method, profiler used, caveats." }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Playtest report (.gamestudio/playtests/*.playtest.json, evidence playthrough.json)",
+  "description": "Result of a playtest: a deterministic scripted playthrough, bot runs, a persona playtest by the player-simulator agent, or a human session. Engine runners (Godot runner.gd, Unity PlaytestRunner) write this shape; the playthrough gate accepts it as evidence. A \"pass\" verdict cannot coexist with blocker findings or crashes.",
+  "type": "object",
+  "required": ["schema_version", "mode", "verdict"],
+  "additionalProperties": true,
+  "allOf": [
+    {
+      "description": "A passing report must have zero crashes and no blocker findings.",
+      "if": { "properties": { "verdict": { "const": "pass" } }, "required": ["verdict"] },
+      "then": {
+        "properties": {
+          "metrics": { "properties": { "crashes": { "const": 0 } } },
+          "findings": { "items": { "properties": { "severity": { "not": { "const": "blocker" } } } } }
+        }
+      }
+    }
+  ],
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "playtest-report", "description": "Optional self-identification for validate_json.py --auto." },
+    "feature_id": { "$ref": "common.schema.json#/$defs/feature_id", "description": "Feature under test, when the report is gate evidence." },
+    "build": { "type": "string", "description": "Build identifier: version, commit hash or CI run, e.g. \"0.3.0+a1b2c3d\"." },
+    "mode": {
+      "type": "string",
+      "enum": ["deterministic_script", "bot", "persona", "human"],
+      "description": "deterministic_script (scripted inputs with state assertions), bot (automated policy over many runs), persona (player-simulator agent role-playing a persona), human (real players)."
+    },
+    "persona": { "type": ["string", "object", "null"], "description": "Persona used in persona mode (id or description)." },
+    "runs": { "type": "integer", "minimum": 1, "description": "Number of runs aggregated in metrics (1 for a scripted playthrough)." },
+    "seed": { "type": ["integer", "null"], "description": "RNG seed of the first run; scripted playthroughs must be reproducible with it." },
+    "steps": {
+      "type": "array",
+      "description": "Step log of a scripted or persona playthrough.",
+      "items": {
+        "type": "object",
+        "description": "One step: an action, what was expected, what was observed.",
+        "additionalProperties": true,
+        "properties": {
+          "t": { "type": "number", "minimum": 0, "description": "Time since start in seconds (or simulation tick / step index for headless runs; say which in notes)." },
+          "action": { "type": ["string", "object"], "description": "Injected input, e.g. {\"type\": \"merge\", \"from\": [0,1], \"to\": [0,2]} or \"tap Spawn\"." },
+          "expect": { "type": ["object", "string", "null"], "description": "Expected state, e.g. {\"board.max_tier\": 2} or {\"pebbles\": {\"op\": \">=\", \"value\": 10}}." },
+          "observed": { "description": "Observed values for the expected keys (any JSON)." },
+          "ok": { "type": "boolean", "description": "Whether observed matched expect." }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Aggregate metrics over all runs.",
+      "additionalProperties": true,
+      "properties": {
+        "win_rate": { "oneOf": [{ "$ref": "common.schema.json#/$defs/ratio" }, { "type": "null" }], "description": "Share of runs won, or null when not applicable." },
+        "avg_session_sec": { "type": ["number", "null"], "minimum": 0, "description": "Average run / session length in seconds." },
+        "time_to_first_reward_sec": { "type": ["number", "null"], "minimum": 0, "description": "Seconds from start to the first reward; the FTUE proxy for time to fun." },
+        "softlocks": { "$ref": "common.schema.json#/$defs/non_negative_integer", "description": "Runs that reached a state with no legal progress." },
+        "crashes": { "$ref": "common.schema.json#/$defs/non_negative_integer", "description": "Crashes or fatal errors; must be 0 for a pass." },
+        "errors": { "$ref": "common.schema.json#/$defs/non_negative_integer", "description": "Non-fatal errors logged (script errors, failed assertions outside steps)." }
+      }
+    },
+    "screenshots": { "$ref": "common.schema.json#/$defs/path_list", "description": "Screenshots captured during the run (project-relative paths)." },
+    "findings": {
+      "type": "array",
+      "description": "Issues found, most severe first.",
+      "items": {
+        "type": "object",
+        "description": "One finding.",
+        "required": ["severity", "title"],
+        "additionalProperties": true,
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["blocker", "major", "minor", "polish"],
+            "description": "blocker (cannot ship / gate fails), major (hurts the experience for many players), minor (noticeable, workaround exists), polish (nice to fix)."
+          },
+          "title": { "type": "string", "minLength": 1, "description": "One-line summary." },
+          "detail": { "type": "string", "description": "What happened, expected versus actual, player impact." },
+          "repro": { "type": ["string", "array"], "items": { "type": "string" }, "description": "Reproduction steps (or the seed and step index)." }
+        }
+      }
+    },
+    "verdict": { "type": "string", "enum": ["pass", "fail"], "description": "Overall result against the test's targets." },
+    "notes": { "type": "string", "description": "Context: targets used, environment, caveats." }
+  }
+}

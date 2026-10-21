@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Concept card (.gamestudio/concepts/*.concept.json)",
+  "description": "One game concept from ideation, scored for the concept tournament. All seven scores are oriented so that higher is better for us (production_cost 10 = cheapest), which lets tournaments sum or weight them directly. The winning concept seeds the design contract.",
+  "type": "object",
+  "required": ["schema_version", "id", "title"],
+  "additionalProperties": true,
+  "$defs": {
+    "score": {
+      "type": "number",
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Score from 1 (worst) to 10 (best); halves allowed when averaging judges."
+    }
+  },
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "concept", "description": "Optional self-identification for validate_json.py --auto." },
+    "id": { "$ref": "common.schema.json#/$defs/id", "description": "Concept id, e.g. \"c03_pebble_keep\"." },
+    "title": { "type": "string", "minLength": 1, "maxLength": 100, "description": "Working title." },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "shortlisted", "winner", "parked", "killed"],
+      "description": "Tournament state: draft, shortlisted, winner (becomes the contract), parked (revisit later), killed (with rationale)."
+    },
+    "logline": { "type": "string", "maxLength": 300, "description": "One-sentence pitch." },
+    "analogy": { "type": "string", "description": "\"X meets Y\" positioning." },
+    "genre": { "type": "string", "description": "Market genre / subgenre." },
+    "player_fantasy": { "type": "string", "description": "The fantasy the player lives." },
+    "core_loop": {
+      "anyOf": [
+        { "type": "string", "minLength": 1 },
+        { "$ref": "common.schema.json#/$defs/loop" }
+      ],
+      "description": "Core loop as one line (\"spawn -> merge -> defend -> earn\") or as a loop graph."
+    },
+    "hook": { "type": "string", "description": "The novel twist that makes it worth making and easy to market in a 3-second ad." },
+    "pillars": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 5,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "3-5 design pillars."
+    },
+    "target_audience": { "$ref": "common.schema.json#/$defs/target_audience", "description": "Who it is for." },
+    "monetization_model": { "$ref": "common.schema.json#/$defs/monetization_model", "description": "Business model." },
+    "comparables": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/comparable" },
+      "description": "Comparable games with borrow / change."
+    },
+    "scores": {
+      "type": "object",
+      "description": "Rubric scores, each 1-10, higher is better. Unknown keys are rejected so a misspelt criterion cannot silently drop out of the ranking.",
+      "additionalProperties": false,
+      "properties": {
+        "market": { "$ref": "#/$defs/score", "description": "Market attractiveness: audience size, demand trend, competitive gap." },
+        "novelty": { "$ref": "#/$defs/score", "description": "Freshness of the hook versus top-grossing and trending comparables." },
+        "fun_potential": { "$ref": "#/$defs/score", "description": "Strength of the core loop as judged by paper or greybox prototype." },
+        "feasibility": { "$ref": "#/$defs/score", "description": "Technical and design risk (10 = low risk)." },
+        "monetization": { "$ref": "#/$defs/score", "description": "Ethical revenue potential of the model and loops." },
+        "production_cost": { "$ref": "#/$defs/score", "description": "Inverted cost: 10 = cheapest to produce (content volume, art complexity, team size)." },
+        "agent_buildability": { "$ref": "#/$defs/score", "description": "How well AI agents can build and verify it (deterministic sim, 2D, data-driven content, testable)." },
+        "weighted_total": { "type": "number", "minimum": 0, "maximum": 10, "description": "Optional computed weighted mean of the seven scores, 0-10." }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": { "type": ["string", "object"] },
+      "description": "Key risks: strings, or risk objects as in the contract ({id, risk, likelihood, impact, mitigation})."
+    },
+    "kill_criteria": { "$ref": "common.schema.json#/$defs/string_list", "description": "Measurable conditions that would kill the concept (e.g. prototype fun score below 6 after two iterations)." },
+    "rationale": { "type": "string", "description": "Why this concept, why now, and why us; plus the judges' summary." }
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "schema_version": "1.0",
+  "as_of": "2026-10-18",
+  "game": {
+    "title": "Royal Match",
+    "developer": "Dream Games",
+    "year": 2021,
+    "genre": "match-3 puzzle with castle-renovation meta",
+    "platforms": ["ios", "android"]
+  },
+  "core_loop": {
+    "id": "core",
+    "name": "Play a level",
+    "type": "core",
+    "period": "minutes",
+    "description": "Short, goal-driven match-3 levels with a move limit; power-up creation and combos are the skill expression.",
+    "steps": [
+      { "id": "s1", "action": "start the next level from the castle screen", "reward": null, "next": "s2" },
+      { "id": "s2", "action": "swap adjacent tiles to match 3+ and build power-ups toward the level goals", "reward": "cascades and power-up combo effects", "next": ["s3", "s4"] },
+      { "id": "s3", "action": "meet every goal within the move limit", "reward": "1 star plus coins", "next": "loop:renovate" },
+      { "id": "s4", "action": "run out of moves", "reward": null, "next": "s5" },
+      { "id": "s5", "action": "accept extra moves for coins, or fail and lose a life", "reward": "another chance", "next": ["s2", "s1"] }
+    ]
+  },
+  "meta_loops": [
+    {
+      "id": "renovate",
+      "name": "Restore the castle",
+      "type": "meta",
+      "period": "session",
+      "description": "Stars from wins are spent on visible renovation tasks; finishing an area opens the next one.",
+      "steps": [
+        { "id": "m1", "action": "spend stars on the next renovation task", "reward": "an animated restoration beat", "next": "m2" },
+        { "id": "m2", "action": "complete all tasks in an area", "reward": "area completion reward and a new area", "next": "loop:core" }
+      ]
+    },
+    {
+      "id": "team",
+      "name": "Team support",
+      "type": "social",
+      "period": "daily",
+      "description": "Teams let players ask for and send lives, turning waiting into a social exchange.",
+      "steps": [
+        { "id": "t1", "action": "request lives from teammates when out of lives", "reward": "lives from teammates", "next": "t2" },
+        { "id": "t2", "action": "send lives to teammates who ask", "reward": "reciprocity and team standing", "next": "t1" }
+      ]
+    }
+  ],
+  "mechanics": [
+    {
+      "id": "match3_swap",
+      "name": "Swap to match",
+      "category": "match",
+      "verbs": ["swap"],
+      "rules": ["Swapping two adjacent tiles is legal only if it creates a match of 3 or more", "Matched tiles clear, tiles above fall, new tiles refill from the top"],
+      "dynamics": ["Cascades create unearned luck moments", "Players scan the lower board first because clears there cause more cascades"],
+      "aesthetics": ["submission", "challenge", "sensation"]
+    },
+    {
+      "id": "powerup_creation",
+      "name": "Shape-based power-ups",
+      "category": "match",
+      "rules": [
+        "Matching 4 in a line makes a line-clearing rocket",
+        "An L or T shape makes a bomb (TNT)",
+        "A 2x2 square makes a propeller that flies to a target tile",
+        "Matching 5 in a line makes a colour-clearing light ball",
+        "Swapping two power-ups together creates a stronger combined effect"
+      ],
+      "dynamics": ["Players set up combos instead of taking the first available match", "The propeller rewards squares and helps reach awkward goal tiles"],
+      "aesthetics": ["challenge", "sensation", "expression"],
+      "failure_modes": ["Too many power-ups per level devalues them; too few makes hard levels feel like luck"],
+      "references": ["Royal Match"]
+    },
+    {
+      "id": "rescue_level",
+      "name": "Rescue-the-king special levels",
+      "category": "puzzle",
+      "player_fantasy": "Saving the hapless king from a comic disaster that worsens with every move.",
+      "rules": ["A special level type shows the king in peril; the player must reach the goal before the threat completes"],
+      "dynamics": ["Urgency and humour in one beat", "Breaks the rhythm of standard levels"],
+      "aesthetics": ["fantasy", "challenge", "narrative"],
+      "mobile_fit": { "one_hand": true, "session_fit": "micro", "notes": "Very short and readable at thumbnail size, which also makes it strong ad footage." }
+    }
+  ],
+  "economy": {
+    "currencies": [
+      { "id": "coins", "kind": "hard", "note": "earned slowly from play and events, mainly bought; spent on extra moves, boosters and lives" },
+      { "id": "stars", "kind": "material", "note": "one per win; spent on renovation tasks" },
+      { "id": "lives", "kind": "energy", "note": "lost on failure, regenerate over time, can be gifted by teammates" }
+    ],
+    "sources": ["level wins (stars, small coin amounts)", "area completion and event rewards", "team life gifts", "IAP"],
+    "sinks": ["extra moves after running out", "pre-level and in-level boosters", "life refills", "renovation tasks (stars)"]
+  },
+  "progression": {
+    "structure": "linear level map; one star per win drives the castle renovation track",
+    "difficulty": "regular hard and very hard levels flagged in the UI before starting, between easier levels",
+    "boosters": "unlock gradually in the early levels as the player meets new obstacles"
+  },
+  "monetization": {
+    "model": "iap",
+    "top_offers": ["coin packs", "bundles of coins plus boosters and timed unlimited lives", "a season pass (Royal Pass)"],
+    "ads": "No interstitial or banner ads observed; verify on the current build."
+  },
+  "liveops": {
+    "pass": "season pass with free and premium tracks",
+    "events": "rotating time-limited events (competitions, streak and collection events); the roster changes often, so check the live build",
+    "cadence": "overlapping events so there is always an active goal"
+  },
+  "retention_hooks": [
+    "Unfinished renovation area with visible progress",
+    "Lives regenerate over time, so there is a reason to return later",
+    "Win-streak rewards that grant starting power-ups and reset on a loss",
+    "Team life requests create small obligations to return",
+    "Always-on event goals layered over the level map"
+  ],
+  "social": ["teams with life requests and gifting", "team chat", "team-based competitive events"],
+  "ux_notable": [
+    "Very fast flow from map to level: few taps and short transitions",
+    "Hard levels are labelled before the attempt, which sets expectations and frames boosters",
+    "Goal panel stays compact and always visible; remaining moves are large and central",
+    "The extra-moves offer shows exactly which goals remain"
+  ],
+  "art_audio_notable": [
+    "High-contrast, saturated tiles with strong silhouettes that read at small sizes",
+    "Juicy, short power-up animations that do not slow the pace",
+    "Comedic king character carries tone in the meta and the special levels"
+  ],
+  "psychology": [
+    "Goal-gradient effect: renovation and event progress bars speed up play near completion",
+    "Loss aversion: the extra-moves offer arrives when only a few goals remain; streak rewards are lost on failure",
+    "Reciprocity: team life gifting",
+    "Variable reward: cascades and combo outcomes",
+    "Zeigarnik effect: an unfinished renovation task stays visible on the home screen"
+  ],
+  "innovations": [
+    "A propeller power-up that flies to a target, which rewards a new match shape (the square)",
+    "Rescue-the-king levels used both as content and as ad creative",
+    "Pace: notably fast animations and level entry for the genre"
+  ],
+  "weaknesses": [
+    "Hard-level spikes push coin spending and frustrate non-payers (common review theme; verify against current reviews)",
+    "Renovation offers little player choice compared with decoration-choice metas",
+    "Lives gate long sessions for non-payers"
+  ],
+  "lessons": [
+    "Speed is a feature: cut every transition that does not deliver feedback",
+    "Label difficulty spikes up front; surprise difficulty feels unfair",
+    "A meta that shows visible progress for every win makes losses easier to accept",
+    "Special level formats can double as the ad creative, so design them for a 3-second read"
+  ],
+  "borrow_for_us": [
+    "One star per win spent on visible keep restoration, but restoration also unlocks golem families so the meta feeds the core",
+    "Hard-level labels on every 10th level of the sawtooth curve, shown before the attempt",
+    "Bonus Rune Sort levels as our special format: a calm breather (not a threat) that also gives a clean ad hook",
+    "Fast map-to-battle flow: at most 2 taps and under 1.5 s from the home keep to the first spawn",
+    "No lives system in the prototype: we test retention without energy gating first"
+  ],
+  "sources": [
+    "https://www.dreamgames.com/",
+    "https://play.google.com/store/apps/details?id=com.dreamgames.royalmatch"
+  ]
+}

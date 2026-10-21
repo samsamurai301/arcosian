@@ -1,0 +1,76 @@
+# Codemagic workflows. Create groups "store_credentials" and "android_signing" in the Codemagic UI
+# and add the variables listed in ../README.md. Pin the engine version; verify tool names before use.
+workflows:
+  godot-ios-testflight:
+    name: Godot iOS TestFlight
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      groups:
+        - store_credentials
+      vars:
+        GODOT_VERSION: "4.7.2"
+        APP_IDENTIFIER: com.example.game
+      xcode: latest
+    scripts:
+      - name: Install Godot and export templates
+        script: |
+          curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_macos.universal.zip"
+          unzip -q godot.zip -d godot_app
+          curl -fsSL -o tpz.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          T="$HOME/Library/Application Support/Godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$T"; unzip -q tpz.zip -d tpz_tmp; mv tpz_tmp/templates/* "$T/"
+          echo "GODOT_BIN=$PWD/godot_app/Godot.app/Contents/MacOS/Godot" >> $CM_ENV
+      - name: Validate
+        script: |
+          "$GODOT_BIN" --headless --path . -s res://tools/ci/check_all.gd -- --out=$PWD/static.log
+          "$GODOT_BIN" --headless --path . -s res://tools/ci/run_tests.gd -- --out=$PWD/unit.xml
+      - name: Export Xcode project
+        script: |
+          # Godot needs the team ID to export iOS; the template leaves it blank. Add APPLE_TEAM_ID to the store_credentials group.
+          sed -i '' "s/^application\/app_store_team_id=\"\"/application\/app_store_team_id=\"${APPLE_TEAM_ID}\"/" export_presets.cfg
+          mkdir -p build/ios
+          "$GODOT_BIN" --headless --path . --export-release "iOS" "$PWD/build/ios/game.xcodeproj"
+      - name: fastlane beta
+        script: |
+          cd fastlane && bundle install && XCODEPROJ_PATH="$CM_BUILD_DIR/build/ios/game.xcodeproj" bundle exec fastlane ios beta
+    artifacts:
+      - build/ipa/*.ipa
+      - static.log
+      - unit.xml
+
+  godot-android-internal:
+    name: Godot Android internal
+    instance_type: linux_x2
+    max_build_duration: 45
+    environment:
+      groups:
+        - android_signing
+        - store_credentials
+      vars:
+        GODOT_VERSION: "4.7.2"
+        APP_IDENTIFIER: com.example.game
+    scripts:
+      - name: Install Godot and templates
+        script: |
+          curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip && mv Godot_v${GODOT_VERSION}-stable_linux.x86_64 godot && chmod +x godot
+          curl -fsSL -o tpz.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          T="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$T"; unzip -q tpz.zip -d tpz_tmp; mv tpz_tmp/templates/* "$T/"
+      - name: Decode keystore and export AAB
+        script: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$CM_BUILD_DIR/upload.keystore"
+          export GODOT_ANDROID_KEYSTORE_RELEASE_PATH="$CM_BUILD_DIR/upload.keystore"
+          export GODOT_ANDROID_KEYSTORE_RELEASE_USER="$ANDROID_KEY_ALIAS"
+          export GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD="$ANDROID_KEYSTORE_PASSWORD"
+          mkdir -p build/android
+          ./godot --headless --path . --install-android-build-template --export-release "Android" "$PWD/build/android/game.aab"
+      - name: fastlane internal
+        script: |
+          cd fastlane && bundle install && AAB_PATH="$CM_BUILD_DIR/build/android/game.aab" bundle exec fastlane android internal
+    artifacts:
+      - build/android/*.aab
+
+  # Unity: Codemagic's Unity support and licence handling differ from GitHub Actions.
+  # Prefer GameCI on GitHub for the engine build, then Codemagic only for the iOS finish if you want it.

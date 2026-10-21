@@ -1,0 +1,12 @@
+{
+  "unity-csharp": {
+    "command": "node",
+    "args": ["${CLAUDE_PLUGIN_ROOT}/lsp/unity-csharp-lsp.mjs"],
+    "extensionToLanguage": {
+      ".cs": "csharp"
+    },
+    "startupTimeout": 180000,
+    "shutdownTimeout": 8000,
+    "maxRestarts": 3
+  }
+}

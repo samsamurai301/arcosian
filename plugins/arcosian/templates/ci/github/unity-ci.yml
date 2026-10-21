@@ -1,0 +1,148 @@
+# Unity CI with GameCI: tests -> Android AAB -> iOS Xcode project (Linux) -> signing/upload on macOS.
+# Copy to .github/workflows/unity-ci.yml. One-time human step: Unity licence activation (see README).
+name: unity-ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+  UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+  UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+  # Pro/Plus alternative: also set UNITY_SERIAL. Floating licence: use unityLicensingServer instead.
+
+jobs:
+  core-tests-dotnet:
+    # Free and licence-less: Game.Core + EditMode tests on the .NET SDK (see unity-mobile README, "Core tests without Unity").
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - name: Build harness and run core tests
+        run: |
+          python3 tools/dotnet-harness/build_harness.py . "$RUNNER_TEMP/unity-harness"
+          cd "$RUNNER_TEMP/unity-harness/Tests"
+          UNITY_ASSETS_DIR="$GITHUB_WORKSPACE/Assets" dotnet test --logger "trx;LogFileName=core-tests.trx"
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: true
+      - uses: actions/cache@v6
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Packages/manifest.json', 'ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-
+      - uses: game-ci/unity-test-runner@v4
+        id: tests
+        with:
+          testMode: editmode
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          # unityVersion defaults to ProjectSettings/ProjectVersion.txt; pin the Unity 6 LTS editor there.
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: test-results
+          path: ${{ steps.tests.outputs.artifactsPath }}
+
+  build-android:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: true
+      - uses: actions/cache@v6
+        with:
+          path: Library
+          key: Library-Android-${{ hashFiles('Packages/manifest.json', 'ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-Android-
+      - uses: game-ci/unity-builder@v6
+        with:
+          targetPlatform: Android
+          buildMethod: Game.EditorTools.BuildScript.BuildAndroid
+          customParameters: -gsOut Builds/Android/game.aab
+          androidExportType: androidAppBundle
+          androidKeystoreName: upload.keystore
+          androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          androidKeyaliasName: ${{ secrets.ANDROID_KEY_ALIAS }}
+          androidKeyaliasPass: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: android-aab
+          path: Builds/Android   # BuildScript writes -gsOut Builds/Android/game.aab
+  android-internal:
+    needs: build-android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: android-aab
+          path: build/android
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: fastlane
+      - name: fastlane android internal
+        working-directory: fastlane
+        env:
+          PLAY_JSON_KEY_DATA: ${{ secrets.PLAY_JSON_KEY_DATA }}
+          AAB_PATH: ${{ github.workspace }}/build/android/game.aab   # confirm the file name the build emits
+        run: bundle exec fastlane android internal
+
+  build-ios-project:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: true
+      - uses: game-ci/unity-builder@v6
+        with:
+          targetPlatform: iOS
+          buildMethod: Game.EditorTools.BuildScript.BuildIOS
+          customParameters: -gsOut Builds/iOS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ios-xcode-project
+          path: Builds/iOS       # BuildScript writes the Xcode project to -gsOut Builds/iOS
+
+  ios-beta:
+    needs: build-ios-project
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: ios-xcode-project
+          path: build/ios
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: fastlane
+      - name: fastlane ios beta
+        working-directory: fastlane
+        env:
+          XCODEPROJ_PATH: ${{ github.workspace }}/build/ios/Unity-iPhone.xcodeproj
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_KEY_CONTENT: ${{ secrets.ASC_KEY_CONTENT }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          APP_IDENTIFIER: ${{ vars.APP_IDENTIFIER }}
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          XCODE_SCHEME: Unity-iPhone
+        run: bundle exec fastlane ios beta

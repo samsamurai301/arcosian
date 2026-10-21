@@ -1,0 +1,161 @@
+{
+  "schema_version": "1.0",
+  "naming": "snake_case",
+  "common_params": [
+    { "name": "session_id", "type": "string", "required": true, "description": "Random id per app session (new after 30 min in background)." },
+    { "name": "build", "type": "string", "required": true, "description": "App version plus build number, e.g. \"0.3.0-42\"." },
+    { "name": "player_level", "type": "int", "required": true, "description": "Highest level reached." },
+    { "name": "ab_cohort", "type": "string", "required": false, "description": "Active experiment cohorts, comma-separated, e.g. \"spawn_cost_b\"." }
+  ],
+  "events": [
+    {
+      "name": "tutorial_begin",
+      "category": "ftue",
+      "trigger": "first frame of the first battle on a fresh install",
+      "params": [],
+      "kpis": ["ftue_funnel"]
+    },
+    {
+      "name": "tutorial_step",
+      "category": "ftue",
+      "trigger": "each FTUE beat completed (contract ftue.steps)",
+      "params": [
+        { "name": "step_id", "type": "string", "required": true, "description": "FTUE step id.", "enum": ["ftue_spawn", "ftue_merge", "ftue_power", "ftue_star"] },
+        { "name": "seconds_since_install", "type": "float", "required": true, "description": "Seconds since first launch; feeds the aha-time target (45 s)." }
+      ],
+      "kpis": ["ftue_funnel", "aha_seconds"]
+    },
+    {
+      "name": "tutorial_complete",
+      "category": "ftue",
+      "trigger": "first star placed in the keep",
+      "params": [
+        { "name": "seconds_since_install", "type": "float", "required": true, "description": "Seconds since first launch." }
+      ],
+      "kpis": ["ftue_funnel", "d1"]
+    },
+    {
+      "name": "level_start",
+      "category": "progression",
+      "trigger": "battle or Rune Sort level begins (after the pre-level screen)",
+      "params": [
+        { "name": "level_id", "type": "string", "required": true, "description": "Level id from the level spec, e.g. \"w1_l012\", \"bonus_005\"." },
+        { "name": "attempt", "type": "int", "required": true, "description": "Attempt number on this level, starting at 1." },
+        { "name": "dda_step", "type": "int", "required": true, "description": "Difficulty assist steps applied (0-2)." }
+      ],
+      "kpis": ["level_funnel"]
+    },
+    {
+      "name": "level_end",
+      "category": "progression",
+      "trigger": "results screen shown, or the player quits a level",
+      "params": [
+        { "name": "level_id", "type": "string", "required": true, "description": "Level id." },
+        { "name": "attempt", "type": "int", "required": true, "description": "Attempt number." },
+        { "name": "success", "type": "bool", "required": true, "description": "True on win." },
+        { "name": "reason", "type": "string", "required": true, "description": "How it ended.", "enum": ["win", "hearts_out", "moves_out", "quit"] },
+        { "name": "duration_sec", "type": "float", "required": true, "description": "Level time excluding pauses." },
+        { "name": "waves_cleared", "type": "int", "required": false, "description": "Battle levels only." },
+        { "name": "max_tier", "type": "int", "required": false, "description": "Highest golem tier reached (battle levels)." },
+        { "name": "revived", "type": "bool", "required": false, "description": "Whether a revive was used." }
+      ],
+      "kpis": ["level_win_rate", "attempts_p50", "churn_by_level"]
+    },
+    {
+      "name": "earn_virtual_currency",
+      "category": "economy",
+      "trigger": "any currency grant",
+      "params": [
+        { "name": "virtual_currency_name", "type": "string", "required": true, "description": "Currency id.", "enum": ["coins", "gems", "stars", "runes", "shells"] },
+        { "name": "value", "type": "int", "required": true, "description": "Amount granted." },
+        { "name": "source", "type": "string", "required": true, "description": "Economy node id, e.g. \"win_reward\", \"rune_sort_bonus\"." }
+      ],
+      "kpis": ["economy_balance"],
+      "sampling": 1.0
+    },
+    {
+      "name": "spend_virtual_currency",
+      "category": "economy",
+      "trigger": "any currency spend",
+      "params": [
+        { "name": "virtual_currency_name", "type": "string", "required": true, "description": "Currency id.", "enum": ["coins", "gems", "stars", "runes", "shells"] },
+        { "name": "value", "type": "int", "required": true, "description": "Amount spent." },
+        { "name": "item_name", "type": "string", "required": true, "description": "Sink id, e.g. \"family_upgrade\", \"revive_gems\", \"restore_task\"." }
+      ],
+      "kpis": ["economy_balance"]
+    },
+    {
+      "name": "restore_task_complete",
+      "category": "progression",
+      "trigger": "a keep restoration task finishes its animation",
+      "params": [
+        { "name": "area_index", "type": "int", "required": true, "description": "Keep area, starting at 1." },
+        { "name": "task_index", "type": "int", "required": true, "description": "Task within the area, starting at 1." }
+      ],
+      "kpis": ["meta_engagement", "d7"]
+    },
+    {
+      "name": "rv_offer_shown",
+      "category": "ads",
+      "trigger": "a rewarded-ad offer becomes visible",
+      "params": [
+        { "name": "placement", "type": "string", "required": true, "description": "Placement id.", "enum": ["results_double_coins", "revive_continue", "daily_chest"] }
+      ],
+      "kpis": ["rv_opt_in_rate"]
+    },
+    {
+      "name": "rv_completed",
+      "category": "ads",
+      "trigger": "the ad SDK confirms the reward",
+      "params": [
+        { "name": "placement", "type": "string", "required": true, "description": "Placement id." },
+        { "name": "network", "type": "string", "required": false, "description": "Mediation network that served the ad." }
+      ],
+      "kpis": ["rv_opt_in_rate", "arpdau_usd"]
+    },
+    {
+      "name": "iap_purchase_completed",
+      "category": "monetization",
+      "trigger": "receipt validated server-side and contents granted",
+      "params": [
+        { "name": "product_id", "type": "string", "required": true, "description": "Contract IAP id.", "enum": ["starter_pack", "gems_s", "gems_m", "piggy_break", "remove_ads", "keep_pass"] },
+        { "name": "price_usd_micros", "type": "int", "required": true, "description": "Reference USD price in micros (4.99 USD = 4990000)." },
+        { "name": "first_purchase", "type": "bool", "required": true, "description": "True for the player's first purchase ever." }
+      ],
+      "kpis": ["payer_conversion", "arpdau_usd"]
+    },
+    {
+      "name": "liveops_event_progress",
+      "category": "liveops",
+      "trigger": "a Snail Rally milestone is reached",
+      "params": [
+        { "name": "event_id", "type": "string", "required": true, "description": "Live event id, e.g. \"snail_rally\"." },
+        { "name": "milestone", "type": "int", "required": true, "description": "Milestone index reached." }
+      ],
+      "kpis": ["event_participation"]
+    },
+    {
+      "name": "settings_changed",
+      "category": "ux",
+      "trigger": "player toggles a setting",
+      "params": [
+        { "name": "setting", "type": "string", "required": true, "description": "Setting key.", "enum": ["music", "sfx", "haptics", "reduced_motion", "text_scale", "language"] },
+        { "name": "value", "type": "string", "required": true, "description": "New value as a string." }
+      ],
+      "kpis": ["accessibility_usage"]
+    },
+    {
+      "name": "perf_sample",
+      "category": "tech",
+      "trigger": "every 60 s of battle, sampled",
+      "params": [
+        { "name": "fps_avg", "type": "float", "required": true, "description": "Average FPS over the window." },
+        { "name": "frame_ms_p95", "type": "float", "required": true, "description": "95th-percentile frame time, ms." },
+        { "name": "memory_mb", "type": "int", "required": true, "description": "Resident memory, MB." },
+        { "name": "thermal", "type": "string", "required": false, "description": "Thermal state label if the OS exposes one." }
+      ],
+      "kpis": ["perf_health"],
+      "sampling": 0.05
+    }
+  ]
+}

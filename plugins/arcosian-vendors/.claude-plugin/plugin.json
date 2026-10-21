@@ -1,0 +1,40 @@
+{
+  "name": "arcosian-vendors",
+  "version": "0.3.0",
+  "description": "Vendor MCP adapter for arcosian: PixelLab, Meshy, ElevenLabs hosted MCP, plus Scenario and ComfyUI notes, with a skill on when to use a vendor MCP versus the core studio-gateway and how to keep provenance and budgets intact.",
+  "author": {
+    "name": "samsamurai301",
+    "url": "https://github.com/samsamurai301"
+  },
+  "homepage": "https://github.com/samsamurai301/arcosian/tree/main/plugins/arcosian-vendors",
+  "repository": "https://github.com/samsamurai301/arcosian",
+  "license": "MIT",
+  "keywords": [
+    "pixellab",
+    "meshy",
+    "elevenlabs",
+    "scenario",
+    "comfyui",
+    "mcp",
+    "asset-pipeline"
+  ],
+  "dependencies": [
+    "arcosian"
+  ],
+  "userConfig": {
+    "pixellab_api_key": {
+      "type": "string",
+      "title": "PixelLab API token",
+      "description": "Bearer token for the PixelLab remote MCP at api.pixellab.ai/mcp. A PixelLab subscription is required.",
+      "sensitive": true,
+      "required": false
+    },
+    "meshy_api_key": {
+      "type": "string",
+      "title": "Meshy API key",
+      "description": "MESHY_API_KEY for the Meshy MCP server. The key requires a Pro plan or above.",
+      "sensitive": true,
+      "required": false
+    }
+  }
+}

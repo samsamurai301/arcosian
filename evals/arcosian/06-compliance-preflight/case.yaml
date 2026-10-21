@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: 06-compliance-preflight
+description: Compliance pre-flight flags a Godot project targeting SDK 34
+context:
+  scaffold_script: scaffold.sh

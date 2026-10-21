@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "revenuecat": {
+      "type": "http",
+      "url": "https://mcp.revenuecat.ai/mcp"
+    },
+    "firebase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firebase-tools@15.34.0",
+        "mcp"
+      ]
+    },
+    "adjust": {
+      "type": "http",
+      "url": "https://mcp.adjust.com/mcpo"
+    }
+  }
+}

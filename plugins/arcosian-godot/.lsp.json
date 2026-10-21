@@ -1,0 +1,12 @@
+{
+  "gdscript": {
+    "command": "node",
+    "args": ["${CLAUDE_PLUGIN_ROOT}/lsp/gdscript-bridge.mjs"],
+    "extensionToLanguage": {
+      ".gd": "gdscript"
+    },
+    "startupTimeout": 180000,
+    "shutdownTimeout": 8000,
+    "maxRestarts": 3
+  }
+}

@@ -1,0 +1,13 @@
+# Normalise line endings; Unity YAML must stay LF
+* text=auto eol=lf
+*.cs text diff=csharp
+*.meta text
+*.unity text merge=unityyamlmerge eol=lf
+*.prefab text merge=unityyamlmerge eol=lf
+*.asset text merge=unityyamlmerge eol=lf
+*.mat text merge=unityyamlmerge eol=lf
+*.controller text merge=unityyamlmerge eol=lf
+*.anim text merge=unityyamlmerge eol=lf
+
+# Git LFS rules for textures, audio, models and fonts are in gitattributes-lfs.example:
+# append them here after copying the template (they ship separately so the plugin itself stays LFS-free).

@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: 02-design-contract
+description: Fill the design contract and validate it with gs.py
+context:
+  scaffold_script: scaffold.sh

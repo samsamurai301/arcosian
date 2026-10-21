@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "seed": 1,
+  "steps": [
+    {"action": {"type": "new_game", "seed": 1}, "expect": {"status": "playing", "moves": 0, "empty_count": 23}},
+    {"action": {"type": "move", "dir": "left"}, "expect": {"status": "playing", "moves": {"op": ">=", "value": 0}}},
+    {"action": {"type": "move", "dir": "down"}, "expect": {"status": "playing"}},
+    {"action": {"type": "move", "dir": "right"}, "expect": {"status": "playing"}},
+    {"action": {"type": "move", "dir": "up"}, "expect": {"status": "playing", "max_tile": {"op": ">=", "value": 2}}}
+  ]
+}

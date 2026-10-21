@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Game deconstruction (.gamestudio/research/*.deconstruction.json)",
+  "description": "A structured teardown of an existing game in the ontology's terms: core and meta loops, mechanics (mechanic cards), economy, progression, monetization, live-ops, retention hooks, social, notable UX / art / audio, psychology, innovations, weaknesses and lessons, ending in what we borrow. Record only publicly observable or sourced facts; mark inferences as such and date the teardown (as_of) because live games change.",
+  "type": "object",
+  "required": ["schema_version", "game"],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "deconstruction", "description": "Optional self-identification for validate_json.py --auto." },
+    "as_of": { "$ref": "common.schema.json#/$defs/iso_date", "description": "Date the game was observed or the sources were read; live-ops and monetization details go stale quickly." },
+    "game": {
+      "type": "object",
+      "description": "Identity of the game being deconstructed.",
+      "required": ["title"],
+      "additionalProperties": true,
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "description": "Game title." },
+        "developer": { "type": "string", "description": "Developer (and publisher, if different)." },
+        "year": { "type": "integer", "minimum": 1950, "maximum": 2100, "description": "Year of global release (state soft-launch years in notes)." },
+        "genre": { "type": "string", "description": "Market genre / subgenre." },
+        "platforms": { "$ref": "common.schema.json#/$defs/platform_list", "description": "Platforms the game ships on." }
+      }
+    },
+    "core_loop": { "$ref": "common.schema.json#/$defs/loop", "description": "The moment-to-moment loop, as a loop graph (same shape as contract loops)." },
+    "meta_loops": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/loop" },
+      "description": "Loops around the core: progression, collection, social, live-ops, monetization."
+    },
+    "mechanics": {
+      "type": "array",
+      "items": { "$ref": "mechanic-card.schema.json#/$defs/mechanic_card" },
+      "description": "Key mechanics as mechanic cards (id and name required; fill what is observable)."
+    },
+    "economy": {
+      "type": "object",
+      "description": "Observed economy.",
+      "additionalProperties": true,
+      "properties": {
+        "currencies": {
+          "type": "array",
+          "items": { "type": ["string", "object"] },
+          "description": "Currencies: names, or objects such as {\"id\": \"coins\", \"kind\": \"soft\", \"note\": \"...\"}."
+        },
+        "sources": { "$ref": "common.schema.json#/$defs/string_list", "description": "Faucets: where resources come from." },
+        "sinks": { "$ref": "common.schema.json#/$defs/string_list", "description": "Drains: where resources go." }
+      }
+    },
+    "progression": { "type": ["string", "array", "object"], "description": "Progression structure: tracks, unlock pacing, difficulty pattern." },
+    "monetization": {
+      "type": "object",
+      "description": "Observed monetization.",
+      "additionalProperties": true,
+      "properties": {
+        "model": { "$ref": "common.schema.json#/$defs/monetization_model", "description": "Business model." },
+        "top_offers": { "type": "array", "items": { "type": ["string", "object"] }, "description": "Most prominent offers / products and their positioning." },
+        "ads": { "type": ["string", "object", "null"], "description": "Ad usage (placements, pacing), or null if none observed." }
+      }
+    },
+    "liveops": { "type": ["string", "array", "object"], "description": "Live-ops: event types, cadence, passes, seasons." },
+    "retention_hooks": { "$ref": "common.schema.json#/$defs/string_list", "description": "Mechanisms that bring players back (streaks, timers, social obligations, collections)." },
+    "social": { "type": ["string", "array", "object"], "description": "Social features: teams, gifting, leaderboards, PvP." },
+    "ux_notable": { "$ref": "common.schema.json#/$defs/string_list", "description": "Notable UX decisions worth studying." },
+    "art_audio_notable": { "$ref": "common.schema.json#/$defs/string_list", "description": "Notable art and audio decisions." },
+    "psychology": { "$ref": "common.schema.json#/$defs/string_list", "description": "Psychological principles the design leans on (e.g. goal-gradient effect, loss aversion), each tied to the feature that uses it." },
+    "innovations": { "$ref": "common.schema.json#/$defs/string_list", "description": "What the game did first or better than its genre." },
+    "weaknesses": { "$ref": "common.schema.json#/$defs/string_list", "description": "Weaknesses and player complaints; openings for competitors." },
+    "lessons": { "$ref": "common.schema.json#/$defs/string_list", "description": "General lessons, stated as reusable rules." },
+    "borrow_for_us": { "$ref": "common.schema.json#/$defs/string_list", "description": "Concrete, transformed borrowings for our project (what, and how we change it)." },
+    "sources": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/url" },
+      "uniqueItems": true,
+      "description": "URLs backing the factual claims (store pages, developer talks, reputable analyses)."
+    }
+  }
+}

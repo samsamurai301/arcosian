@@ -1,0 +1,31 @@
+{
+  "name": "arcosian-godot",
+  "version": "0.3.0",
+  "description": "Godot adapter for arcosian: Godot's own GDScript language server for Claude Code (type errors after edits, go to definition, references, symbols), runtime-verification MCP bridges (satelliteoflove/godot-mcp, tugcantopaloglu/godot-mcp) and a skill on wiring them into the five gates and the playtest runner.",
+  "author": {
+    "name": "samsamurai301",
+    "url": "https://github.com/samsamurai301"
+  },
+  "homepage": "https://github.com/samsamurai301/arcosian/tree/main/plugins/arcosian-godot",
+  "repository": "https://github.com/samsamurai301/arcosian",
+  "license": "MIT",
+  "dependencies": [
+    "arcosian"
+  ],
+  "userConfig": {
+    "godot_bin": {
+      "type": "file",
+      "title": "Godot binary",
+      "description": "Path to the Godot 4.x executable used by the bridges, the GDScript language server and headless gates (pin to the engine version your project targets).",
+      "required": false
+    },
+    "godot_lsp_port": {
+      "type": "number",
+      "title": "Use an open editor's GDScript language server (port)",
+      "description": "Leave empty and the plugin starts its own headless Godot editor for code checks. Set 6005 (Godot's default) to use the language server of the editor you keep open instead, so two editors never run on one project.",
+      "min": 1,
+      "max": 65535,
+      "required": false
+    }
+  }
+}

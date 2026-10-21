@@ -1,0 +1,282 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "arcosian common definitions",
+  "description": "Shared $defs for the arcosian ontology. Not a document type: other schemas reference these shapes as \"common.schema.json#/$defs/<name>\". Changing a shape here changes every document that uses it, so keep edits backward compatible within schema_version 1.0.",
+  "$comment": "Ontology version 1.0. Loops are graphs of steps; parameters are tunable numbers with ranges; mechanics bind verbs to rules. See skill game-ontology for the conceptual model.",
+  "$defs": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Ontology schema version. Every top-level arcosian document carries \"1.0\"; tools refuse documents from a future major version instead of guessing."
+    },
+    "schema_name": {
+      "type": "string",
+      "description": "Optional self-identification of the document type (a canonical schema name such as \"level-spec\"). validate_json.py --auto uses it when the file name does not follow the naming conventions."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$",
+      "description": "Stable identifier: starts with a letter or digit, then letters, digits, '_', '.', ':' or '-', at most 128 characters. Prefer lower snake_case (\"merge_two\", \"core\", \"coins\"). Ids are referenced from other documents, so never rename one casually."
+    },
+    "id_list": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/id" },
+      "uniqueItems": true,
+      "description": "Unique list of ids referring to objects defined elsewhere (verbs, mechanics, resources, assets)."
+    },
+    "feature_id": {
+      "type": "string",
+      "pattern": "^F\\d{3,4}$",
+      "description": "Feature identifier: 'F' followed by 3 or 4 digits (F001 to F9999). Matches features.json and .gamestudio/evidence/<FEATURE-ID>/."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 64,
+      "description": "URL- and folder-safe lower-case kebab-case name, e.g. \"pebble-keep\"."
+    },
+    "iso_datetime": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?(Z|[+-]\\d{2}:?\\d{2})?$",
+      "description": "ISO 8601 timestamp, preferably UTC with 'Z', e.g. \"2026-10-18T14:05:00Z\"."
+    },
+    "iso_date": {
+      "type": "string",
+      "format": "date",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "ISO 8601 calendar date, e.g. \"2026-10-18\"."
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "File path. Use forward slashes and keep it relative to the game project root (e.g. \"assets/generated/sprites/golem_t1.png\") so the project stays portable across machines and CI."
+    },
+    "project_rel_path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?![/\\\\])(?![A-Za-z]:)(?!.*(^|[/\\\\])\\.\\.([/\\\\]|$)).+$",
+      "description": "Strictly project-relative path: no leading '/', no drive letter, no '..' segments. Used where a wrong path would silently defeat enforcement, such as gate evidence (\".gamestudio/evidence/F012/static.log\")."
+    },
+    "path_list": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/path" },
+      "description": "List of project-relative file paths."
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^https?://\\S+$",
+      "description": "Absolute http(s) URL."
+    },
+    "ratio": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Fraction between 0 and 1 inclusive (0.42 means 42%). Never use 0-100 percentages in ratio fields."
+    },
+    "usd": {
+      "type": "number",
+      "minimum": 0,
+      "description": "Amount in US dollars, non-negative, decimal (e.g. 0.067)."
+    },
+    "non_negative_integer": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Whole number >= 0."
+    },
+    "string_list": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "List of non-empty strings."
+    },
+    "text_or_list": {
+      "type": ["string", "array"],
+      "items": { "type": "string" },
+      "description": "Either one string or a list of strings (bullet points)."
+    },
+    "platform": {
+      "type": "string",
+      "enum": ["ios", "android", "web", "windows", "macos", "linux", "switch", "playstation", "xbox", "other"],
+      "description": "Target or shipped platform. Mobile projects use \"ios\" and \"android\"; the others exist so deconstructions of non-mobile games validate."
+    },
+    "platform_list": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/platform" },
+      "uniqueItems": true,
+      "description": "Unique list of platforms."
+    },
+    "orientation": {
+      "type": "string",
+      "enum": ["portrait", "landscape", "both"],
+      "description": "Screen orientation. Portrait suits one-handed casual play; landscape suits two-thumb action; \"both\" doubles UI layout and QA cost."
+    },
+    "engine": {
+      "type": "string",
+      "enum": ["godot", "unity", "unreal", "defold", "web", "other"],
+      "description": "Game engine or runtime. arcosian ships templates for godot and unity."
+    },
+    "monetization_model": {
+      "type": "string",
+      "enum": ["premium", "iap", "ads", "hybrid", "subscription"],
+      "description": "Primary business model: premium (paid up front), iap (free with in-app purchases), ads (ad-funded), hybrid (IAP plus ads, typical for hybrid-casual), subscription."
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["prototype", "slice", "soft_launch", "global", "live"],
+      "description": "Production stage: prototype (find the fun), slice (vertical slice at target quality), soft_launch (limited-market KPI test), global (worldwide launch), live (operating)."
+    },
+    "likelihood_impact": {
+      "enum": ["low", "medium", "high", 1, 2, 3, 4, 5],
+      "description": "Qualitative level (low, medium, high) or a 1-5 score where 5 is the most likely / most severe."
+    },
+    "verb": {
+      "type": "object",
+      "description": "A player verb: the atomic input-to-intent mapping that mechanics build on.",
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id", "description": "Verb id, e.g. \"drag_merge\", \"tap_spawn\". Mechanics list these ids in their verbs field." },
+        "input": {
+          "type": "string",
+          "description": "Physical input on the device. Suggested vocabulary: tap, double_tap, long_press, drag, swipe, flick, pinch, rotate, hold_release, multi_touch, tilt, virtual_stick, button, none (automatic)."
+        },
+        "description": { "type": "string", "description": "What the player intends and what the game does in response, in one sentence." }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "description": "A tunable value of a mechanic or system, with its design range. Balance tools and remote config read these.",
+      "required": ["key"],
+      "properties": {
+        "key": { "$ref": "#/$defs/id", "description": "Parameter name, unique within its mechanic, e.g. \"spawn_cost\". Becomes the remote-config key suffix when the value is tunable live." },
+        "value": {
+          "type": ["number", "string", "boolean", "null"],
+          "description": "Current design value. Use null while still undecided (TBD); numbers carry the unit in the unit field."
+        },
+        "min": { "type": ["number", "null"], "description": "Lowest value the design tolerates; balance passes and remote config must stay inside [min, max]." },
+        "max": { "type": ["number", "null"], "description": "Highest value the design tolerates." },
+        "unit": { "type": "string", "description": "Unit of value, e.g. \"sec\", \"cells\", \"coins\", \"x\" (multiplier), \"%\"." },
+        "note": { "type": "string", "description": "Why this value, what it trades off, and what breaks outside the range." }
+      }
+    },
+    "comparable": {
+      "type": "object",
+      "description": "A reference game and what to take from it. The borrow/change pair forces an explicit transformation instead of a clone.",
+      "required": ["title"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "description": "Name of the comparable game." },
+        "borrow": { "$ref": "#/$defs/text_or_list", "description": "What we take from it (a mechanic, structure, pacing, feel)." },
+        "change": { "$ref": "#/$defs/text_or_list", "description": "What we change, and why it serves our players better or differentiates us." }
+      }
+    },
+    "target_audience": {
+      "type": "object",
+      "description": "Who the game is for. Drives tone, difficulty, monetization ethics and store age rating.",
+      "properties": {
+        "age_min": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99,
+          "description": "Youngest intended player age. Below 13 (or the local digital-consent age) triggers children's-privacy, ad and loot-box constraints; see skill legal-ethics."
+        },
+        "segments": { "$ref": "#/$defs/string_list", "description": "Player segments in plain words, e.g. \"lapsed puzzle players 25-45\", \"commute players\"." },
+        "motivations": {
+          "$ref": "#/$defs/string_list",
+          "description": "Primary player motivations. Use one consistent model, e.g. Quantic Foundry motivation names such as \"challenge\", \"strategy\", \"completion\", \"design\"."
+        }
+      }
+    },
+    "loop_step": {
+      "type": "object",
+      "description": "One node of a loop graph: the player does action, gets reward, and the loop continues at next.",
+      "required": ["id", "action"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id", "description": "Step id, unique within its loop, e.g. \"s1\" or \"merge\"." },
+        "action": { "type": "string", "minLength": 1, "description": "What the player does at this step (verb plus object), e.g. \"drag two tier-2 golems together\"." },
+        "reward": {
+          "type": ["string", "object", "null"],
+          "additionalProperties": { "type": "number" },
+          "description": "What the step pays out: a description, a resource map such as {\"coins\": 40}, or null for a pure decision step."
+        },
+        "next": {
+          "type": ["string", "array", "null"],
+          "items": { "type": "string" },
+          "description": "Id of the following step, a list of ids for a branch, \"loop:<loop-id>\" to hand off to another loop, or null to end."
+        }
+      }
+    },
+    "loop": {
+      "type": "object",
+      "description": "A gameplay loop modelled as a graph of steps. Core loops repeat every few seconds; meta loops wrap sessions and days.",
+      "required": ["id", "steps"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id", "description": "Loop id, e.g. \"core\", \"meta_restore\"." },
+        "name": { "type": "string", "description": "Human-readable loop name." },
+        "type": {
+          "type": "string",
+          "enum": ["core", "meta", "social", "monetization", "liveops"],
+          "description": "Loop layer: core (moment to moment), meta (progression around sessions), social, monetization, liveops."
+        },
+        "period": {
+          "type": "string",
+          "enum": ["seconds", "minutes", "session", "daily", "weekly", "season"],
+          "description": "Typical time for one full turn of the loop."
+        },
+        "description": { "type": "string", "description": "Why the loop is satisfying and what keeps the player turning it." },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/loop_step" },
+          "description": "Steps in play order. The last step's next normally points back to the first, closing the loop."
+        }
+      }
+    },
+    "mechanic": {
+      "type": "object",
+      "description": "A mechanic as listed in the design contract: verbs bound to rules and parameters. A richer stand-alone form is mechanic-card.schema.json.",
+      "required": ["id"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id", "description": "Mechanic id, e.g. \"merge_two\". Referenced by levels (mechanic_refs), cards and features." },
+        "name": { "type": "string", "description": "Short display name." },
+        "category": {
+          "type": "string",
+          "description": "Mechanic family. Suggested vocabulary: movement, aiming, timing, placement, merge, match, sort, physics, combat, resource, construction, chance, collection, progression, social, narrative, puzzle, economy."
+        },
+        "verbs": { "$ref": "#/$defs/id_list", "description": "Ids of the verbs (contract verbs) this mechanic consumes." },
+        "rules": { "$ref": "#/$defs/string_list", "description": "Unambiguous rules, one per line, testable by a deterministic playthrough." },
+        "parameters": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/parameter" },
+          "description": "Tunable values with design ranges."
+        },
+        "feedback": { "$ref": "#/$defs/text_or_list", "description": "Juice and readability: what the player sees, hears and feels when the mechanic fires." },
+        "mobile_notes": { "$ref": "#/$defs/text_or_list", "description": "Thumb reach, one-hand play, interruption safety, small-screen readability." }
+      }
+    },
+    "licence": {
+      "type": "object",
+      "description": "Licence and provenance terms of an asset. studio-gateway licence_check compares them with config.revenue; config.licence_allowlist lists terms accepted without review.",
+      "properties": {
+        "terms": {
+          "type": "string",
+          "description": "Licence identifier: an SPDX id for open licences (\"CC0-1.0\", \"CC-BY-4.0\") or the provider's terms label or URL for generated assets."
+        },
+        "plan_tier": {
+          "type": ["string", "null"],
+          "description": "Provider plan the asset was generated under (e.g. \"free\", \"starter\", \"pro\"). Free tiers often withhold commercial rights; record it at generation time."
+        },
+        "commercial_ok": { "type": "boolean", "description": "True only if the terms allow use in a commercial game at the project's revenue level." },
+        "attribution": { "type": ["string", "null"], "description": "Required attribution text, or null when none is required." },
+        "restrictions": {
+          "$ref": "#/$defs/string_list",
+          "description": "Conditions that could invalidate use, e.g. revenue thresholds, no AI training, no resale as a stand-alone asset."
+        }
+      }
+    },
+    "resource_amounts": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$" },
+      "additionalProperties": { "type": "number" },
+      "description": "Map of resource id to amount, e.g. {\"coins\": 40, \"stars\": 1}. Keys must be resource ids defined in the same document."
+    }
+  }
+}

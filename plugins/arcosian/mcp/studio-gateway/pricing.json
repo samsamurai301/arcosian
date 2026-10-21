@@ -1,0 +1,136 @@
+{
+  "_note": "Default model ids and list prices checked 2026-10-20. Override any model with GS_MODEL_<PROVIDER>_<KIND> (e.g. GS_MODEL_GEMINI_IMAGE). Fields: usd = price per unit for the default model and default tier; tiers = per size or quality price for the default model; models = prices of other known model ids (number or tier map); image_usd, texture_usd, rig_usd, ref_usd = surcharges. verified:true means model id and price both came from a source: verified_via 'docs' = official API documentation fetched on 2026-10-20, 'research-notes' = a figure the Oct 2026 research notes cite from an official page (not re-fetched). verified:false means an estimate (see note). source = page confirming the price, docs = page confirming the request shape.",
+  "as_of": "2026-10-20",
+  "models": {
+    "gemini.image": {
+      "model": "gemini-nano-banana-2.1", "unit": "image", "usd": 0.0336, "default_tier": "1K",
+      "tiers": {"1K": 0.0336, "2K": 0.0504, "4K": 0.113},
+      "models": {
+        "gemini-3.1-flash-image": {"1K": 0.067, "2K": 0.101, "4K": 0.151},
+        "gemini-3.1-flash-lite-image": {"1K": 0.0336},
+        "gemini-3-pro-image": {"1K": 0.134, "2K": 0.134, "4K": 0.24}
+      },
+      "verified": true, "verified_via": "docs (model id, endpoint) + research-notes (prices)",
+      "source": "https://ai.google.dev/gemini-api/docs/pricing", "docs": "https://ai.google.dev/gemini-api/docs/image-generation",
+      "note": "Interactions API. gemini-2.5-flash-image is legacy and was shut down on 2026-10-02 per the research notes. Interim 'thought' images are not charged."
+    },
+    "gemini.image_edit": {
+      "model": "gemini-nano-banana-2.1", "unit": "image", "usd": 0.0336, "default_tier": "1K",
+      "tiers": {"1K": 0.0336, "2K": 0.0504, "4K": 0.113},
+      "models": {
+        "gemini-3.1-flash-image": {"1K": 0.067, "2K": 0.101, "4K": 0.151},
+        "gemini-3.1-flash-lite-image": {"1K": 0.0336},
+        "gemini-3-pro-image": {"1K": 0.134, "2K": 0.134, "4K": 0.24}
+      },
+      "verified": true, "verified_via": "docs (model id, endpoint) + research-notes (prices)",
+      "source": "https://ai.google.dev/gemini-api/docs/pricing", "docs": "https://ai.google.dev/gemini-api/docs/image-generation",
+      "note": "Same model and price as generation; input images are billed as input tokens (small, not estimated)."
+    },
+    "gemini.music": {
+      "model": "lyria-3.5", "unit": "song", "usd": 0.08,
+      "models": {"lyria-3-clip-preview": 0.04},
+      "verified": true, "verified_via": "docs (model ids, endpoint) + research-notes (prices)",
+      "source": "https://ai.google.dev/gemini-api/docs/pricing", "docs": "https://ai.google.dev/gemini-api/docs/music-generation",
+      "note": "lyria-3.5 makes songs of about two minutes (length is steered by the prompt only); lyria-3-clip-preview always makes 30 s. No free tier."
+    },
+    "gemini.tts": {
+      "model": "gemini-3.8-flash-tts", "unit": "1k_chars", "usd": 0.016,
+      "verified": false, "verified_via": null,
+      "source": "https://ai.google.dev/gemini-api/docs/pricing", "docs": "https://ai.google.dev/gemini-api/docs/speech-generation",
+      "note": "Derived: $9.00 per 1M audio output tokens through 2026-12-31 (about 25 tokens per second of speech) plus $0.50 per 1M input tokens, at an assumed 14 characters per second. From 2027-01-01 the token rates double, so the figure becomes about 0.032."
+    },
+    "openai.image": {
+      "model": "gpt-image-2.5-flare", "unit": "image", "usd": 0.053, "default_tier": "medium",
+      "tiers": {"low": 0.006, "medium": 0.053, "high": 0.211}, "wide_mult": 1.5,
+      "models": {
+        "gpt-image-2.5-sunburst": {"low": 0.006, "medium": 0.053, "high": 0.211},
+        "gpt-image-2": {"low": 0.006, "medium": 0.053, "high": 0.211}
+      },
+      "verified": false, "verified_via": null,
+      "source": "https://developers.openai.com/api/docs/pricing", "docs": "https://developers.openai.com/api/docs/guides/image-generation",
+      "note": "Token-billed (image output $30 per 1M tokens for GPT Image 2 and 2.5). Per-image figures are the approximate 1024x1024 output costs reported by a third-party calculator write-up for gpt-image-2; 2.5 uses the same token rates. Wide or tall sizes are estimated at 1.5x. The gateway always sends quality explicitly (default medium) so the estimate holds."
+    },
+    "openai.image_edit": {
+      "model": "gpt-image-2.5-sunburst", "unit": "image", "usd": 0.053, "default_tier": "medium", "ref_usd": 0.01,
+      "tiers": {"low": 0.006, "medium": 0.053, "high": 0.211}, "wide_mult": 1.5,
+      "models": {
+        "gpt-image-2.5-flare": {"low": 0.006, "medium": 0.053, "high": 0.211},
+        "gpt-image-2": {"low": 0.006, "medium": 0.053, "high": 0.211}
+      },
+      "verified": false, "verified_via": null,
+      "source": "https://developers.openai.com/api/docs/pricing", "docs": "https://developers.openai.com/api/docs/guides/image-generation",
+      "note": "Sunburst is the 2.5 variant recommended for edit precision. ref_usd approximates input-image tokens ($8 per 1M) per source or reference image."
+    },
+    "recraft.image": {
+      "model": "recraftv4_1", "unit": "image", "usd": 0.035,
+      "models": {"recraftv4_1_flash": 0.007, "recraftv4_1_pro": 0.21, "recraftv4_1_utility": 0.035, "recraftv4_1_utility_pro": 0.21, "recraftv4_styles": 0.035, "recraftv4_styles_pro": 0.1, "recraftv4": 0.04, "recraftv4_pro": 0.25, "recraftv3": 0.04, "recraftv2": 0.022},
+      "verified": true, "verified_via": "docs",
+      "source": "https://www.recraft.ai/llms-full.txt", "docs": "https://www.recraft.ai/docs/api-reference",
+      "note": "1 API unit = $0.001. Default raster output is WebP, so the gateway requests image_format png."
+    },
+    "recraft.image_vector": {
+      "model": "recraftv4_1_vector", "unit": "image", "usd": 0.08,
+      "models": {"recraftv4_1_pro_vector": 0.3, "recraftv4_1_utility_vector": 0.08, "recraftv4_1_utility_pro_vector": 0.3, "recraftv4_styles_vector": 0.05, "recraftv4_styles_pro_vector": 0.12, "recraftv4_vector": 0.08, "recraftv4_pro_vector": 0.3, "recraftv3_vector": 0.08, "recraftv2_vector": 0.044},
+      "verified": true, "verified_via": "docs",
+      "source": "https://www.recraft.ai/llms-full.txt", "docs": "https://www.recraft.ai/docs/api-reference",
+      "note": "Vector is selected by a *_vector model id and returns SVG; size must be a w:h ratio."
+    },
+    "recraft.remove_background": {"model": "removeBackground", "unit": "call", "usd": 0.01, "verified": true, "verified_via": "docs", "source": "https://www.recraft.ai/llms-full.txt", "docs": "https://www.recraft.ai/docs/api-reference"},
+    "recraft.vectorize": {"model": "vectorize", "unit": "call", "usd": 0.01, "verified": true, "verified_via": "docs", "source": "https://www.recraft.ai/llms-full.txt", "docs": "https://www.recraft.ai/docs/api-reference"},
+    "recraft.upscale": {"model": "crispUpscale", "unit": "call", "usd": 0.004, "verified": true, "verified_via": "docs", "source": "https://www.recraft.ai/llms-full.txt", "docs": "https://www.recraft.ai/docs/api-reference"},
+    "fal.image": {
+      "model": "fal-ai/flux/schnell", "unit": "megapixel", "usd": 0.003,
+      "verified": false, "verified_via": null,
+      "source": "https://fal.ai/models/fal-ai/flux/schnell/api", "docs": "https://fal.ai/models/fal-ai/flux/schnell/api",
+      "note": "Model id, input and output schema confirmed on the model page (not deprecated, commercial use). The page does not show a price: $0.003 per megapixel is from memory. The queue REST paths were not re-fetched (the page shows only the JS client)."
+    },
+    "stability.image": {
+      "model": "stable-image-core", "unit": "image", "usd": 0.03,
+      "verified": false, "verified_via": null,
+      "source": "https://docs.stability.ai/pricing.md", "docs": "https://docs.stability.ai/api-reference/generate/stable-image-core.md",
+      "note": "Endpoint POST /v2beta/stable-image/generate/core and Accept: image/* confirmed; 1 credit = $0.01 per the pricing index. The 3-credit price of Core is from memory."
+    },
+    "stability.audio": {
+      "model": "stable-audio-3", "unit": "call", "usd": 0.08,
+      "verified": true, "verified_via": "docs",
+      "source": "https://docs.stability.ai/api-reference/stable-audio/text-to-audio.md", "docs": "https://docs.stability.ai/api-reference/stable-audio/text-to-audio.md",
+      "note": "Flat 8 credits per successful generation (1 credit = $0.01); failed generations are not charged. Asynchronous: POST returns 202 {id}, then GET /v2beta/audio/results/{id}."
+    },
+    "tripo.model3d": {
+      "model": "P1-20260311", "unit": "task", "usd": 0.30, "image_usd": 0.40, "texture_usd": 0.10, "rig_usd": 0.25,
+      "verified": false, "verified_via": null,
+      "source": "https://developers.tripo3d.com/en/models/p1", "docs": "https://developers.tripo3d.com/assets/developer/tripo-v2-to-v3-migration/SKILL.md",
+      "note": "Credits per the research notes (P1 page): text 30, image 40, standard texture +10, rig 25, rig-check free. USD per credit is the launch-era $0.01 and may be outdated, so the price is unverified. Model id and the v3 request shape are confirmed by the migration guide and quick start. P2-20260801 (native quad, preview) exists; set GS_MODEL_TRIPO_MODEL3D to use it and re-check credits."
+    },
+    "meshy.model3d": {
+      "model": "meshy-7.1", "unit": "task", "usd": 0.40, "image_usd": 0.40, "texture_usd": 0.20,
+      "verified": false, "verified_via": null,
+      "source": "https://docs.meshy.ai/en/api/pricing", "docs": "https://docs.meshy.ai/en/api/text-to-3d",
+      "note": "Credits per the research notes (official pricing page): text preview 20, refine 10, image-to-3D 20 mesh-only or 30 textured. Meshy publishes no USD price for API credits: 0.02 per credit assumed (Pro plan is about 0.019 EUR per credit), so the price is unverified. Model ids (meshy-7.1, meshy-6, latest) confirmed on the text-to-3d page."
+    },
+    "elevenlabs.music": {
+      "model": "music_v2", "unit": "minute", "usd": 0.15,
+      "verified": true, "verified_via": "research-notes",
+      "source": "https://elevenlabs.io/pricing/api", "docs": "https://elevenlabs.io/docs/api-reference/music/compose",
+      "note": "Indie Game rights only below $500k per game and $1M per year developer revenue; see licence_check."
+    },
+    "elevenlabs.sfx": {
+      "model": "eleven_text_to_sound_v2", "unit": "minute", "usd": 0.12,
+      "verified": true, "verified_via": "research-notes",
+      "source": "https://elevenlabs.io/pricing/api", "docs": "https://elevenlabs.io/docs/api-reference/text-to-sound-effects/convert",
+      "note": "loop is only supported by eleven_text_to_sound_v2."
+    },
+    "elevenlabs.tts": {
+      "model": "eleven_multilingual_v2", "unit": "1k_chars", "usd": 0.08,
+      "models": {"eleven_v3": 0.08},
+      "verified": true, "verified_via": "research-notes",
+      "source": "https://elevenlabs.io/pricing/api", "docs": "https://elevenlabs.io/docs/api-reference/text-to-speech/convert"
+    },
+    "elevenlabs.dialogue": {
+      "model": "eleven_v3", "unit": "1k_chars", "usd": 0.08,
+      "verified": false, "verified_via": null,
+      "source": "https://elevenlabs.io/pricing/api", "docs": "https://elevenlabs.io/docs/api-reference/text-to-dialogue/convert",
+      "note": "Priced as eleven_v3 text to speech; a dialogue-specific rate is not stated in the sources."
+    }
+  }
+}

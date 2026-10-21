@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: 03-five-gates
+description: Refuses to pass a feature without gate evidence
+context:
+  scaffold_script: scaffold.sh

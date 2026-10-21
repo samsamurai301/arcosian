@@ -1,0 +1,7 @@
+# match stores encrypted certs/profiles in a private git repo. CI runs readonly (set in the Fastfile).
+git_url(ENV["MATCH_GIT_URL"])
+storage_mode("git")
+type("appstore")
+app_identifier([ENV["APP_IDENTIFIER"]])
+# MATCH_PASSWORD and MATCH_GIT_BASIC_AUTHORIZATION are read from env automatically.
+# If the API cannot tell App Store from Enterprise teams, add: in_house(false) or true as appropriate.

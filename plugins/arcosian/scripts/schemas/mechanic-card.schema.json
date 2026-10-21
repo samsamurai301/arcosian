@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Mechanic card (*.mechanic.json)",
+  "description": "A stand-alone, reusable description of one mechanic in the ontology's verbs -> mechanics -> dynamics -> aesthetics chain (after the MDA framework of Hunicke, LeBlanc and Zubek, 2004): fantasy, verbs, rules, tunable parameters, emergent dynamics, target aesthetics, feedback, failure modes, mobile fit, reference games and combos. The mechanics-codex skill and deconstructions use the same card shape ($defs/mechanic_card).",
+  "type": "object",
+  "$ref": "#/$defs/mechanic_card",
+  "required": ["schema_version", "id", "name"],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": { "$ref": "common.schema.json#/$defs/schema_version", "description": "Ontology version; always \"1.0\"." },
+    "$schema_name": { "const": "mechanic-card", "description": "Optional self-identification for validate_json.py --auto." }
+  },
+  "$defs": {
+    "aesthetic": {
+      "type": "string",
+      "enum": ["sensation", "fantasy", "narrative", "challenge", "fellowship", "discovery", "expression", "submission"],
+      "description": "MDA aesthetic (the eight kinds of fun listed by Hunicke, LeBlanc and Zubek): sensation (sense pleasure), fantasy (make-believe), narrative (drama), challenge (obstacle course), fellowship (social), discovery (uncharted territory), expression (self-discovery), submission (pastime)."
+    },
+    "mechanic_card": {
+      "type": "object",
+      "description": "Mechanic card body (no schema_version), embeddable in other documents such as deconstructions.",
+      "required": ["id", "name"],
+      "additionalProperties": true,
+      "properties": {
+        "id": { "$ref": "common.schema.json#/$defs/id", "description": "Mechanic id, e.g. \"merge_two\"; same id space as contract mechanics." },
+        "name": { "type": "string", "minLength": 1, "description": "Display name, e.g. \"Merge-two upgrade\"." },
+        "category": {
+          "type": "string",
+          "description": "Mechanic family. Suggested vocabulary: movement, aiming, timing, placement, merge, match, sort, physics, combat, resource, construction, chance, collection, progression, social, narrative, puzzle, economy."
+        },
+        "player_fantasy": { "type": "string", "description": "What the mechanic makes the player feel they are or do." },
+        "verbs": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "common.schema.json#/$defs/id" },
+              { "$ref": "common.schema.json#/$defs/verb" }
+            ]
+          },
+          "description": "Verbs used: verb ids, or full verb objects {id, input, description}."
+        },
+        "rules": { "$ref": "common.schema.json#/$defs/string_list", "description": "Precise rules, one per line, implementable without further questions." },
+        "parameters": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/parameter" },
+          "description": "Tunable parameters with ranges."
+        },
+        "dynamics": { "$ref": "common.schema.json#/$defs/string_list", "description": "Emergent behaviours that arise in play (strategies, tensions, rhythms), e.g. \"players hold merges to chain combos\"." },
+        "aesthetics": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/aesthetic" },
+          "uniqueItems": true,
+          "description": "Target MDA aesthetics, most important first."
+        },
+        "feedback": { "$ref": "common.schema.json#/$defs/text_or_list", "description": "Feedback and juice: visual, audio, haptic, numeric." },
+        "failure_modes": { "$ref": "common.schema.json#/$defs/string_list", "description": "How the mechanic goes wrong (degenerate strategies, frustration, readability problems) and the detection signal for each." },
+        "mobile_fit": {
+          "type": "object",
+          "description": "How well the mechanic suits phones.",
+          "additionalProperties": true,
+          "properties": {
+            "one_hand": { "type": "boolean", "description": "Playable with one thumb in portrait." },
+            "session_fit": {
+              "type": "string",
+              "enum": ["micro", "short", "medium", "long"],
+              "description": "Natural length of one complete engagement: micro (< 1 min), short (1-5 min), medium (5-15 min), long (> 15 min)."
+            },
+            "notes": { "type": "string", "description": "Interruption safety, screen-size and touch-precision notes." }
+          }
+        },
+        "references": { "$ref": "common.schema.json#/$defs/string_list", "description": "Game titles that use the mechanic well." },
+        "combos": { "$ref": "common.schema.json#/$defs/id_list", "description": "Ids of mechanics this combines well with." }
+      }
+    }
+  }
+}

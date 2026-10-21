@@ -1,0 +1,56 @@
+{
+  "schema_version": "1.0",
+  "id": "c03_pebble_keep",
+  "title": "Pebble Keep",
+  "status": "winner",
+  "logline": "Merge stone golems on a tiny garden board to stop a comedic snail horde from reaching the keep gate, in one-thumb runs of about three minutes.",
+  "analogy": "Rush Royale meets Royal Match",
+  "genre": "hybrid-casual / merge tower defense",
+  "player_fantasy": "You are the young keeper of a crumbling garden keep, waking stone golems and fusing them into mighty guardians.",
+  "core_loop": {
+    "id": "core",
+    "type": "core",
+    "period": "seconds",
+    "steps": [
+      { "id": "s1", "action": "spawn a golem with pebbles", "next": "s2" },
+      { "id": "s2", "action": "merge identical golems", "reward": "power spike", "next": "s3" },
+      { "id": "s3", "action": "golems defeat snails", "reward": { "pebbles": 3 }, "next": "s1" }
+    ]
+  },
+  "hook": "Every win restores a piece of a cosy keep you can see, and the restored keep wakes new golem families: the meta feeds the core instead of sitting beside it.",
+  "pillars": [
+    "One thumb, three minutes",
+    "Every merge is a visible power spike",
+    "Readable chaos on small phones",
+    "The keep grows with you"
+  ],
+  "target_audience": {
+    "age_min": 13,
+    "segments": ["casual merge and puzzle players 25-45", "lapsed tower-defense fans"],
+    "motivations": ["strategy", "completion", "design"]
+  },
+  "monetization_model": "hybrid",
+  "comparables": [
+    { "title": "Rush Royale", "borrow": "merge-to-tier units with kill-funded spawns", "change": "solo PvE, deterministic family merges, portrait one-thumb" },
+    { "title": "Royal Match", "borrow": "star-per-win renovation meta", "change": "renovation unlocks gameplay (golem families), not only decoration" }
+  ],
+  "scores": {
+    "market": 7,
+    "novelty": 6,
+    "fun_potential": 8,
+    "feasibility": 8,
+    "monetization": 7,
+    "production_cost": 7,
+    "agent_buildability": 9,
+    "weighted_total": 7.47
+  },
+  "risks": [
+    "Crowded merge-defense space; the creative must sell the keep and the snails, not the merge",
+    { "id": "R2", "risk": "Random spawns feel unfair", "likelihood": "medium", "impact": "high", "mitigation": "shuffled spawn bag, bot-tested worst cases" }
+  ],
+  "kill_criteria": [
+    "Greybox prototype: fewer than 6 of 10 persona playtests choose a second run unprompted after two iterations",
+    "Creative test: no creative of 5 reaches the CPI ceiling set before the test"
+  ],
+  "rationale": "Strongest agent-buildability of the five shortlisted concepts: a deterministic grid sim, 2D assets with a narrow style, data-driven levels and solver-verifiable bonus puzzles. Weighted total uses fun_potential x2, market x1.5 and the rest x1 (63.5 / 8.5 = 7.47). Novelty is its weakest score; the keep-unlocks-families hook and the snail humour are the differentiation bets the creative test must validate."
+}
