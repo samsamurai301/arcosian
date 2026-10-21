@@ -88,7 +88,7 @@ claude plugin install arcosian@arcosian
 claude plugin install arcosian-godot@arcosian
 ```
 
-Claude Code's PowerShell tool gets the same guards as Bash: store submission asks first; reading keystores, `.p12`, `.p8` or `.env` files (`Get-Content`, `type`, `[IO.File]::ReadAllBytes` and similar) is denied; `Remove-Item -Recurse` or `rd /s` on project state asks first. If you use git, let the templates' `.gitattributes` keep line endings as LF.
+Claude Code's PowerShell tool gets the same guards as Bash: store submission asks first; reading keystores, `.p12`, `.p8` or `.env` files (`Get-Content`, `type`, `[IO.File]::ReadAllBytes` and similar) is denied; `Remove-Item -Recurse` or `rd /s` on project state asks first. When you copy a template into a git repository, rename its `gitattributes.example` to `.gitattributes` so line endings stay LF on Windows.
 
 Verified on macOS with Windows-like setups (no `python3`, a Store placeholder, only `py`, versioned Godot file names); not yet run on a Windows PC.
 

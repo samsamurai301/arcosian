@@ -1,0 +1,13 @@
+# Copy this file to .gitattributes in your game project. It ships under this name because the plugin
+# folder may not contain .gitattributes rules that rewrite file contents (Anthropic's plugin directory refuses them).
+
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary
+*.ogg binary
+*.wav binary
+*.mp3 binary
+*.ttf binary
+*.otf binary
+*.glb binary

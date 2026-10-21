@@ -41,7 +41,8 @@ core/          RefCounted only, no Node/scene/autoload access, deterministic
 1. Copy this folder to your game repo root (or `cp -R templates/godot-mobile <game>/`).
 2. `project.godot`: change `config/name`, `config/description`; `export_presets.cfg`: change `package/unique_name`,
    `package/name`, `application/bundle_identifier` (reverse-DNS, one per store) and `version/*`.
-3. Replace `icon.svg`. Delete `.godot/` if you copied from a working checkout.
+3. Replace `icon.svg`. Delete `.godot/` if you copied from a working checkout. Rename `gitattributes.example` to
+   `.gitattributes` (LF line endings, binary assets); it ships under that name because a plugin folder may not contain one.
 4. Import once so global caches exist: `godot --headless --path <project> --import`.
 5. Run the gates below; all must pass before you change anything.
 6. Replace the sample mechanic (see "Add a mechanic"), keep `tests/` and `tools/` in place.

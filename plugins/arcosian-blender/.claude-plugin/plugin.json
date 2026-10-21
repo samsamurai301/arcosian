@@ -1,6 +1,6 @@
 {
   "name": "arcosian-blender",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Blender adapter for arcosian: ahujasid blender-mcp bridge plus a skill on mobile asset cleanup (decimate, UV, bake, glTF export), gltfpack and KTX2, preview renders for the critic, and the security model of the bridge.",
   "author": {
     "name": "samsamurai301",
@@ -9,6 +9,10 @@
   "homepage": "https://github.com/samsamurai301/arcosian/tree/main/plugins/arcosian-blender",
   "repository": "https://github.com/samsamurai301/arcosian",
   "license": "MIT",
+  "icon": "./icon.png",
+  "documentationUrl": "https://github.com/samsamurai301/arcosian/blob/main/plugins/arcosian-blender/README.md",
+  "supportUrl": "https://github.com/samsamurai301/arcosian/issues",
+  "privacyPolicyUrl": "https://github.com/samsamurai301/arcosian/blob/main/PRIVACY.md",
   "keywords": [
     "blender",
     "3d",

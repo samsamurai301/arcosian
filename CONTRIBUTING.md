@@ -32,6 +32,8 @@ for f in plugins/arcosian/scripts/*.py plugins/arcosian/skills/*/scripts/*.py; d
 claude plugin validate --strict plugins/arcosian
 ```
 
+On Windows, clone with `git -c core.autocrlf=input clone ...` so the eval scaffolds (shell scripts) keep LF line endings. The repository has no `.gitattributes`: Anthropic's plugin directory refuses repositories whose attributes rewrite file contents.
+
 With Godot 4 and csharp-ls installed, also run the language-server self-tests from a copy of each template (commands in the adapters' READMEs). CI runs all of this on macOS, Linux and Windows for every pull request.
 
 ## Releases

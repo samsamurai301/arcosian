@@ -2,6 +2,14 @@
 
 Versions before 0.3.0 were internal builds under the working name `game-studio`; their entries keep the names those builds had.
 
+## 0.3.2 (2026-10-21): ready for Anthropic's plugin directory (core 0.3.2, adapters 0.3.1)
+
+### Fixed
+- The directory's validator stopped at "Couldn't validate that repository": it refuses `.gitattributes` rules that rewrite file contents, line-ending conversion included, at the repository root or inside a plugin folder. The root `.gitattributes` is gone, and the Godot and Unity templates ship theirs as `gitattributes.example`: rename it to `.gitattributes` after copying a template. The Unity file also carries the Git LFS rules that were in `gitattributes-lfs.example`.
+
+### Added
+- Every plugin has an icon (`icon.png`, original artwork) and `documentationUrl`, `supportUrl` and `privacyPolicyUrl` in its manifest, as the directory asks. These fields need Claude Code 2.1.281 or later to pass `claude plugin validate --strict`; older versions warn about unknown fields and still load the plugin.
+
 ## 0.3.1 (2026-10-21): fixes from the first Windows CI run (core plugin only)
 
 ### Fixed

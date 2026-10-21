@@ -127,7 +127,7 @@ Ops: `==` (default), `!=`, `>=`, `<=`, `>`, `<`. Actions: `{"type":"move","dir":
   `GS_BUILD_NUMBER` sets the Android version code and iOS build number (CI run number works). Play needs a current target SDK:
   the script uses "highest installed" (`AndroidApiLevelAuto`); verify against Play policy at release time.
 - iOS: `BuildIOS` produces an Xcode project; archive, sign and upload with Xcode or `xcodebuild` on a macOS runner.
-- `.gitattributes` keeps text and Unity YAML at LF line endings. Git LFS rules for textures, audio, models and fonts are in `gitattributes-lfs.example`: append them to `.gitattributes` after copying the template and run `git lfs install` before the first commit that adds such files. They ship separately because a plugin folder may not contain LFS filters.
+- `gitattributes.example`: rename it to `.gitattributes` after copying the template. It keeps text and Unity YAML at LF line endings, sets Unity's YAML merge driver and routes textures, audio, models and fonts to Git LFS (run `git lfs install` before the first commit that adds them). It ships under that name because a plugin folder may not contain `.gitattributes` rules that rewrite files.
 - Run in this order and stop on the first failure: unit, playthrough, bots, scene, build, visual.
 
 ## Services at a glance
