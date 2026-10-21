@@ -120,7 +120,7 @@ docs/research/                    the October 2026 research behind the design
 
 ## Status and limits
 
-All six plugins are at 0.3.0, the first public release. What has and has not been verified is listed in the CHANGELOG; CI runs the checks on macOS, Linux and Windows. The adapters wrap community MCP servers whose maintenance you should verify before depending on them. Generated art and audio carry licence terms from the vendor; the gateway records provenance but you remain responsible for checking terms before shipping.
+The core plugin is at 0.3.1 and the adapters at 0.3.0 (the first public release was 0.3.0). What has and has not been verified is listed in the CHANGELOG; CI runs the checks on macOS, Linux and Windows. The adapters wrap community MCP servers whose maintenance you should verify before depending on them. Generated art and audio carry licence terms from the vendor; the gateway records provenance but you remain responsible for checking terms before shipping.
 
 ## Contributing and security
 

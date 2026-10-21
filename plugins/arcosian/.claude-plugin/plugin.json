@@ -1,7 +1,7 @@
 {
   "name": "arcosian",
   "displayName": "Arcosian",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A principal game developer and full studio for Claude Code: a deep game-dev codex (design theory, mechanics, genres, case studies, psychology, economy, analytics, art, audio, tech, live-ops, release), a shared game ontology with schemas, 24 specialist agents, multi-agent workflows, simulators and solvers, an asset and audio gateway with budgets and provenance, Godot and Unity mobile templates, and hooks that enforce a five-gate definition of done.",
   "author": {
     "name": "samsamurai301",

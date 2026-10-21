@@ -2,6 +2,15 @@
 
 Versions before 0.3.0 were internal builds under the working name `game-studio`; their entries keep the names those builds had.
 
+## 0.3.1 (2026-10-21): fixes from the first Windows CI run (core plugin only)
+
+### Fixed
+- Windows: the `gs.py` state lock and the parse-check hook's import lock did nothing, because both relied on the Unix-only `fcntl`. They now lock through `msvcrt` on Windows, so parallel agents can no longer lose updates to `features.json`.
+- A gslib self-test assumed Unix paths; it now builds its outside-the-project path from the platform's own root.
+
+### Verified
+- GitHub Actions on Windows: both language servers with a real Godot 4.7.2 (the GUI build swapped for its `_console.exe` twin) and csharp-ls 0.28.0, and the Godot parse-check hook tests, passed on the first run.
+
 ## 0.3.0 (2026-10-21): first public release, as Arcosian
 
 All six plugins are at 0.3.0.

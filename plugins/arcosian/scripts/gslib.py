@@ -66,7 +66,7 @@ import time
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple
 
 __version__ = "1.0.0"
 
@@ -257,38 +257,63 @@ def load_state(root: Any) -> Dict[str, Any]:
     return {key: load_json(state_path(root, key), None) for key in STATE_FILES}
 
 
+def _lock_calls() -> Tuple[Callable[[Any], None], Callable[[Any], None]]:
+    """(lock, unlock) for an open file: fcntl on macOS and Linux; on Windows msvcrt locks the file's first byte."""
+    try:
+        import fcntl  # type: ignore
+        return (lambda fh: fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB),
+                lambda fh: fcntl.flock(fh.fileno(), fcntl.LOCK_UN))
+    except ImportError:  # Windows
+        import msvcrt  # type: ignore
+
+        def lock(fh: Any) -> None:
+            fh.seek(0)
+            msvcrt.locking(fh.fileno(), msvcrt.LK_NBLCK, 1)
+
+        def unlock(fh: Any) -> None:
+            fh.seek(0)
+            msvcrt.locking(fh.fileno(), msvcrt.LK_UNLCK, 1)
+        return lock, unlock
+
+
+def try_lock(fh: Any) -> bool:
+    """Take an exclusive, non-blocking lock on an open file; False while another handle holds it."""
+    try:
+        _lock_calls()[0](fh)
+        return True
+    except OSError:
+        return False
+
+
+def unlock(fh: Any) -> None:
+    try:
+        _lock_calls()[1](fh)
+    except OSError:
+        pass
+
+
 @contextlib.contextmanager
 def state_lock(root: Any, timeout: float = 15.0) -> Iterator[None]:
     """Exclusive advisory lock on `.gamestudio/.lock` for read-modify-write of state files.
 
     Parallel agents running gs.py against one project would otherwise lose
-    updates to features.json.  POSIX only (fcntl); a no-op where unavailable.
+    updates to features.json.  Works on macOS, Linux and Windows (see try_lock).
     Raises TimeoutError if the lock cannot be taken within `timeout` seconds.
     """
-    try:
-        import fcntl  # type: ignore
-    except ImportError:  # pragma: no cover - Windows
-        yield
-        return
     path = gs_dir(root) / ".lock"
     path.parent.mkdir(parents=True, exist_ok=True)
     fh = open(str(path), "a+", encoding="utf-8")
     try:
         deadline = time.monotonic() + timeout
-        while True:
-            try:
-                fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-                break
-            except OSError:
-                if time.monotonic() >= deadline:
-                    raise TimeoutError("could not lock %s within %.0f s (another gs.py running?)" % (path, timeout))
-                time.sleep(0.05)
-        yield
-    finally:
+        while not try_lock(fh):
+            if time.monotonic() >= deadline:
+                raise TimeoutError("could not lock %s within %.0f s (another gs.py running?)" % (path, timeout))
+            time.sleep(0.05)
         try:
-            fcntl.flock(fh.fileno(), fcntl.LOCK_UN)
-        except OSError:
-            pass
+            yield
+        finally:
+            unlock(fh)
+    finally:
         fh.close()
 
 
@@ -2461,8 +2486,9 @@ def _selftest() -> int:
         # ---- evidence normalisation ----
         n = normalize_evidence([str(evd / "static.log")], root)
         check(n[0]["stored"] == ".gamestudio/evidence/F003/static.log" and n[0]["exists"], "absolute -> relative")
-        n = normalize_evidence(["/nonexistent-gs/x.log"], root)
-        check(n[0]["stored"] == "/nonexistent-gs/x.log" and not n[0]["exists"], "outside path kept absolute")
+        outside = Path(Path.cwd().anchor) / "nonexistent-gs" / "x.log"  # "/..." here, "C:\..." on Windows
+        n = normalize_evidence([str(outside)], root)
+        check(n[0]["stored"] == _abspath(outside).as_posix() and not n[0]["exists"], "outside path kept absolute")
         n = normalize_evidence(["static.log"], root, cwd=evd)
         check(n[0]["stored"] == ".gamestudio/evidence/F003/static.log", "relative to cwd resolved")
 

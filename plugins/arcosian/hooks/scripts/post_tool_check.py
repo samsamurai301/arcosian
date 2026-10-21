@@ -147,12 +147,7 @@ def stale_cache_errors(errors: List[str], proj: Path) -> List[str]:
 @contextlib.contextmanager
 def import_lock(proj: Path, deadline: float) -> Iterator[bool]:
     """Serialise cache refreshes: parallel tool calls fire parallel hooks and two `--import` runs would race.
-    Yields False when the lock could not be taken before `deadline` (POSIX only; elsewhere no lock, no wait)."""
-    try:
-        import fcntl
-    except ImportError:
-        yield True
-        return
+    Yields False when the lock could not be taken before `deadline` (gslib.try_lock: macOS, Linux and Windows)."""
     try:
         (proj / ".godot").mkdir(exist_ok=True)
         fh = open(str(proj / ".godot" / "arcosian-import.lock"), "a+", encoding="utf-8")
@@ -160,16 +155,15 @@ def import_lock(proj: Path, deadline: float) -> Iterator[bool]:
         yield False
         return
     try:
-        while True:
-            try:
-                fcntl.flock(fh.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
-                break
-            except OSError:
-                if time.monotonic() >= deadline:
-                    yield False
-                    return
-                time.sleep(0.1)
-        yield True
+        while not gslib.try_lock(fh):
+            if time.monotonic() >= deadline:
+                yield False
+                return
+            time.sleep(0.1)
+        try:
+            yield True
+        finally:
+            gslib.unlock(fh)
     finally:
         fh.close()
 
