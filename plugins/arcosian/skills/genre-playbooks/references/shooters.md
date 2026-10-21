@@ -46,7 +46,7 @@ TTK (first shot at t=0)   TTK = (N − 1) · dt          (add reload/charge if a
 Sustained DPS      DPS = damage · RPM / 60 · accuracy
 Worked example: 100 HP, rifle 25 dmg body / 50 dmg head, 600 RPM (dt = 0.10 s)
   body only: N = 4 → TTK = 0.30 s     one head + two body: N = 3 → 0.20 s
-  all head:  N = 2 → TTK = 0.10 s     (my arithmetic)
+  all head:  N = 2 → TTK = 0.10 s     (computed)
 ```
 
 - **Reaction check.** A typical human visual reaction time is about 200–250 ms (estimate; varies by person and display). If TTK is below reaction time plus round-trip latency, the victim dies before they can respond. That suits twitch arena shooters and punishes tactical ones. For a tactical shooter aim for TTK of 0.4–1.0 s so a flank can be survived. For an arena shooter, 0.5–1.5 s with armour and movement is common. These ranges are design guidance, not measured data.

@@ -62,7 +62,7 @@ Stamina regen model   S(t+dt) = min(S_max, S + r · dt)   after a delay d with n
 Worked example: S_max 100, light attack 15, heavy 30, dodge 20, regen r = 40/s after delay 0.8 s
   Chain: 3 lights (45) + dodge (20) = 65 → 35 left. Full refill needs (65 / 40) + 0.8 ≈ 2.4 s
 Poise meter    P decreases by hit_poise_damage; at P ≤ 0 → stagger for T_stagger, then P resets
-  Boss P_max 100, light hit 12, heavy hit 35 → 9 lights or 3 heavies to stagger (my arithmetic)
+  Boss P_max 100, light hit 12, heavy hit 35 → 9 lights or 3 heavies to stagger (computed)
   Poise regen starts after 4–6 s without a hit (estimate). Tune so staggers happen about every 20–30 s.
 ```
 

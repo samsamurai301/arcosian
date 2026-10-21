@@ -15,7 +15,7 @@ Requires the core plugin `arcosian` (declared as a dependency).
 | `github` | remote http, `https://api.githubcopilot.com/mcp/readonly` | Bearer token from `github_token` (sensitive) | Read-only variant of GitHub's official remote server. URL confirmed in GitHub's docs (Oct 2026). |
 | `sentry` | remote http, `https://mcp.sentry.dev/mcp` | OAuth with your Sentry account through `/mcp`; no token stored | URL confirmed on Sentry's MCP page (Oct 2026). |
 
-Without your accounts both do nothing. No Discord server is registered: Discord publishes no official MCP server that I could find, and this plugin does not add community ones.
+Without your accounts both do nothing. No Discord server is registered: Discord publishes no official MCP server (none found in an October 2026 search), and this plugin does not add community ones.
 
 ## Setup
 

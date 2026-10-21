@@ -87,7 +87,7 @@ Strategy games hold hundreds of numbers. The UI must let a player understand, de
 **Mana curve.** The distribution of card costs in a deck. A healthy curve gives a playable card every turn.
 
 ```
-Example 40-card limited-style deck (my numbers): cost 1: 4 · 2: 8 · 3: 7 · 4: 5 · 5: 3 · 6+: 1 = 28 spells + 12 lands
+Example 40-card limited-style deck (illustrative numbers): cost 1: 4 · 2: 8 · 3: 7 · 4: 5 · 5: 3 · 6+: 1 = 28 spells + 12 lands
 Average cost  = (4·1 + 8·2 + 7·3 + 5·4 + 3·5 + 1·6) / 28 = 82 / 28 ≈ 2.9
 Rule of thumb: most of the deck at 2–4 cost, few above 5.
 ```
@@ -99,7 +99,7 @@ Rule of thumb: most of the deck at 2–4 cost, few above 5.
 
 **Card advantage.** Count the net cards each side has after an exchange. A 2-for-1 trade (one card removes two enemy cards) is card advantage. A draw spell that costs a card and draws two is +1. Tempo (mana spent versus mana removed) trades off against card advantage. Design rule: every source of card advantage needs a tempo cost or a condition.
 
-**Hypergeometric draw odds (my arithmetic).** Probability of drawing at least one copy of a card:
+**Hypergeometric draw odds (computed).** Probability of drawing at least one copy of a card:
 - 60-card deck, 4 copies, 7-card opening hand: 1 − C(56,7)/C(60,7) ≈ 40.0%.
 - 40-card deck, 16 lands, 7-card hand: 2, 3 or 4 lands ≈ 79.0%; 0 or 1 lands ≈ 13.4%.
 - 30-card deckbuilder deck, 2 copies of a card, draw 5: 1 − C(28,5)/C(30,5) ≈ 31.0%.

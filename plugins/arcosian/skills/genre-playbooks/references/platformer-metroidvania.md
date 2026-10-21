@@ -43,7 +43,7 @@ Given  h = apex height (units),  t_up = time to apex (s)
 Worked example: h = 3.0 tiles, t_up = 0.40 s
   g = 6.0 / 0.16 = 37.5 tiles/s²    v0 = 6.0 / 0.40 = 15.0 tiles/s
   air time (flat ground) = 2 · t_up = 0.80 s
-Horizontal reach   gap_max = v_x · t_air     v_x = 8 tiles/s → 8 · 0.80 = 6.4 tiles (my arithmetic)
+Horizontal reach   gap_max = v_x · t_air     v_x = 8 tiles/s → 8 · 0.80 = 6.4 tiles (computed)
 Design gaps at about 70–85% of gap_max so that most players clear them (estimate)
 ```
 

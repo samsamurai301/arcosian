@@ -32,7 +32,7 @@ Most games do not need FMOD or Wwise. This file lists what Godot, Unity and the 
 | Playlist | `AudioStreamPlaylist` | Sequential or random playback with simple next-track transitions |
 | Formats | WAV, Ogg Vorbis, MP3 | Use Ogg for music and long sounds, WAV for short SFX |
 
-AudioStreamInteractive, AudioStreamSynchronized and AudioStreamPlaylist are listed as AudioStream subclasses in the Godot 4.3 class reference; the interactive features arrived in 4.3 (verify against the 4.3 release notes, which I could not fetch). A forum thread from the 4.3 era suggests nesting an AudioStreamInteractive inside an AudioStreamSynchronized for layered music with transition tables. One forum user reported a start delay on AudioStreamPlaylist that did not occur with AudioStreamInteractive; test latency on your target.
+AudioStreamInteractive, AudioStreamSynchronized and AudioStreamPlaylist are listed as AudioStream subclasses in the Godot 4.3 class reference; the interactive features arrived in 4.3 (verify against the 4.3 release notes, which could not be fetched in October 2026). A forum thread from the 4.3 era suggests nesting an AudioStreamInteractive inside an AudioStreamSynchronized for layered music with transition tables. One forum user reported a start delay on AudioStreamPlaylist that did not occur with AudioStreamInteractive; test latency on your target.
 
 Godot patterns:
 1. Create buses `Master > Music, SFX, UI, Voice`. Put the player sliders on these buses with `AudioServer.set_bus_volume_db` and convert slider values with `linear_to_db`.

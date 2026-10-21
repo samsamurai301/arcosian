@@ -18,7 +18,7 @@ Discord is where most indie communities live; devlogs are where the team's progr
 
 ## 1. Is there an official Discord MCP server?
 
-A web search in Oct 2026 found only third-party Discord MCP servers (community projects, some stating they are not affiliated with Discord, one that logs in as a user account and warns about Discord's terms). I found no server published by Discord itself. This plugin therefore registers none and does not add a community one. Reasons: a bot token can read and write a whole server; unofficial servers are unvetted; user-account automation can break Discord's terms.
+A web search in Oct 2026 found only third-party Discord MCP servers (community projects, some stating they are not affiliated with Discord, one that logs in as a user account and warns about Discord's terms). No server published by Discord itself was found. This plugin therefore registers none and does not add a community one. Reasons: a bot token can read and write a whole server; unofficial servers are unvetted; user-account automation can break Discord's terms.
 
 If Discord publishes one later, add it after checking the publisher, URL and scopes against Discord's own developer docs.
 

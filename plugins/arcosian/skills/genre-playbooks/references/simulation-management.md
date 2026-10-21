@@ -783,7 +783,7 @@ Data-heavy: players, staff, clubs, leagues, researchers to keep the database cur
 - Steam Next Fest ran 19–26 Oct 2026, and Valve has published its sale and festival schedule through July 2027. Use the festival demo window to test a sim slice — [God Is a Geek](https://godisageek.com/2026/10/steam-next-fest-october-2026/), [Digital Citizen](https://www.digitalcitizen.life/valve-reveals-full-steam-sale-and-festival-schedule-through-july-2027/)
 - Steam store revenue share and per-app fee terms are not verified in this session. Check [Steamworks documentation](https://partner.steamgames.com/doc/gettingstarted) before budgeting.
 - Console mod and early access policies, licensing costs for sports data and the status of any specific title's release are not verified. Check `console-pathway` and the platform holder's documentation.
-- I found no sourced market-size or retention figures for PC simulation genres this session. All numbers labelled "estimate" above are design defaults, not statistics.
+- No sourced market-size or retention figures for PC simulation genres were found in the October 2026 research. All numbers labelled "estimate" above are design defaults, not statistics.
 
 ## Related skills
 - `mechanics-codex`: cards for every mechanic named above.

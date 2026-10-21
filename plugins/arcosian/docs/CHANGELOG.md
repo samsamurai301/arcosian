@@ -44,10 +44,11 @@ Core, `arcosian-godot`, `arcosian-unity`, `arcosian-vendors` and `arcosian-comme
 - Project map and impact on both templates (48 and 34 files); the dashboard rendered and checked in a browser in dark mode.
 - A SpriteFrames `.tres` from `sprite_sheet.py` loads in Godot 4.7.2 with the expected animations, speeds and per-frame durations; `level_import.py` fails a Tiled map whose exit is walled off and passes it once a door is opened.
 - Every self-test, the hook tests (40) and the gateway tests pass; all ten plugins pass `claude plugin validate`, and all nine adapters pass `addon.py check`.
+- GitHub Actions, first run on macOS, Linux and Windows: on Linux, the template's gates and all four exports with the official Godot 4.7.2 editor and export templates (both checked against Godot's SHA-512 sums); each desktop build then launched with `--smoke` on its own runner and printed `SMOKE OK` on Windows, macOS and Linux. The checks job (self-tests of every plugin's scripts and the repository tools, hook and gateway tests, the audit with the description budget, the adapter checks, the connector catalog, strict validation with Claude Code 2.1.306) and both language servers also passed.
 
 ### Not verified
 - Unity changes (desktop and web build methods, WASD and gamepad input) are not compiled in the Unity Editor here; the engine-free core still builds and passes on .NET.
-- Desktop builds launched on Windows and Linux, and the CI template jobs, run only in GitHub Actions.
+- The CI template jobs in `templates/ci/` need a game repository and its secrets to run; the repository's own CI runs the same exports and smoke checks.
 - New adapter content was researched in October 2026; each file lists what could not be checked against the vendor's own pages (for example itch.io and Discord help pages that refused automated fetches).
 
 ## 0.3.2 (2026-10-21): ready for Anthropic's plugin directory (core 0.3.2, adapters 0.3.1)

@@ -112,7 +112,7 @@ From FMOD's licensing page as reported in October 2026 (verify on https://www.fm
 
 | Tier | Development budget | Fee per game |
 |---|---|---|
-| Indie | Under $600k | Free, or $2,000 depending on a condition on the page that I could not read |
+| Indie | Under $600k | Free, or $2,000 depending on a condition on the page that could not be read in October 2026 (check FMOD's licensing page) |
 | Basic | $600k to $1.8M | $6,000 |
 | Premium | Over $1.8M | $18,000 |
 

@@ -130,7 +130,7 @@ CI procedure:
 |---|---|---|
 | Unity | Wwise Unity integration, installed through the Wwise Launcher | Official from Audiokinetic |
 | Unreal | Wwise Unreal integration | Official |
-| Godot | `alessandrofama/wwise-godot-integration` (GDExtension wrapper; nodes AkEvent3D, AkEvent2D, AkBank, AkListener) | Community-originated. Audiokinetic has a blog post "What's New in Wwise 2024.1 for Godot". The newest release I found was v2.0.4 for Wwise 2023.1 and Godot 4.2; the last push seen in an index was April 2024. Check releases for Godot 4.3 or later |
+| Godot | `alessandrofama/wwise-godot-integration` (GDExtension wrapper; nodes AkEvent3D, AkEvent2D, AkBank, AkListener) | Community-originated. Audiokinetic has a blog post "What's New in Wwise 2024.1 for Godot". The newest release found in October 2026 was v2.0.4 for Wwise 2023.1 and Godot 4.2; the last push seen in an index was April 2024. Check releases for Godot 4.3 or later |
 | Web | No first-party Wwise web runtime known | Unverified. Use FMOD or native Web Audio for web |
 | Custom engine | Wwise SDK (C++), sample sound engine | Official |
 

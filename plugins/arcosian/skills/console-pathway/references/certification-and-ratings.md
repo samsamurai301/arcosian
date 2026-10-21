@@ -95,7 +95,7 @@ Automate where possible: an input fuzzer script, a save-corruption injector and 
 | ACB (Australian Classification Board) | Australia | Member of IARC; some content can be refused classification |
 | ClassInd | Brazil | Member of IARC |
 | GRAC | South Korea | Joined IARC later; assigns ratings for participating storefronts |
-| CERO | Japan | Separate; not an IARC participant in the sources I found: unverified |
+| CERO | Japan | Separate; not an IARC participant in the sources checked in October 2026: unverified |
 Founding IARC members listed by the coalition: ClassInd, the Australian Classification Board, ESRB, PEGI and USK; GRAC joined later; others (Taiwan, Indonesia and more) appear in the milestone timeline (https://www.globalratings.com/milestones).
 
 ## 8. Which console store needs what

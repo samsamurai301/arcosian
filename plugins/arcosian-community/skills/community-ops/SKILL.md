@@ -22,7 +22,7 @@ Do not use it for paid acquisition (`marketing-ua`), store metadata and uploads 
 ## What this plugin gives you
 
 - Two opt-in MCP servers: GitHub's official remote server (read-only URL by default, token through sensitive `github_token`) and Sentry's official remote server (OAuth through `/mcp`). Without your accounts they do nothing.
-- Four references (listed below). No Discord MCP is registered: Discord publishes no official one that I could find.
+- Four references (listed below). No Discord MCP is registered: Discord publishes no official one (none found in an October 2026 search).
 - A rule: Claude drafts files, a human approves in chat, a human posts.
 
 ## Decision procedures

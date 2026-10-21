@@ -53,7 +53,7 @@ Peak grip near α ≈ 6–10°. Past the peak force falls: that is understeer or
 
 A simpler alternative for agent-built prototypes is a clamped linear model: `Fy = clamp(Cα · α, −μ·Fz, +μ·Fz)`, with a friction circle so braking and cornering share one budget: `sqrt(Fx² + Fy²) ≤ μ·Fz`.
 
-**Worked example (my arithmetic).** A 1,200 kg car at 30 m/s with μ = 1.2 can reach about 1.2 × 9.81 = 11.8 m/s² lateral acceleration. The tightest steady corner is r = v² / a = 900 / 11.8 ≈ 76 m. Weight transfer in a corner of 8 m/s² with centre-of-gravity height 0.5 m and track width 1.6 m is ΔFz = m·a·h / t = 1,200 × 8 × 0.5 / 1.6 = 3,000 N moved to the outside tyres. Because grip is not linear in load, this loss on the inside tyre costs more than the outside tyre gains. That is the physical reason cars slide at the limit.
+**Worked example (computed).** A 1,200 kg car at 30 m/s with μ = 1.2 can reach about 1.2 × 9.81 = 11.8 m/s² lateral acceleration. The tightest steady corner is r = v² / a = 900 / 11.8 ≈ 76 m. Weight transfer in a corner of 8 m/s² with centre-of-gravity height 0.5 m and track width 1.6 m is ΔFz = m·a·h / t = 1,200 × 8 × 0.5 / 1.6 = 3,000 N moved to the outside tyres. Because grip is not linear in load, this loss on the inside tyre costs more than the outside tyre gains. That is the physical reason cars slide at the limit.
 
 Rules for building it:
 - Run vehicle physics at a fixed step of 120 Hz or higher (60 Hz at minimum for arcade) and decouple it from rendering. Sub-step the wheel solver if the car is fast.
