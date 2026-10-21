@@ -92,6 +92,30 @@ AREAS = (
 ENGINES = ("godot", "unity", "unreal", "defold", "web", "other")
 PLATFORMS = ("ios", "android", "web", "windows", "macos", "linux", "switch", "playstation", "xbox", "other")
 ORIENTATIONS = ("portrait", "landscape", "both")
+INPUTS = ("touch", "mouse_keyboard", "gamepad", "motion", "other")
+MOBILE_PLATFORMS = ("ios", "android")
+# Input methods each platform expects by default; the design contract can add or drop any of them.
+_PLATFORM_INPUTS = {
+    "ios": ("touch",), "android": ("touch",), "web": ("mouse_keyboard", "touch"),
+    "windows": ("mouse_keyboard", "gamepad"), "macos": ("mouse_keyboard", "gamepad"),
+    "linux": ("mouse_keyboard", "gamepad"), "switch": ("gamepad",), "playstation": ("gamepad",),
+    "xbox": ("gamepad",), "other": (),
+}
+
+
+def default_inputs(platforms: List[str]) -> List[str]:
+    """Union of the input methods the given platforms expect, in first-seen order."""
+    out: List[str] = []
+    for p in platforms:
+        for i in _PLATFORM_INPUTS.get(p, ()):
+            if i not in out:
+                out.append(i)
+    return out or ["other"]
+
+
+def default_orientation(platforms: List[str]) -> str:
+    """Portrait for phone-only games, landscape as soon as a desktop, web or console target is in."""
+    return "portrait" if platforms and all(p in MOBILE_PLATFORMS for p in platforms) else "landscape"
 TIERS = ("prototype", "slice", "soft_launch", "global", "live")
 MONETIZATION_MODELS = ("premium", "iap", "ads", "hybrid", "subscription")
 FEATURE_ID_RE = re.compile(r"^F\d{3,4}$")
@@ -387,7 +411,8 @@ def detect_engine(root: Any) -> Tuple[Optional[str], Optional[str], str]:
 
 def default_config(title: str, engine: str = "other", *, slug: Optional[str] = None,
                    engine_version: Optional[str] = None, platforms: Optional[List[str]] = None,
-                   orientation: str = "portrait", tier: str = "prototype",
+                   orientation: Optional[str] = None, tier: str = "prototype",
+                   input_methods: Optional[List[str]] = None,
                    asset_usd_cap: float = DEFAULT_ASSET_USD_CAP,
                    per_call_usd_cap: float = DEFAULT_PER_CALL_USD_CAP,
                    project_root: str = ".") -> Dict[str, Any]:
@@ -399,8 +424,9 @@ def default_config(title: str, engine: str = "other", *, slug: Optional[str] = N
         "project": {"title": title, "slug": slug or slugify(title)},
         "engine": engine,
         "engine_version": engine_version,
-        "platforms": list(platforms or ["ios", "android"]),
-        "orientation": orientation,
+        "platforms": list(platforms or []),
+        "orientation": orientation or default_orientation(list(platforms or [])),
+        "input": list(input_methods or default_inputs(list(platforms or []))),
         "paths": {
             "project_root": project_root,
             "assets_dir": "assets/",
@@ -425,8 +451,9 @@ def default_config(title: str, engine: str = "other", *, slug: Optional[str] = N
 
 
 def default_contract(title: str, engine: str = "other", *, genre: Optional[str] = None,
-                     platforms: Optional[List[str]] = None, orientation: str = "portrait",
-                     tier: str = "prototype", monetization_model: str = "hybrid") -> Dict[str, Any]:
+                     platforms: Optional[List[str]] = None, orientation: Optional[str] = None,
+                     tier: str = "prototype", monetization_model: str = "hybrid",
+                     input_methods: Optional[List[str]] = None) -> Dict[str, Any]:
     """Skeleton design contract with every section present and type-correct.
 
     Strings that must be decided by design start with "TBD" so reviews and
@@ -443,8 +470,9 @@ def default_contract(title: str, engine: str = "other", *, genre: Optional[str] 
             "logline": "TBD: one sentence - who the player is, what they do, why it is fun.",
             "genre": genre or "TBD",
             "subgenre": "",
-            "platforms": list(platforms or ["ios", "android"]),
-            "orientation": orientation,
+            "platforms": list(platforms or []),
+            "orientation": orientation or default_orientation(list(platforms or [])),
+            "input": list(input_methods or default_inputs(list(platforms or []))),
             "engine": engine,
             "target_audience": {"age_min": 13, "segments": [], "motivations": []},
             "session_length_target_sec": 180,
@@ -534,7 +562,8 @@ def progress_header(title: str) -> str:
 
 def init_project(root: Any, title: str, engine: Optional[str] = None, genre: Optional[str] = None, *,
                  force: bool = False, slug: Optional[str] = None, engine_version: Optional[str] = None,
-                 platforms: Optional[List[str]] = None, orientation: str = "portrait",
+                 platforms: Optional[List[str]] = None, orientation: Optional[str] = None,
+                 input_methods: Optional[List[str]] = None,
                  tier: str = "prototype", monetization_model: str = "hybrid",
                  asset_usd_cap: float = DEFAULT_ASSET_USD_CAP,
                  per_call_usd_cap: float = DEFAULT_PER_CALL_USD_CAP) -> Dict[str, Any]:
@@ -552,16 +581,21 @@ def init_project(root: Any, title: str, engine: Optional[str] = None, genre: Opt
         engine = det_engine or "other"
     if engine not in ENGINES:
         raise ValueError("engine must be one of %s" % ", ".join(ENGINES))
-    if orientation not in ORIENTATIONS:
-        raise ValueError("orientation must be one of %s" % ", ".join(ORIENTATIONS))
     if tier not in TIERS:
         raise ValueError("tier must be one of %s" % ", ".join(TIERS))
     if monetization_model not in MONETIZATION_MODELS:
         raise ValueError("monetization model must be one of %s" % ", ".join(MONETIZATION_MODELS))
-    plats = [p.strip().lower() for p in (platforms or ["ios", "android"]) if p and p.strip()]
+    plats = [p.strip().lower() for p in (platforms or []) if p and p.strip()]
     bad = [p for p in plats if p not in PLATFORMS]
     if bad or not plats:
-        raise ValueError("platforms must be a non-empty subset of %s" % ", ".join(PLATFORMS))
+        raise ValueError("choose the target platforms, any combination of %s%s" % (
+            ", ".join(PLATFORMS), " (unknown: %s)" % ", ".join(bad) if bad else ""))
+    orientation = orientation or default_orientation(plats)
+    if orientation not in ORIENTATIONS:
+        raise ValueError("orientation must be one of %s" % ", ".join(ORIENTATIONS))
+    inputs = [i.strip().lower() for i in (input_methods or default_inputs(plats)) if i and i.strip()]
+    if not inputs or any(i not in INPUTS for i in inputs):
+        raise ValueError("input methods must be a non-empty subset of %s" % ", ".join(INPUTS))
     if slug is not None and not re.match(r"^[a-z0-9]+(?:-[a-z0-9]+)*$", slug):
         raise ValueError("slug must be kebab-case ASCII (e.g. merge-ninja), got %r" % slug)
     if engine_version is not None and not re.match(r"^\d+(\.\d+){0,3}[A-Za-z0-9.+_-]*$", engine_version):
@@ -574,11 +608,11 @@ def init_project(root: Any, title: str, engine: Optional[str] = None, genre: Opt
     docs = {
         "config.json": default_config(
             title, engine, slug=slug, engine_version=engine_version, platforms=plats,
-            orientation=orientation, tier=tier, asset_usd_cap=asset_usd_cap,
+            orientation=orientation, tier=tier, input_methods=inputs, asset_usd_cap=asset_usd_cap,
             per_call_usd_cap=per_call_usd_cap, project_root=project_rel),
         "contract.json": default_contract(
             title, engine, genre=genre, platforms=plats, orientation=orientation, tier=tier,
-            monetization_model=monetization_model),
+            monetization_model=monetization_model, input_methods=inputs),
         "features.json": empty_features(),
         "budget.json": empty_budget(asset_usd_cap),
         "assets/manifest.json": empty_manifest(),
@@ -643,6 +677,9 @@ def init_project(root: Any, title: str, engine: Optional[str] = None, genre: Opt
         "root": str(root_p),
         "gs_dir": str(g),
         "engine": engine,
+        "platforms": plats,
+        "orientation": orientation,
+        "input": inputs,
         "created": created,
         "skipped": skipped,
         "overwritten": overwritten,
@@ -1985,6 +2022,13 @@ def _summarize(root: Any, max_chars: int) -> str:
             # newest entry is the most important one to keep
             items.append((8 + (len(entries) - i), _clip(e, 220)))
 
+    mp = gs_dir(root_p) / "map" / "MAP.md"
+    if mp.is_file():
+        items.append((7, "Project map: %s/map/MAP.md (built %s); read it before opening files, and run gs.py impact "
+                         "<file|class|key> to choose which gates to re-run." % (GS_DIRNAME, datetime.fromtimestamp(
+                             mp.stat().st_mtime).strftime("%Y-%m-%d %H:%M"))))
+    else:
+        items.append((11, "No project map yet: gs.py map indexes scenes, scripts, classes, assets and tuning."))
     items.append((1, FIVE_GATE_RULE if max_chars >= 1200 else FIVE_GATE_RULE_SHORT))
     items.append((12, 'Project root: %s. State CLI: python3 "%s" status | feature next | feature gate | '
                       'kb "query".' % (root_p, SCRIPTS_DIR / "gs.py")))
@@ -2350,7 +2394,15 @@ def _selftest() -> int:
         root.mkdir()
         (root / "project.godot").write_text('config/features=PackedStringArray("4.7", "Mobile")\n',
                                             encoding="utf-8")
-        r = init_project(root, "Selftest Game", None, "puzzle")
+        r = init_project(root, "Selftest Game", None, "puzzle", platforms=["windows", "web"])
+        cfg0 = load_json(gs_dir(_abspath(root)) / "config.json")
+        check(cfg0["input"] == ["mouse_keyboard", "gamepad", "touch"] and cfg0["orientation"] == "landscape",
+              "input and orientation follow the platforms (%r)" % ([cfg0.get("input"), cfg0.get("orientation")],))
+        try:
+            init_project(tmp / "no-platforms", "X", "godot")
+            check(False, "init without platforms must fail")
+        except ValueError as exc:
+            check("choose the target platforms" in str(exc), "init without platforms explains the choice")
         g = gs_dir(_abspath(root))
         check(r["engine"] == "godot", "engine auto-detected from project.godot")
         for rel in ("config.json", "contract.json", "features.json", "budget.json",
@@ -2362,9 +2414,9 @@ def _selftest() -> int:
               "find_project_root from a not-yet-existing nested file")
         check(find_project_root(g / "features.json") == _abspath(root), "find_project_root from inside .gamestudio")
         check(find_project_root(tmp) is None, "find_project_root returns None outside a project")
-        r2 = init_project(root, "Other", "godot")
+        r2 = init_project(root, "Other", "godot", platforms=["ios"])
         check(r2["created"] == [] and "config.json" in r2["skipped"], "second init without force overwrites nothing")
-        r3 = init_project(root, "Selftest Game", "godot", "puzzle", force=True)
+        r3 = init_project(root, "Selftest Game", "godot", "puzzle", force=True, platforms=["windows", "web"])
         check("config.json" in r3["overwritten"] and r3["backup_dir"] and
               (Path(r3["backup_dir"]) / "config.json").is_file(), "init --force backs up before overwrite")
         prog_text = (g / "progress.md").read_text(encoding="utf-8")
@@ -2375,7 +2427,7 @@ def _selftest() -> int:
         check(set(st) == {"config", "contract", "features", "manifest", "budget"}, "load_state keys")
         cfg = st["config"]
         check(cfg["engine"] == "godot" and cfg["engine_version"] == "4.7", "config engine/version")
-        check(cfg["platforms"] == ["ios", "android"] and cfg["orientation"] == "portrait", "config platforms")
+        check(cfg["platforms"] == ["windows", "web"] and cfg["orientation"] == "landscape", "config platforms")
         check(cfg["budgets"] == {"asset_usd_cap": 50.0, "per_call_usd_cap": 5.0}, "config budgets")
         check(cfg["storefronts"] == ["US"] and cfg["tier"] == "prototype", "config storefronts/tier")
         check(cfg["licence_allowlist"] == DEFAULT_LICENCE_ALLOWLIST, "config licence allowlist")
@@ -2516,7 +2568,7 @@ def _selftest() -> int:
         # ---- cross_check ----
         xr = tmp / "xproj"
         xr.mkdir()
-        init_project(xr, "Cross Check", "godot")
+        init_project(xr, "Cross Check", "godot", platforms=["ios", "android"])
         xg = gs_dir(_abspath(xr))
         check(cross_check(xr) == [], "cross_check: a fresh skeleton is clean: %s" % cross_check(xr))
         check(cross_check(tmp / "nowhere-at-all") == [], "cross_check: no project, nothing to report, no crash")
@@ -2676,7 +2728,7 @@ def _selftest() -> int:
         if avail:
             fresh = tmp / "fresh"
             fresh.mkdir()
-            init_project(fresh, "Fresh", "unity")
+            init_project(fresh, "Fresh", "unity", platforms=["ios", "android"])
             for rel in ("config.json", "contract.json", "features.json", "budget.json", "assets/manifest.json"):
                 sp = schema_for(gs_dir(fresh) / rel)
                 if sp is None:

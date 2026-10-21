@@ -89,7 +89,7 @@ Rules for good playthrough scripts:
 
 ## 5. The template runners
 
-**Godot (templates/godot-mobile).** Runner: `tools/playtest/runner.gd`. Run headless:
+**Godot (templates/godot-starter).** Runner: `tools/playtest/runner.gd`. Run headless:
 
 ```
 godot --headless --path <project> -s res://tools/playtest/runner.gd -- \
@@ -113,7 +113,7 @@ Exit codes: 0 pass, 1 fail (script) or softlocks (bots), 2 usage error. Script f
 
 Time metrics from headless runs are estimates (the template documents seconds-per-move as a constant), so say "estimated" in notes. A run that goes over the move cap without ending counts as a softlock.
 
-**Unity (templates/unity-mobile).** The runner is `Game.EditorTools.PlaytestRunner.Run` (`Assets/_Game/Editor/PlaytestRunner.cs`). It follows the same contract (script file in, playtest-report JSON out, same exit codes) but is a batchmode `-executeMethod` entry point over `Game.Core`, not a Unity Test Framework run; the actual logic is `Playthrough.RunScript` and `Playthrough.RunBots` in `Assets/_Game/Core/Playthrough.cs`. Run it headless (`<p>` = project path, relative `-gsOut` paths resolve against the project root, `-quit` is required):
+**Unity (templates/unity-starter).** The runner is `Game.EditorTools.PlaytestRunner.Run` (`Assets/_Game/Editor/PlaytestRunner.cs`). It follows the same contract (script file in, playtest-report JSON out, same exit codes) but is a batchmode `-executeMethod` entry point over `Game.Core`, not a Unity Test Framework run; the actual logic is `Playthrough.RunScript` and `Playthrough.RunBots` in `Assets/_Game/Core/Playthrough.cs`. Run it headless (`<p>` = project path, relative `-gsOut` paths resolve against the project root, `-quit` is required):
 
 ```
 Unity -batchmode -nographics -projectPath <p> -executeMethod Game.EditorTools.PlaytestRunner.Run \
@@ -122,7 +122,7 @@ Unity -batchmode -nographics -projectPath <p> -executeMethod Game.EditorTools.Pl
   -gsMode bot -gsBot greedy|random -gsRuns 200 -gsSeed 1 -gsOut <abs>/bots.json -quit
 ```
 
-Flags: `-gsMode script|bot` (default script), `-gsOut` (required), `-gsScript` (script mode), `-gsBot`, `-gsRuns` (default 200), `-gsSeed` (optional; overrides the script's seed). Exit codes: 0 pass, 1 fail or softlocks, 2 usage error. The script format and expect paths are the same as the Godot template's (`smoke.json` ships in both), and `SimTests.cs` runs the same `Playthrough` code as EditMode tests, so a broken playthrough also fails the unit gate (`-runTests -testPlatform EditMode -testResults <abs>/unit.xml`, NUnit XML). The full command table, including scene build, AAB and Xcode builds and the screenshot gate, is in `${CLAUDE_PLUGIN_ROOT}/templates/unity-mobile/README.md`. Input-level flows (touch through the UI layer) are outside the template and need PlayMode tests.
+Flags: `-gsMode script|bot` (default script), `-gsOut` (required), `-gsScript` (script mode), `-gsBot`, `-gsRuns` (default 200), `-gsSeed` (optional; overrides the script's seed). Exit codes: 0 pass, 1 fail or softlocks, 2 usage error. The script format and expect paths are the same as the Godot template's (`smoke.json` ships in both), and `SimTests.cs` runs the same `Playthrough` code as EditMode tests, so a broken playthrough also fails the unit gate (`-runTests -testPlatform EditMode -testResults <abs>/unit.xml`, NUnit XML). The full command table, including scene build, AAB and Xcode builds and the screenshot gate, is in `${CLAUDE_PLUGIN_ROOT}/templates/unity-starter/README.md`. Input-level flows (touch through the UI layer) are outside the template and need PlayMode tests.
 
 **Adapting to your game.** Add action types to the runner's dispatcher for your game's commands and extend the state summary with the keys you want to assert. Keep action names identical in script files and in bot policies so the same vocabulary serves both.
 
@@ -210,7 +210,7 @@ Mutation check: change the cancel handler to grant the entitlement and confirm s
 - Pure-function style: given state and action, return new state; assertable and replayable.
 - Property tests where easy: after any random legal action sequence, invariants hold (resources conserved, no illegal states). Implement as a seeded bot with invariant checks (see `bots-and-visual-qa.md`).
 - Edge cases to enumerate: zero and max values, integer overflow in currencies, simultaneous events, undo or retry, empty inventories, duplicate taps, saving mid-animation.
-- Engine-side: Godot headless unit runner (`tools/ci/run_tests.gd`) writes JUnit XML; Unity Test Framework EditMode tests for pure assemblies (`Assets/_Game/Tests/EditMode/SimTests.cs` in the template) write NUnit XML. The same Core and EditMode tests also run on the plain .NET SDK through `templates/unity-mobile/tools/dotnet-harness/build_harness.py`, which needs no Unity licence.
+- Engine-side: Godot headless unit runner (`tools/ci/run_tests.gd`) writes JUnit XML; Unity Test Framework EditMode tests for pure assemblies (`Assets/_Game/Tests/EditMode/SimTests.cs` in the template) write NUnit XML. The same Core and EditMode tests also run on the plain .NET SDK through `templates/unity-starter/tools/dotnet-harness/build_harness.py`, which needs no Unity licence.
 
 ## 11. Flakiness policy and CI integration
 

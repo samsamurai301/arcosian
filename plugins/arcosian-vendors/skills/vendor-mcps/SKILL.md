@@ -1,6 +1,6 @@
 ---
 name: vendor-mcps
-description: Decides when to call a vendor MCP (PixelLab, Meshy, ElevenLabs, Scenario, ComfyUI) directly versus the core studio-gateway, covers each vendor's strengths, licences and plan requirements, and requires manifest_update registration so provenance and budgets stay intact. Use when asked to "generate pixel art with PixelLab", "use the Meshy MCP", "make SFX with ElevenLabs", "connect Scenario or ComfyUI", "which asset vendor should I use" or "why is this asset missing provenance".
+description: Decides when to call a vendor MCP (PixelLab, Meshy, ElevenLabs, Scenario, ComfyUI) directly instead of the core studio-gateway, with each vendor's strengths, licences and plan needs, and requires manifest_update so provenance and budgets stay intact. Use when asked to "generate pixel art with PixelLab", "use Meshy", "make SFX with ElevenLabs", "which asset vendor should I use" or "why is this asset missing provenance".
 ---
 
 # Vendor MCPs

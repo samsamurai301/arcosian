@@ -1,8 +1,8 @@
 {
   "name": "arcosian",
   "displayName": "Arcosian",
-  "version": "0.3.2",
-  "description": "A principal game developer and full studio for Claude Code: a deep game-dev codex (design theory, mechanics, genres, case studies, psychology, economy, analytics, art, audio, tech, live-ops, release), a shared game ontology with schemas, 24 specialist agents, multi-agent workflows, simulators and solvers, an asset and audio gateway with budgets and provenance, Godot and Unity mobile templates, and hooks that enforce a five-gate definition of done.",
+  "version": "0.4.0",
+  "description": "A principal game developer and full studio for Claude Code, for any genre on any platform: a deep game-dev codex (design, mechanics, genres, case studies, platforms, psychology, economy, art, audio, tech, live-ops, release), a game ontology with schemas, 24 specialist agents, workflows, simulators, a project map with change impact and what-if predictions, an offline dashboard, an asset and audio gateway with budgets and provenance, Godot and Unity templates for phones, desktop and web, and hooks that enforce a five-gate definition of done.",
   "author": {
     "name": "samsamurai301",
     "url": "https://github.com/samsamurai301"
@@ -16,8 +16,10 @@
   "privacyPolicyUrl": "https://github.com/samsamurai301/arcosian/blob/main/PRIVACY.md",
   "keywords": [
     "game-development",
-    "mobile-games",
     "game-design",
+    "mobile-games",
+    "pc-games",
+    "web-games",
     "godot",
     "unity",
     "liveops",

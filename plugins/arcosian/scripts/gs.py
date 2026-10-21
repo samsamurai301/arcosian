@@ -95,7 +95,7 @@ def _find_root(args: argparse.Namespace) -> Path:
         if r is not None:
             return r
     raise CliError("no %s/ directory found from %s; create one with: gs.py init --title \"Name\" "
-                   "--engine godot" % (G.GS_DIRNAME, starts[0]))
+                   "--engine godot --platforms <list>" % (G.GS_DIRNAME, starts[0]))
 
 
 def _fid(value: str) -> str:
@@ -163,11 +163,17 @@ def cmd_init(args: argparse.Namespace) -> int:
         raise CliError("cannot create project root %s: %s" % (root, exc))
     root = root.resolve()
     outer = G.find_project_root(root.parent) if root.parent != root else None
-    platforms = [p for p in (args.platforms or "ios,android").split(",") if p.strip()]
+    platforms = [p for p in (args.platforms or "").split(",") if p.strip()]
+    if not platforms:
+        raise CliError("choose the target platforms with --platforms, any combination of %s. Ask the user: "
+                       "platforms drive input, UI, performance budgets and release steps (skill "
+                       "platform-targets)." % ", ".join(G.PLATFORMS))
+    inputs = [i for i in (args.input or "").split(",") if i.strip()] or None
     try:
         res = G.init_project(
             root, args.title, args.engine, args.genre, force=args.force, slug=args.slug,
             engine_version=args.engine_version, platforms=platforms, orientation=args.orientation,
+            input_methods=inputs,
             tier=args.tier, monetization_model=args.monetization, asset_usd_cap=args.budget,
             per_call_usd_cap=args.per_call_cap)
     except ValueError as exc:
@@ -183,6 +189,8 @@ def cmd_init(args: argparse.Namespace) -> int:
                      "to .gamestudio/snapshots/; progress.md is never truncated).")
     else:
         lines.append("Initialised %s (engine %s)." % (res["gs_dir"], res["engine"]))
+        lines.append("  platforms:   %s | input: %s | orientation: %s" % (
+            ", ".join(res["platforms"]), ", ".join(res["input"]), res["orientation"]))
         if res["created"]:
             lines.append("  created:     " + ", ".join(res["created"]))
         elif res["dirs_created"]:
@@ -195,7 +203,7 @@ def cmd_init(args: argparse.Namespace) -> int:
     if outer is not None:
         lines.append("Note: an enclosing project already exists at %s; commands run from this folder "
                      "will use %s." % (outer, root))
-    tpl = G.PLUGIN_ROOT / "templates" / ("%s-mobile" % res["engine"])
+    tpl = G.PLUGIN_ROOT / "templates" / ("%s-starter" % res["engine"])
     lines += [
         "",
         "Next steps (gs.py = %s):" % GS_CMD,
@@ -295,6 +303,49 @@ def cmd_summary(args: argparse.Namespace) -> int:
     root = _find_root(args)
     text = G.summarize(root, args.max_chars)
     _emit(args, {"summary": text, "chars": len(text)}, text)
+    return 0
+
+
+# --------------------------------------------------------------------------
+# understanding layer: project map, change impact, what-if, dashboard
+# --------------------------------------------------------------------------
+
+def cmd_map(args: argparse.Namespace) -> int:
+    import project_map
+    root = _find_root(args)
+    doc = project_map.build(root)
+    d = project_map.map_dir(root)
+    data = dict(doc["stats"], engine=doc["engine"], summary=_rel(d / "MAP.md", root), graph=_rel(d / "map.json", root))
+    _emit(args, data, "Mapped %d files (%d parsed, %d references, engine %s).\n  summary: %s\n  graph:   %s" % (
+        data["files"], data["reparsed"], data["edges"], data["engine"], data["summary"], data["graph"]))
+    return 0
+
+
+def cmd_impact(args: argparse.Namespace) -> int:
+    import project_map
+    root = _find_root(args)
+    res = project_map.impact(project_map.load(root, refresh=True), root, args.targets, max(1, args.depth))
+    _emit(args, res, project_map.render_impact(res))
+    return 1 if res["missing"] and not res["resolved"] else 0
+
+
+def cmd_whatif(args: argparse.Namespace) -> int:
+    import whatif
+    root = _find_root(args)
+    try:
+        res = whatif.run(root, args.set, args.sim, args.runs, args.seeds, args.seed, args.bot, args.model,
+                         args.level, args.label, args.tolerance, not args.no_save)
+    except whatif.WhatIfError as exc:
+        raise CliError(str(exc))
+    _emit(args, res, whatif.render(res))
+    return 1 if res["verdict"] == "reject" else 0
+
+
+def cmd_dashboard(args: argparse.Namespace) -> int:
+    import dashboard
+    root = _find_root(args)
+    path = dashboard.write(root, Path(args.out).resolve() if args.out else None, not args.no_map)
+    _emit(args, {"path": str(path)}, "Dashboard written: %s\nOpen it in a browser; it works offline." % _rel(path, root))
     return 0
 
 
@@ -529,6 +580,8 @@ def cmd_feature_add(args: argparse.Namespace) -> int:
                           notes=args.notes or "")
     except ValueError as exc:
         raise CliError(str(exc))
+    if getattr(args, "path", None):
+        f["paths"] = [p.replace("\\", "/") for p in args.path]
     doc["features"].append(f)
     _save_features(root, doc)
     text = "Added %s [%s] %s: %s" % (f["id"], f["priority"], f["area"], f["title"])
@@ -865,7 +918,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = argparse.ArgumentParser(
         prog="gs.py", description="arcosian project-state CLI: contract, features and the five gates, "
-        "progress, budget, evidence, codex search.",
+        "progress, budget, evidence, codex search, project map, change impact, what-if predictions, dashboard.",
         epilog="Five-gate rule: a feature is done only when static, unit, playthrough, visual and perf are each "
         "'pass' (with evidence on disk) or 'n/a' (with a note). Exit codes: 0 ok, 1 check failed, 2 usage error.")
     p.add_argument("--selftest", action="store_true", help="run the built-in end-to-end self-test")
@@ -877,8 +930,11 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--engine", choices=G.ENGINES, help="engine (default: auto-detect, else other)")
     sp.add_argument("--genre", help="genre, e.g. puzzle, idle, roguelite")
     sp.add_argument("--engine-version", help="e.g. 4.7 or 6000.3.2f1 (default: detected or current line)")
-    sp.add_argument("--platforms", help="comma list (default ios,android)")
-    sp.add_argument("--orientation", choices=G.ORIENTATIONS, default="portrait")
+    sp.add_argument("--platforms", help="required comma list, any of: " + ",".join(G.PLATFORMS))
+    sp.add_argument("--input", help="comma list of %s (default: what the platforms expect)"
+                    % ",".join(G.INPUTS))
+    sp.add_argument("--orientation", choices=G.ORIENTATIONS,
+                    help="default: portrait for phone-only games, landscape otherwise")
     sp.add_argument("--tier", choices=G.TIERS, default="prototype")
     sp.add_argument("--monetization", choices=G.MONETIZATION_MODELS, default="hybrid")
     sp.add_argument("--slug", help="kebab-case slug (default: from title)")
@@ -923,6 +979,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--depends", action="append", default=[], metavar="IDS", help="comma list of feature ids")
     s.add_argument("--desc", help="description")
     s.add_argument("--owner", help="owning agent or person")
+    s.add_argument("--path", action="append", default=[], metavar="GLOB",
+                   help="code or content this feature owns, e.g. core/combat/* (repeatable; used by gs.py impact)")
     s.add_argument("--notes", help="free notes")
     s.set_defaults(func=cmd_feature_add)
 
@@ -966,6 +1024,34 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("budget", parents=[common], help="asset/audio spend vs cap")
     sp.set_defaults(func=cmd_budget)
+
+    sp = sub.add_parser("map", parents=[common], help="index scenes, scripts, classes, assets and tuning (.gamestudio/map/)")
+    sp.set_defaults(func=cmd_map)
+
+    sp = sub.add_parser("impact", parents=[common], help="what a change to a file, class, tuning key or feature touches")
+    sp.add_argument("targets", nargs="+", metavar="TARGET")
+    sp.add_argument("--depth", type=int, default=4, help="how many dependency hops to follow (default 4)")
+    sp.set_defaults(func=cmd_impact)
+
+    sp = sub.add_parser("whatif", parents=[common], help="predict a change with bots or simulators against the contract")
+    sp.add_argument("--set", action="append", required=True, metavar="KEY=VALUE",
+                    help="tuning key or model path = JSON value, *factor or +=delta (repeatable)")
+    sp.add_argument("--sim", choices=("auto", "godot", "economy", "match3"), default="auto")
+    sp.add_argument("--runs", type=int, default=100, help="runs per seed (default 100)")
+    sp.add_argument("--seeds", type=int, default=5, help="independent seeds (default 5)")
+    sp.add_argument("--seed", type=int, default=1)
+    sp.add_argument("--bot", default="greedy")
+    sp.add_argument("--model", help="economy-model JSON (economy simulator)")
+    sp.add_argument("--level", help="match-3 level spec (match3 simulator)")
+    sp.add_argument("--label")
+    sp.add_argument("--tolerance", type=float, default=0.05, help="win-rate band half-width (default 0.05)")
+    sp.add_argument("--no-save", action="store_true", help="do not write .gamestudio/whatif/")
+    sp.set_defaults(func=cmd_whatif)
+
+    sp = sub.add_parser("dashboard", parents=[common], help="write the offline project dashboard (HTML)")
+    sp.add_argument("--out", help="output path (default .gamestudio/reports/dashboard.html)")
+    sp.add_argument("--no-map", action="store_true", help="skip the dependency graph")
+    sp.set_defaults(func=cmd_dashboard)
 
     sp = sub.add_parser("kb", parents=[common], help="ranked search across the plugin's skills")
     sp.add_argument("query")
@@ -1054,7 +1140,7 @@ def _selftest() -> int:
         root = tmp / "game"
         R = str(root)
         # ---- init ----
-        code, out, _ = run("init", "--title", "Selftest Merge", "--engine", "godot", "--genre", "puzzle", "--root", R)
+        code, out, _ = run("init", "--platforms", "ios,android", "--title", "Selftest Merge", "--engine", "godot", "--genre", "puzzle", "--root", R)
         check(code == 0 and "Next steps" in out, "init exit 0 + next steps (%d)" % code)
         g = root.resolve() / G.GS_DIRNAME
         for rel in ("config.json", "contract.json", "features.json", "budget.json", "assets/manifest.json",
@@ -1065,27 +1151,46 @@ def _selftest() -> int:
         for d in ("design", "art", "audio"):
             shutil.rmtree(str(g / d))
         before = (g / "config.json").read_text(encoding="utf-8")
-        code, out, _ = run("init", "--title", "Again", "--engine", "godot", "--root", R)
+        code, out, _ = run("init", "--platforms", "ios,android", "--title", "Again", "--engine", "godot", "--root", R)
         check(code == 0 and "added missing directories" in out and all((g / d).is_dir() for d in ("design", "art", "audio"))
               and (g / "config.json").read_text(encoding="utf-8") == before, "re-init adds missing directories only")
         cfg = json.loads((g / "config.json").read_text(encoding="utf-8"))
         check(cfg["budgets"]["asset_usd_cap"] == 50 and cfg["budgets"]["per_call_usd_cap"] == 5
               and cfg["platforms"] == ["ios", "android"] and cfg["orientation"] == "portrait"
+              and cfg["input"] == ["touch"]
               and cfg["storefronts"] == ["US"] and cfg["tier"] == "prototype"
               and cfg["licence_allowlist"] == ["commercial-paid", "cc0", "cc-by", "mit", "apache-2.0"],
               "config defaults")
-        code, out, _ = run("init", "--title", "Again", "--engine", "godot", "--root", R)
+        code, out, _ = run("init", "--platforms", "ios,android", "--title", "Again", "--engine", "godot", "--root", R)
         check(code == 1 and "already" in out, "re-init without --force refuses (exit 1)")
         check(json.loads((g / "config.json").read_text(encoding="utf-8"))["project"]["title"] == "Selftest Merge",
               "re-init did not overwrite config")
-        code, data = jrun("init", "--title", "Selftest Merge", "--engine", "godot", "--root", R, "--force")
+        code, data = jrun("init", "--platforms", "ios,android", "--title", "Selftest Merge", "--engine", "godot", "--root", R, "--force")
         check(code == 0 and "config.json" in data["overwritten"] and data["backup_dir"], "init --force with backup")
         code, _, err = run("init", "--title", "Bad", "--engine", "godot", "--root", str(tmp / "bad"),
                            "--platforms", "ios,gameboy")
         check(code == 2 and "platforms" in err, "init rejects unknown platform (exit 2)")
+        code, _, err = run("init", "--title", "Bad", "--engine", "godot", "--root", str(tmp / "bad2"))
+        check(code == 2 and "choose the target platforms" in err, "init without --platforms asks for them (exit 2)")
+        code, out, _ = run("init", "--title", "Desk", "--engine", "godot", "--root", str(tmp / "desk"),
+                           "--platforms", "windows,linux,switch")
+        dcfg = json.loads((tmp / "desk" / G.GS_DIRNAME / "config.json").read_text(encoding="utf-8"))
+        check(code == 0 and dcfg["input"] == ["mouse_keyboard", "gamepad"] and dcfg["orientation"] == "landscape"
+              and "input: mouse_keyboard, gamepad" in out, "desktop/console init: input and orientation defaults")
+
+        # ---- understanding layer ----
+        code, out, _ = run("map", "--root", R)
+        check(code == 0 and (Path(R) / G.GS_DIRNAME / "map" / "MAP.md").is_file(), "map writes MAP.md")
+        code, out, _ = run("impact", "no/such/file.gd", "--root", R)
+        check(code == 1 and "not found" in out, "impact reports an unknown target (exit 1)")
+        code, out, _ = run("dashboard", "--root", R)
+        check(code == 0 and (Path(R) / G.GS_DIRNAME / "reports" / "dashboard.html").is_file(), "dashboard written")
+        code, _, err = run("whatif", "--set", "x=1", "--root", R)
+        check(code == 2 and "simulator" in err, "whatif without a simulator explains the options (exit 2)")
+        check("No project map yet" not in G.summarize(Path(R), 2500), "summary points at the map once it exists")
 
         # ---- feature add ----
-        check(run("feature", "add", "--id", "F001", "--title", "Merge rule", "--area", "gameplay",
+        check(run("feature", "add", "--id", "F001", "--title", "Merge rule", "--area", "gameplay", "--path", "core/*",
                   "--accept", "two equal tiles merge into their sum", "--root", R)[0] == 0, "add F001")
         check(run("feature", "add", "--id", "F002", "--title", "Merge VFX", "--area", "vfx", "--priority", "P0",
                   "--depends", "F001", "--accept", "burst on merge", "--root", R)[0] == 0, "add F002 (P0, dep F001)")
@@ -1229,7 +1334,7 @@ def _selftest() -> int:
         # ---- validate --cross (separate project: the main one keeps its state for the checks below) ----
         xr = tmp / "xgame"
         XR = str(xr)
-        run("init", "--title", "Cross", "--engine", "godot", "--root", XR)
+        run("init", "--platforms", "ios,android", "--title", "Cross", "--engine", "godot", "--root", XR)
         xg = xr.resolve() / G.GS_DIRNAME
         code, out, _ = run("validate", "--cross", "--root", XR)
         check(code == 0 and "cross-document checks: ok" in out, "validate --cross on a fresh project: ok (%d)" % code)

@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""{{title}} helper: one job, standard library only.
+
+  {{script}}.py check FILE [--json]
+  {{script}}.py --selftest
+
+Exit codes: 0 ok, 1 check failed, 2 usage error.
+"""
+import argparse
+import json
+import sys
+import tempfile
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+
+def check(path: Path) -> Dict[str, Any]:
+    """Replace with the real check. Returns a JSON-serialisable report."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    problems: List[str] = [] if isinstance(data, dict) else ["top level must be an object"]
+    return {"file": str(path), "problems": problems, "ok": not problems}
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--selftest", action="store_true")
+    sub = ap.add_subparsers(dest="cmd")
+    c = sub.add_parser("check")
+    c.add_argument("file")
+    c.add_argument("--json", action="store_true")
+    a = ap.parse_args(argv)
+    if a.selftest:
+        return selftest()
+    if a.cmd != "check":
+        ap.print_help()
+        return 2
+    rep = check(Path(a.file))
+    print(json.dumps(rep, indent=1) if a.json else ("ok" if rep["ok"] else "\n".join(rep["problems"])))
+    return 0 if rep["ok"] else 1
+
+
+def selftest() -> int:
+    with tempfile.TemporaryDirectory() as td:
+        good, bad = Path(td) / "good.json", Path(td) / "bad.json"
+        good.write_text("{}", encoding="utf-8")
+        bad.write_text("[]", encoding="utf-8")
+        assert check(good)["ok"] and not check(bad)["ok"]
+    print("selftest ok")
+    return 0
+
+
+if __name__ == "__main__":
+    for _stream in (sys.stdout, sys.stderr):  # Windows pipes default to the ANSI code page; Claude Code reads UTF-8
+        if hasattr(_stream, "reconfigure"):
+            _stream.reconfigure(encoding="utf-8", errors="replace")
+    sys.exit(main())

@@ -40,7 +40,7 @@ Rule: pipelines that must be reproducible (CI, release candidates) use batchmode
   -logFile "<abs>/unity.log"
 ```
 
-That is the real scene-generation command of `${CLAUDE_PLUGIN_ROOT}/templates/unity-mobile/` (macOS editor path: `/Applications/Unity/Hub/Editor/<ver>/Unity.app/Contents/MacOS/Unity`). The template's other batch entry points follow the same shape:
+That is the real scene-generation command of `${CLAUDE_PLUGIN_ROOT}/templates/unity-starter/` (macOS editor path: `/Applications/Unity/Hub/Editor/<ver>/Unity.app/Contents/MacOS/Unity`). The template's other batch entry points follow the same shape:
 
 | Entry point (namespace `Game.EditorTools`) | Extra flags | Output and exit codes |
 |---|---|---|
@@ -50,7 +50,7 @@ That is the real scene-generation command of `${CLAUDE_PLUGIN_ROOT}/templates/un
 | `BuildScript.BuildIOS` | `-gsOut Builds/iOS` | Xcode project; 0 built, 1 failed |
 | `ScreenshotCapture.Run` | `-gsOut <abs dir>`; omit `-nographics` | `start.png`, `played.png`; 0 ok, 1 failed, 2 usage |
 
-All of them read the `-gs*` flags through the shared `GsArgs` helper (`Assets/_Game/Editor/BuildScript.cs`), resolve relative paths against the project root and exit through `EditorApplication.Exit(code)`, so the process exit code is the method's own. The EditMode test run is Unity's, not a method: `-runTests -testPlatform EditMode -testResults <abs>/unit.xml` without `-quit`. The complete table is in `${CLAUDE_PLUGIN_ROOT}/templates/unity-mobile/README.md`.
+All of them read the `-gs*` flags through the shared `GsArgs` helper (`Assets/_Game/Editor/BuildScript.cs`), resolve relative paths against the project root and exit through `EditorApplication.Exit(code)`, so the process exit code is the method's own. The EditMode test run is Unity's, not a method: `-runTests -testPlatform EditMode -testResults <abs>/unit.xml` without `-quit`. The complete table is in `${CLAUDE_PLUGIN_ROOT}/templates/unity-starter/README.md`.
 
 | Flag | Meaning |
 |---|---|

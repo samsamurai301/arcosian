@@ -1,0 +1,27 @@
+{
+  "name": "arcosian-audio",
+  "version": "0.4.0",
+  "description": "Audio middleware adapter for arcosian: FMOD Studio and Wwise workflows for any game, a decision guide for when engine-native audio is enough, adaptive music and mix references, and a minimal WAAPI HTTP client for build automation.",
+  "author": {
+    "name": "samsamurai301",
+    "url": "https://github.com/samsamurai301"
+  },
+  "homepage": "https://github.com/samsamurai301/arcosian/tree/main/plugins/arcosian-audio",
+  "repository": "https://github.com/samsamurai301/arcosian",
+  "license": "MIT",
+  "icon": "./icon.png",
+  "documentationUrl": "https://github.com/samsamurai301/arcosian/blob/main/plugins/arcosian-audio/README.md",
+  "supportUrl": "https://github.com/samsamurai301/arcosian/issues",
+  "privacyPolicyUrl": "https://github.com/samsamurai301/arcosian/blob/main/PRIVACY.md",
+  "keywords": [
+    "fmod",
+    "wwise",
+    "waapi",
+    "audio",
+    "middleware",
+    "adaptive-music"
+  ],
+  "dependencies": [
+    "arcosian"
+  ]
+}

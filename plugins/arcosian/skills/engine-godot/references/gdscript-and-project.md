@@ -1,6 +1,6 @@
 # GDScript and Project Structure
 
-Summary: how to lay out a Godot 4 mobile project, write typed GDScript that passes the parser first time, use autoloads, signals, Resources and the node lifecycle correctly, and avoid the specific errors AI agents make (invented UIDs, Python idioms, wrong indentation). Written for Godot 4.5+ and correct on 4.7. Examples follow the conventions of `templates/godot-mobile/`.
+Summary: how to lay out a Godot 4 mobile project, write typed GDScript that passes the parser first time, use autoloads, signals, Resources and the node lifecycle correctly, and avoid the specific errors AI agents make (invented UIDs, Python idioms, wrong indentation). Written for Godot 4.5+ and correct on 4.7. Examples follow the conventions of `templates/godot-starter/`.
 
 ## Contents
 1. Project layout

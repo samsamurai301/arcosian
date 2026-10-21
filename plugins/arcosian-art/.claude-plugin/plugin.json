@@ -1,0 +1,31 @@
+{
+  "name": "arcosian-art",
+  "version": "0.4.0",
+  "description": "Art tools adapter for arcosian: Aseprite, Krita, Spine, Rive, Figma and Penpot recipes, sprite-sheet packing and import into Godot and Unity, research notes on Substance and Houdini, a sprite-sheet checker and Godot SpriteFrames generator, and the official Figma MCP server.",
+  "author": {
+    "name": "samsamurai301",
+    "url": "https://github.com/samsamurai301"
+  },
+  "homepage": "https://github.com/samsamurai301/arcosian/tree/main/plugins/arcosian-art",
+  "repository": "https://github.com/samsamurai301/arcosian",
+  "license": "MIT",
+  "icon": "./icon.png",
+  "documentationUrl": "https://github.com/samsamurai301/arcosian/blob/main/plugins/arcosian-art/README.md",
+  "supportUrl": "https://github.com/samsamurai301/arcosian/issues",
+  "privacyPolicyUrl": "https://github.com/samsamurai301/arcosian/blob/main/PRIVACY.md",
+  "keywords": [
+    "aseprite",
+    "krita",
+    "spine",
+    "rive",
+    "figma",
+    "penpot",
+    "sprite-sheet",
+    "texture-atlas",
+    "godot",
+    "unity"
+  ],
+  "dependencies": [
+    "arcosian"
+  ]
+}

@@ -1,6 +1,6 @@
 ---
 name: audio-direction
-description: Audio direction for mobile games - audio bible and sonic identity, adaptive music (re-sequencing, layering, stingers), SFX layering and reward escalation, bus mixing and ducking, loudness targets, formats, iOS/Android audio session rules, voice direction and AI-voice consent. Use when asked to "write the audio bible", "make the music adaptive", "design UI sounds", "set up the mix", "fix loudness", "direct voice lines" or "plan the audio".
+description: Audio direction for games - audio bible and sonic identity, adaptive music (re-sequencing, layering, stingers), SFX layering and reward escalation, bus mixing and ducking, loudness targets, formats, iOS/Android audio session rules, voice direction and AI-voice consent. Use when asked to "write the audio bible", "make the music adaptive", "design UI sounds", "set up the mix", "fix loudness", "direct voice lines" or "plan the audio".
 ---
 
 # Audio Direction

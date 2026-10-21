@@ -21,7 +21,7 @@ Greenfield projects. For an existing repo use `studio` (onboarding). If a concep
    | Question | Why it matters | Default if unanswered |
    |---|---|---|
    | Who plays, and when (age band, session context)? | Audience drives genre, session length, ethics | Adults 25 to 45, commute and break sessions |
-   | Platforms and orientation? | Template and UI | iOS + Android, portrait |
+   | Platforms (phones, PC, Steam Deck, web, consoles) and input (touch, mouse and keyboard, gamepad)? | Input, UI, performance tiers, exports and stores (`platform-targets`) | Always ask; never assume. Suggest from the genre: casual on phones and web, action and strategy on PC and console |
    | Monetization: premium, IAP, ads, hybrid, subscription? | Shapes the loops and economy | Hybrid, rewarded ads first |
    | Team and time: who builds, how many weeks to a slice? | Scope tier | AI-agent build, slice in days to weeks |
    | Art and audio: AI-generated placeholders OK? Budget cap USD? | Gateway budget | Placeholders OK, cap from `config.budgets` |
@@ -30,12 +30,13 @@ Greenfield projects. For an existing repo use `studio` (onboarding). If a concep
    | What would make you stop the project? | Kill criteria | Core loop not fun after a prototype playtest |
 
    Minors in the audience (under 13) raises compliance load: load `legal-ethics` and tell the user now.
+   Console targets need a developer programme and certification: load `console-pathway` and say so now.
 
 2. **Market scan.** Run the `market-scan` skill with the genre or brief (writes `.gamestudio/research/market-<slug>.md`). Needed to avoid concepts in saturated lanes with no angle. Keep it to the free-budget level unless the user asks for deep.
 
 3. **Concept tournament.** Run `/arcosian:concept-tournament` with args:
    ```json
-   {"brief": "<tightened one-line brief>", "constraints": {"audience": "...", "platforms": ["ios","android"], "monetization": "hybrid", "tier": "slice", "wont": ["..."], "market_file": ".gamestudio/research/market-<slug>.md"}, "n": 5}
+   {"brief": "<tightened one-line brief>", "constraints": {"audience": "...", "platforms": ["<from intake>"], "input": ["<from intake>"], "monetization": "hybrid", "tier": "slice", "wont": ["..."], "market_file": ".gamestudio/research/market-<slug>.md"}, "n": 5}
    ```
    Use `n` 5 for a normal run, 8 only when the user wants breadth. Cards land in `.gamestudio/concepts/` (see `concept-lab` for the rubric). Rank them:
    `python3 ${CLAUDE_PLUGIN_ROOT}/skills/analogy-engine/scripts/analogy_score.py rank --dir .gamestudio/concepts --preset default`
@@ -47,14 +48,14 @@ Greenfield projects. For an existing repo use `studio` (onboarding). If a concep
    | Condition | Engine |
    |---|---|
    | 2D, casual, puzzle, idle, card, UI-driven, small team | Godot (default) |
-   | 3D-heavy, advanced mobile rendering, large asset store dependence, console path | Unity |
+   | 3D-heavy, advanced rendering, large asset store dependence, console path without a porting partner | Unity |
    | User names an engine or has existing code in one | That engine, say what the template does not cover |
    | Anything else (Unreal, web) | Warn that no template exists; use `engine-alternatives` |
 
    ```
-   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/gs.py init --title "<Title>" --engine godot|unity --genre "<genre>" --root .
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/gs.py init --title "<Title>" --engine godot|unity --genre "<genre>" --platforms <list> [--input <list>] [--orientation portrait|landscape|both] --root .
    ```
-   Copy the template into the project root (never overwrite existing files; use `cp -n -R`): `${CLAUDE_PLUGIN_ROOT}/templates/godot-mobile/` or `${CLAUDE_PLUGIN_ROOT}/templates/unity-mobile/`. Rename the project title in `project.godot` or Unity `ProjectSettings` per the template README. Copy CI from `${CLAUDE_PLUGIN_ROOT}/templates/ci/` only if the user wants it.
+   Copy the template into the project root (never overwrite existing files; use `cp -n -R`): `${CLAUDE_PLUGIN_ROOT}/templates/godot-starter/` or `${CLAUDE_PLUGIN_ROOT}/templates/unity-starter/`. Rename the project title in `project.godot` or Unity `ProjectSettings` per the template README. Copy CI from `${CLAUDE_PLUGIN_ROOT}/templates/ci/` only if the user wants it. Both templates build for phones, desktop and web and take touch, mouse, keyboard and gamepad input; delete the export presets or build jobs for platforms the contract does not list.
 
 6. **Write the design contract.** Delegate to `arcosian:game-designer` (mechanics, loops, FTUE) with `arcosian:systems-designer` (economy, progression), `arcosian:monetization-designer` (monetization and ethics), `arcosian:lead-engineer` (technical). Output `.gamestudio/contract.json` conforming to `${CLAUDE_PLUGIN_ROOT}/scripts/schemas/design-contract.schema.json`; field names per the schema (`meta`, `player_fantasy`, `verbs`, `mechanics`, `loops`, `economy`, `progression`, `content`, `ftue`, `ux`, `art_direction`, `audio_direction`, `monetization`, `liveops`, `analytics`, `technical`, `scope`, `risks`, `kill_criteria`). Rules:
    - 3 to 5 pillars, each testable ("every tap yields a visible result within 100 ms").

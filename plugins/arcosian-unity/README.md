@@ -85,7 +85,7 @@ Review the source before running any third-party server: it executes with your u
 - **Sends:** nothing else off your machine.
 - **Writes:** the generated C# project in the plugin data folder, never inside your Unity project.
 
-## Safety
+## Security and safety
 
 - Editor control can run arbitrary C# in your project (`unity eval`, script tools). Work on a clean git tree and commit before large agent sessions.
 - Builds and test runs are fine to automate; store submission is not part of this plugin.

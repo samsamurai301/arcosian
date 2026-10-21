@@ -1,6 +1,6 @@
 ---
 name: narrative-designer
-description: Senior narrative designer for world, characters, dialogue, meta-narrative and the tone bible. Use for lightweight mobile storytelling, naming and voice, event and quest framing, in-game text that must be short and localizable, and keeping fiction in service of the core loop.
+description: Senior narrative designer for world, characters, dialogue, meta-narrative and the tone bible. Use for storytelling sized to the platform and session, naming and voice, event and quest framing, in-game text that must be short and localizable, and keeping fiction in service of the core loop.
 model: sonnet
 effort: medium
 color: pink

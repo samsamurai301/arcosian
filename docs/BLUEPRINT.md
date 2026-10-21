@@ -18,7 +18,7 @@ This is the binding contract for everyone building the **Arcosian** plugin suite
 3. Verify by playing: nothing is "done" until a deterministic playthrough, the perf budget and a visual critique pass.
 4. Data-informed, not data-driven: hypotheses first, then telemetry to confirm.
 5. Scope ruthlessly: one-page design contract, explicit must/should/won't lists, kill criteria.
-6. Mobile-native: thumb reach, 1–5 minute sessions, interruptions, low-end devices, battery and heat.
+6. Platform-native: design for the devices and inputs you ship on (thumb reach and short sessions on phones; mouse, keyboard and gamepad on PC; controller-only TV play on consoles; download size on the web), and for interruptions, low-end hardware, battery and heat.
 7. Readability over detail. Juice everything that the player touches.
 8. Ethical monetization: no dark patterns, transparent odds, respect for minors.
 9. Own the output: native builds the user owns, no runtime lock-in, licences checked.
@@ -45,8 +45,8 @@ ROOT/
     │   ├── mcp/studio-gateway/            # zero-dependency Node MCP server
     │   ├── scripts/*.py                   # Python CLI tools (stdlib only)
     │   ├── scripts/schemas/*.schema.json  # ontology schemas
-    │   ├── templates/godot-mobile/        # Godot 4.x mobile project template
-    │   ├── templates/unity-mobile/        # Unity 6 LTS mobile project skeleton
+    │   ├── templates/godot-starter/        # Godot 4.x template: phones, desktop, web
+    │   ├── templates/unity-starter/        # Unity 6 LTS skeleton: phones, desktop, web
     │   ├── templates/ci/                  # GitHub Actions, fastlane, Codemagic
     │   ├── templates/docs/                # GDD one-pager, style bible, etc.
     │   ├── workflows/*.js                 # dynamic workflows
@@ -110,7 +110,7 @@ Allowed optional frontmatter: `when_to_use` (≤ 200 chars), `argument-hint`, `a
 1. `## What this skill gives you` — 3–6 bullets.
 2. `## Core models` — the essential mental models, frameworks and rules of thumb (the 20% that matters 80% of the time), each actionable.
 3. `## Decision procedures` — step-by-step procedures, checklists, decision tables for the common tasks in this domain.
-4. `## Mobile specifics` — what changes on phones (where relevant).
+4. `## Platform specifics` — what changes on phones, PC, web and consoles (where relevant). Older skills use `## Mobile specifics`.
 5. `## Anti-patterns` — common mistakes and how to detect them.
 6. `## Using the ontology` — how this domain maps to the shared schemas (section 5) and which scripts/tools apply.
 7. `## Reference library` — a table: file → what it contains → when to read it. Every file in `references/` must be listed.
@@ -249,6 +249,10 @@ gs.py progress "text"               # appends a dated entry to progress.md
 gs.py budget [--json]
 gs.py feature show F001 | gs.py summary         # also available: feature start --reopen, gate result 'reset'; every command takes --root and --json
 gs.py kb "query" [--skill NAME] [--limit N] [--json]   # ranked search across PLUGIN/skills/**.md
+gs.py map                         # project map: .gamestudio/map/MAP.md + map.json (incremental)
+gs.py impact TARGET...            # dependents, tests, features and gates a change touches
+gs.py whatif --set KEY=VALUE      # current vs proposed on the same seeds; verdict against contract targets
+gs.py dashboard                   # offline .gamestudio/reports/dashboard.html
 ```
 
 ## 9. Asset & audio gateway MCP server: `studio-gateway`
@@ -282,7 +286,7 @@ Rules: every generation writes files under the project's `generated_dir`, append
 | Event | Script | Behaviour |
 |---|---|---|
 | SessionStart | `session_start.py` | Inject `gslib.summarize()` as `additionalContext`; if an engine project without `.gamestudio/` is detected, inject a one-line hint to run `/arcosian:studio`. |
-| PreToolUse (Bash) | `pre_tool_guard.py` | `ask` before store submission/promotion commands (fastlane deliver/upload_to_app_store/submit_for_review/supply to production, altool/notarytool uploads, Play publishing); `deny` reading or printing signing secrets (keystores, .p12, .mobileprovision contents, .env with keys, `security find-generic-password`); `ask` before `rm -rf` of `.gamestudio`, `assets`, or the project root. |
+| PreToolUse (Bash) | `pre_tool_guard.py` | `ask` before store submission/promotion and PC store upload commands (steamcmd +run_app_build, butler push, BuildPatchTool, msstore publish, fastlane deliver/upload_to_app_store/submit_for_review/supply to production, altool/notarytool uploads, Play publishing); `deny` reading or printing signing secrets (keystores, .p12, .mobileprovision contents, .env with keys, `security find-generic-password`); `ask` before `rm -rf` of `.gamestudio`, `assets`, or the project root. |
 | PreToolUse (Write/Edit on `.gamestudio/features.json`) | `pre_tool_guard.py` | Reconstruct the resulting JSON; `deny` if any feature becomes `passes: true` or `status: "done"` without passing `check_feature_pass`, or if a passing feature is deleted. |
 | PostToolUse (Write/Edit/MultiEdit) | `post_tool_check.py` | `.gd`: if a Godot binary is available (`GODOT_BIN`, `godot`, `godot4`), run a headless parse check; block with errors. `.tscn/.tres`: duplicate `uid://` linter across the project; block on duplicates. `.gamestudio/**.json`: schema-validate; block on errors. New binary assets under `assets/` not in the manifest: add an `additionalContext` reminder. |
 | Stop, SubagentStop | `stop_gate.py` | If `stop_hook_active` → exit 0. Block if any feature is `status: "done"` but fails `check_feature_pass`. |
@@ -303,7 +307,7 @@ Rules: every generation writes files under the project's `generated_dir`, append
 | `build-feature` | Implements one feature through the five gates; runs `build-feature` workflow. |
 | `playtest` | Deterministic playthroughs, bots, persona playtests, visual QA; runs `playtest-sweep`. |
 | `balance` | Economy and difficulty tuning with simulators; runs `balance-pass`. |
-| `optimize` | Mobile performance pass against budgets. |
+| `optimize` | Performance pass against budgets on the target platforms. |
 | `asset-production` | Visual asset pipeline through `studio-gateway` with style lock; runs `asset-batch`. |
 | `audio-production` | Music/SFX/voice pipeline with loop and loudness QC. |
 | `ship` | Release pipeline: compliance pre-flight, signed builds, store metadata, TestFlight/Play internal; runs `release-candidate`; never submits for review without explicit human approval. |
@@ -321,7 +325,7 @@ Rules: every generation writes files under the project's `generated_dir`, append
 | `systems-designer` | opus | Economy, progression, balance, simulation. |
 | `level-designer` | sonnet | Level design, content pipelines, solvers, PCG. |
 | `narrative-designer` | sonnet | World, characters, dialogue, meta-narrative, tone bible. |
-| `ux-designer` | sonnet | Mobile UX/UI flows, HUD, onboarding, accessibility. |
+| `ux-designer` | sonnet | UX/UI flows, HUD, onboarding, accessibility for every target platform. |
 | `art-director` | opus | Style bible, art direction, asset briefs, visual critique. |
 | `technical-artist` | sonnet | Shaders, VFX, atlases, import pipelines, art perf. |
 | `audio-director` | sonnet | Audio bible, music/SFX/voice direction and implementation. |
@@ -348,7 +352,7 @@ Rules: every generation writes files under the project's `generated_dir`, append
 `gslib.py`, `gs.py`, `validate_json.py`, `economy_sim.py`, `progression_calc.py`, `gacha_calc.py`, `difficulty_curve.py`, `ab_test.py`, `retention_ltv.py`, `event_taxonomy.py`, `puzzle_solver.py`, `match3_sim.py`, `pcg.py`, `compliance_preflight.py`, `store_metadata.py`, `perf_budget.py`, `audio_post.py`, `image_post.py`.
 
 ### 11.6 Templates
-`templates/godot-mobile/` (sim-core + presentation architecture, services, playtest runner, tests, export presets), `templates/unity-mobile/` (Core/Presentation/Editor assemblies, SceneBuilder, BuildScript, tests), `templates/ci/` (GitHub Actions for Godot and Unity, fastlane, Codemagic), `templates/docs/` (one-page GDD, style bible, audio bible, playtest plan, soft-launch plan, postmortem, pitch).
+`templates/godot-starter/` (sim-core + presentation architecture, services, playtest runner, tests, export presets), `templates/unity-starter/` (Core/Presentation/Editor assemblies, SceneBuilder, BuildScript, tests), `templates/ci/` (GitHub Actions for Godot and Unity, fastlane, Codemagic), `templates/docs/` (one-page GDD, style bible, audio bible, playtest plan, soft-launch plan, postmortem, pitch).
 
 ## 12. Builder self-check before finishing
 
@@ -362,7 +366,7 @@ Rules: every generation writes files under the project's `generated_dir`, append
 
 ## 13. Runtime interfaces of the templates (binding for templates, process skills, agents, workflows)
 
-**Godot template** (`templates/godot-mobile/`, sample game: a deterministic 5×5 "merge numbers" puzzle that exercises the sim-core + presentation split):
+**Godot template** (`templates/godot-starter/`, sample game: a deterministic 5×5 "merge numbers" puzzle that exercises the sim-core + presentation split):
 ```
 # static gate (load/parse every .gd under res://, report errors; exit code 0/1)
 godot --headless --path <project> -s res://tools/ci/check_all.gd -- --out=<abs>/static.log
@@ -382,7 +386,7 @@ godot --headless --path <project> --export-release "iOS" <out-dir>/game.xcodepro
 ```
 Playthrough script format (`tests/playthroughs/*.json`): `{"schema_version":"1.0","seed":1,"steps":[{"action":{"type":"<action>", ...},"expect":{"<state path>": <value or {"op": ">=", "value": n}>}}]}`. Runner output follows `playtest-report.schema.json`.
 
-**Unity template** (`templates/unity-mobile/`, same sample game):
+**Unity template** (`templates/unity-starter/`, same sample game):
 ```
 Unity -batchmode -nographics -projectPath <p> -runTests -testPlatform EditMode -testResults <abs>/unit.xml -logFile <abs>/unity.log
 Unity -batchmode -nographics -projectPath <p> -executeMethod Game.EditorTools.PlaytestRunner.Run -gsMode script -gsScript Assets/_Game/Tests/Playthroughs/smoke.json -gsOut <abs>/playthrough.json -quit

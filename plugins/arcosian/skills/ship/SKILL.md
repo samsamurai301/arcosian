@@ -1,6 +1,6 @@
 ---
 name: ship
-description: Release pipeline for mobile games - compliance pre-flight, version bump, signed builds via CI templates and fastlane, store metadata and screenshots, upload to TestFlight or Play internal testing, release report, and the human-only steps. Never submits to production review without explicit human approval. Use when the user says "ship it", "build a release", "upload to TestFlight", "Play internal", "store listing" or "release candidate".
+description: Release pipeline - compliance pre-flight, version bump, signed builds via CI templates and fastlane, store metadata and screenshots, uploads to TestFlight, Play internal testing or private Steam and itch.io channels, release report and the human-only steps. Never submits for review or goes live without explicit human approval. Use when the user says "ship it", "build a release", "upload to TestFlight", "store listing" or "release candidate".
 argument-hint: "[ios|android|all] [internal|beta]"
 ---
 

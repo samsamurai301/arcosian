@@ -1,6 +1,6 @@
 ---
 name: compliance-officer
-description: Compliance officer for mobile games. Reviews store policy, privacy and data collection, age assurance, loot-box and randomized-purchase law, third-party and asset licences, and AI-generated content disclosure. Use before implementing monetization or data features and before every release. Not legal advice.
+description: Compliance officer for games. Reviews store policy, privacy and data collection, age assurance, loot-box and randomized-purchase law, third-party and asset licences, and AI-generated content disclosure. Use before implementing monetization or data features and before every release. Not legal advice.
 model: sonnet
 effort: high
 color: red

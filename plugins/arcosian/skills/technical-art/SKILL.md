@@ -1,6 +1,6 @@
 ---
 name: technical-art
-description: Technical art for mobile games - toon, rim, matcap, dissolve, flipbook and wind shaders in Godot and Unity, VFX language and particle budgets, ASTC/ETC2/KTX2 textures, polycount and LOD budgets, gltfpack, skinning limits, tile-based GPU rendering, overdraw and post-processing cost. Use when writing shaders, building VFX, compressing textures, optimizing 3D assets, or fixing GPU-bound or hot-phone frames.
+description: Technical art for games - toon, rim, matcap, dissolve, flipbook and wind shaders in Godot and Unity, VFX language and particle budgets, ASTC/ETC2/KTX2 textures, polycount and LOD budgets, gltfpack, skinning limits, tile-based GPU rendering, overdraw and post-processing cost. Use when writing shaders, building VFX, compressing textures, optimizing 3D assets, or fixing GPU-bound or hot-phone frames.
 ---
 
 # Technical Art

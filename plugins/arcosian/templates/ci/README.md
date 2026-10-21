@@ -6,8 +6,8 @@ Copy these into a game project. Layout assumed: `.github/workflows/*.yml` from `
 
 | File | Purpose |
 |---|---|
-| `github/godot-ci.yml` | Headless Godot 4.7.2: `check_all`, `run_tests`, runner script mode; signed Android AAB; macOS job exports the iOS Xcode project then `fastlane ios beta` |
-| `github/unity-ci.yml` | GameCI test runner and builder; Android AAB, iOS Xcode project (built on Linux), fastlane on macOS |
+| `github/godot-ci.yml` | Headless Godot 4.7.2: `check_all`, `run_tests`, runner script mode; Windows, macOS, Linux and Web exports, each desktop build launched with `--smoke` on its own OS; signed Android AAB; macOS job exports the iOS Xcode project then `fastlane ios beta` |
+| `github/unity-ci.yml` | GameCI test runner and builder; Windows, macOS, Linux and Web players; Android AAB, iOS Xcode project (built on Linux), fastlane on macOS |
 | `github/plugin-quality.yml` | `gs.py validate --all` and compliance pre-flight on PRs |
 | `fastlane/Fastfile` | Lanes: `ios beta`, `ios metadata`, `ios release` (guarded), `android internal`, `android metadata`, `android promote` (guarded) |
 | `fastlane/Appfile`, `Matchfile`, `Gemfile` | Identity, signing storage, pinned fastlane (`~>`) |

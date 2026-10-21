@@ -38,7 +38,7 @@ Risks of community store MCPs:
 - **Fetches:** `firebase-tools@15.34.0` from npm on first start (exact version).
 - **Never automatic:** store submission, production releases, price changes and availability changes need your approval in chat, as below.
 
-## Approval rules (enforced by the skill and the core hooks)
+## Security and approval rules (enforced by the skill and the core hooks)
 
 Claude never submits an app for review, releases to production, changes a price, or alters availability without explicit human approval in chat, stated per action. Read operations and TestFlight or internal-track uploads are the default scope.
 

@@ -50,7 +50,7 @@ Attributes (NUnit): `[Test]`, `[TestCase(1, 2)]`, `[TestCaseSource(nameof(Cases)
   -logFile "<abs>/unity.log"
 ```
 
-The template (`${CLAUDE_PLUGIN_ROOT}/templates/unity-mobile/`) runs its EditMode suite as `Unity -batchmode -nographics -projectPath <p> -runTests -testPlatform EditMode -testResults <abs>/unit.xml -logFile <abs>/unity.log` (exit 0 ok, 2 failures; NUnit XML output). The same Core and EditMode tests also build and run on the plain .NET SDK without a Unity licence: `python3 tools/dotnet-harness/build_harness.py . /tmp/unity-harness`, then `cd /tmp/unity-harness/Tests && UNITY_ASSETS_DIR="$OLDPWD/Assets" dotnet test` (the harness compiles the real `Assets/_Game/Core/**/*.cs` and `Assets/_Game/Tests/EditMode/*.cs`, stubbing only `Application.dataPath`, `Vector2` and `Mathf.Abs`).
+The template (`${CLAUDE_PLUGIN_ROOT}/templates/unity-starter/`) runs its EditMode suite as `Unity -batchmode -nographics -projectPath <p> -runTests -testPlatform EditMode -testResults <abs>/unit.xml -logFile <abs>/unity.log` (exit 0 ok, 2 failures; NUnit XML output). The same Core and EditMode tests also build and run on the plain .NET SDK without a Unity licence: `python3 tools/dotnet-harness/build_harness.py . /tmp/unity-harness`, then `cd /tmp/unity-harness/Tests && UNITY_ASSETS_DIR="$OLDPWD/Assets" dotnet test` (the harness compiles the real `Assets/_Game/Core/**/*.cs` and `Assets/_Game/Tests/EditMode/*.cs`, stubbing only `Application.dataPath`, `Vector2` and `Mathf.Abs`).
 
 - `-testPlatform PlayMode` for play mode (requires a graphics device unless tests avoid rendering; do not pass `-nographics` if tests need a camera or UI).
 - `-testFilter "Namespace.Class.Method;Other"` and `-testCategory "Fast"` select subsets.

@@ -1,11 +1,11 @@
 # Knowledge map
 
-53 skills, 160 reference files, 75546 lines (SKILL.md + references), 24 agents, 9 workflows, 19 scripts.
-Total skill description characters: 21453.
+58 skills, 183 reference files, 86791 lines (SKILL.md + references), 24 agents, 9 workflows, 23 scripts.
+Total skill description characters: 23443.
 
 ## accessibility-localization
 
-Accessibility and localization knowledge for mobile games - Game Accessibility Guidelines, colour-blind, motor, cognitive, hearing and photosensitivity design, Godot and Unity recipes, i18n architecture, ICU plurals, CJK and RTL fonts, text expansion, LQA, machine translation with review, market languages. Use when asked "make it accessible", "colour-blind mode", "add languages", "localize the game" or "RTL support".
+Accessibility and localization knowledge for games on any platform - Game Accessibility Guidelines, colour-blind, motor, cognitive, hearing and photosensitivity design, Godot and Unity recipes, i18n architecture, ICU plurals, CJK and RTL fonts, text expansion, LQA, machine translation with review, market languages. Use when asked "make it accessible", "colour-blind mode", "add languages", "localize the game" or "RTL support".
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -15,7 +15,7 @@ Accessibility and localization knowledge for mobile games - Game Accessibility G
 
 ## ai-asset-pipeline
 
-AI visual asset pipeline for mobile games - 2D and 3D model landscape and licences, style lock and prompt templates, tournament selection, background removal, upscaling, palette and sprite-sheet post chains, 3D cleanup, manifest provenance, disclosure, and studio-gateway usage with budgets. Use when generating sprites, icons, key art or 3D props with AI, keeping a style consistent, choosing a provider, or preparing provenance and AI disclosure.
+AI visual asset pipeline for games - 2D and 3D model landscape and licences, style lock and prompt templates, tournament selection, background removal, upscaling, palette and sprite-sheet post chains, 3D cleanup, manifest provenance, disclosure, and studio-gateway usage with budgets. Use when generating sprites, icons, key art or 3D props with AI, keeping a style consistent, choosing a provider, or preparing provenance and AI disclosure.
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -48,7 +48,7 @@ Analogy and transformation codex for game concepts: structure mapping and concep
 
 ## art-direction
 
-Art direction for mobile games - style selection and style bibles, readability, shape language, value and colour (accessible palettes), asset specs, atlases, 9-slice, icons, store screenshots, key art, and a scored critique rubric with tournament selection. Use when asked to choose an art style, write a style bible, review screens, audit a palette, brief assets, or pick the best AI-generated candidate.
+Art direction for games - style selection and style bibles, readability, shape language, value and colour (accessible palettes), asset specs, atlases, 9-slice, icons, store screenshots, key art, and a scored critique rubric with tournament selection. Use when asked to choose an art style, write a style bible, review screens, audit a palette, brief assets, or pick the best AI-generated candidate.
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -59,11 +59,11 @@ Art direction for mobile games - style selection and style bibles, readability, 
 
 ## asset-production
 
-Runs the visual asset pipeline for a mobile game - style bible, asset list from the contract, style lock, generation through the studio-gateway tools, post-processing, engine import, manifest status flow and licence checks. Use when the user says "make the art", "generate sprites", "asset batch", "lock the style", "build the asset list" or "import these assets".
+Runs the visual asset pipeline for a game - style bible, asset list from the contract, style lock, generation through the studio-gateway tools, post-processing, engine import, manifest status flow and licence checks. Use when the user says "make the art", "generate sprites", "asset batch", "lock the style", "build the asset list" or "import these assets".
 
 ## audio-direction
 
-Audio direction for mobile games - audio bible and sonic identity, adaptive music (re-sequencing, layering, stingers), SFX layering and reward escalation, bus mixing and ducking, loudness targets, formats, iOS/Android audio session rules, voice direction and AI-voice consent. Use when asked to "write the audio bible", "make the music adaptive", "design UI sounds", "set up the mix", "fix loudness", "direct voice lines" or "plan the audio".
+Audio direction for games - audio bible and sonic identity, adaptive music (re-sequencing, layering, stingers), SFX layering and reward escalation, bus mixing and ducking, loudness targets, formats, iOS/Android audio session rules, voice direction and AI-voice consent. Use when asked to "write the audio bible", "make the music adaptive", "design UI sounds", "set up the mix", "fix loudness", "direct voice lines" or "plan the audio".
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -73,7 +73,7 @@ Audio direction for mobile games - audio bible and sonic identity, adaptive musi
 
 ## audio-production
 
-Runs the music, SFX and voice pipeline for a mobile game - audio bible, cue list, generation via studio-gateway audio tools, audio_post.py normalize/loop/convert/qc, engine implementation with buses and adaptive music, QC and licence revenue thresholds. Use when the user says "make the music", "add sound effects", "generate voice lines", "loop this track", "check loudness" or "audio pass".
+Runs the music, SFX and voice pipeline for a game - audio bible, cue list, generation via studio-gateway audio tools, audio_post.py normalize/loop/convert/qc, engine implementation with buses and adaptive music, QC and licence revenue thresholds. Use when the user says "make the music", "add sound effects", "generate voice lines", "loop this track", "check loudness" or "audio pass".
 
 ## balance
 
@@ -91,6 +91,16 @@ Concept ideation lab - five ideation methods (analogy, constraint inversion, mec
 |---|---|---|
 | `references/ideation-methods.md` | 128 | Ideation Methods |
 | `references/scoring-rubric.md` | 140 | Concept Scoring Rubric |
+
+## console-pathway
+
+Guidance for getting a game onto Nintendo, PlayStation and Xbox consoles using public information only - self-publish, publisher or porting partner; when to start; budget and time ranges; what design and code must already do (controller UI, safe area, suspend, user switching, saves); programmes, ratings and a porting plan. Use for "should we port to Switch", "how do I get a dev kit", "console age ratings".
+
+| Reference | Lines | Starts with |
+|---|---|---|
+| `references/certification-and-ratings.md` | 125 | Certification Themes and Age Ratings |
+| `references/porting-plan.md` | 160 | Porting Plan Template |
+| `references/programmes-and-access.md` | 134 | Programmes and Access: Nintendo, Xbox, PlayStation |
 
 ## deconstruct
 
@@ -139,7 +149,7 @@ Game economy codex: currency architecture (soft, hard, premium, energy, event, m
 
 ## engine-alternatives
 
-Engine selection and quick-starts beyond Godot and Unity for mobile - Unreal, Defold, Cocos Creator, web stacks (Phaser, PixiJS, three.js, Babylon, PlayCanvas, Capacitor), Bevy, GameMaker, Construct, GDevelop, Solar2D, Flame, native. Use when asked which engine to use, whether to pick Unreal or Defold, how to ship a web game as an app, how to make a playable ad, or to compare engines.
+Engine selection and quick-starts beyond Godot and Unity - Unreal, Defold, Cocos Creator, web stacks (Phaser, PixiJS, three.js, Babylon, PlayCanvas, Capacitor), Bevy, GameMaker, Construct, GDevelop, Solar2D, Flame, native. Use when asked which engine to use, whether to pick Unreal or Defold, how to ship a web game as an app, how to make a playable ad, or to compare engines.
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -149,7 +159,7 @@ Engine selection and quick-starts beyond Godot and Unity for mobile - Unreal, De
 
 ## engine-godot
 
-Senior Godot 4 practice for mobile games - typed GDScript, project layout, autoloads, signals, Resources, mobile renderer and export (Android gradle, iOS), headless CLI gates, testing, perf and plugin options. Use when asked to build, fix, export, test or optimize a Godot project, write GDScript, set up Android/iOS builds, or choose Godot plugins.
+Senior Godot 4 practice - typed GDScript, project layout, autoloads, signals, Resources, renderers and export (Android gradle, iOS; desktop and web in pc-web-release), headless CLI gates, testing, perf and plugin options. Use when asked to build, fix, export, test or optimize a Godot project, write GDScript, set up Android/iOS builds, or choose Godot plugins.
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -159,13 +169,17 @@ Senior Godot 4 practice for mobile games - typed GDScript, project layout, autol
 
 ## engine-unity
 
-Senior Unity 6 mobile practice - C# project layout with asmdefs and a pure core assembly, URP and Player settings for phones, Addressables, Input System, editor automation (Unity CLI, batchmode, SceneBuilder/BuildScript), tests, CI and SDKs. Use when asked to build, fix, test, automate or ship a Unity mobile game, write C# for Unity, configure URP, or set up IAP, ads or CI.
+Senior Unity 6 practice - C# project layout with asmdefs and a pure core assembly, URP and Player settings for phones, Addressables, Input System, editor automation (Unity CLI, batchmode, SceneBuilder/BuildScript), tests, CI and SDKs. Use when asked to build, fix, test, automate or ship a Unity game, write C# for Unity, configure URP, or set up IAP, ads or CI.
 
 | Reference | Lines | Starts with |
 |---|---|---|
 | `references/csharp-project-and-urp.md` | 326 | Unity C# Project Structure, URP and Mobile Settings |
 | `references/editor-automation-and-services.md` | 337 | Unity Editor Automation, CI and Services |
 | `references/testing-and-cheatsheet.md` | 327 | Unity Testing, Verification and API Cheatsheet |
+
+## extend
+
+Scaffolds and checks an Arcosian add-on - a genre pack, an engine adapter or a tool connector - from the bundled template, then holds it to the house rules (skill format, pinned MCP servers, secrets only in sensitive options, disclosure README, self-tested scripts) before it is shared. Use when asked to "make an add-on", "add support for <engine or tool>", "write a genre pack", "publish my own Arcosian plugin" or "check my add-on".
 
 ## game-architecture
 
@@ -179,7 +193,7 @@ Game architecture codex: the studio sim-core + presentation split, deterministic
 
 ## game-case-studies
 
-Deconstructions of about 90 landmark games (puzzle, hyper/hybrid-casual, midcore strategy, RPG/gacha/cards, casual-social-sim, premium indie) in one 16-lens format, plus the method to deconstruct any game into deconstruction.schema.json and use precedents for decisions and analogies. Use when asked "how does X do it", "deconstruct X", "which games did this", "comparables", "X meets Y", or before choosing a loop, economy or offer.
+Deconstructions of about 113 landmark games (mobile genres, premium indie, PC and console, web and cross-play) in one 16-lens format, plus the method to deconstruct any game into deconstruction.schema.json and use precedents for decisions and analogies. Use when asked "how does X do it", "deconstruct X", "which games did this", "comparables" or "X meets Y", or before choosing a loop, economy or offer.
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -187,9 +201,11 @@ Deconstructions of about 90 landmark games (puzzle, hyper/hybrid-casual, midcore
 | `references/cross-game-patterns.md` | 689 | Cross-game patterns |
 | `references/hyper-hybrid-casual.md` | 1198 | Hyper-casual and hybrid-casual case studies |
 | `references/midcore-strategy.md` | 1740 | Midcore, strategy and competitive case studies |
+| `references/pc-console.md` | 794 | PC and console case studies |
 | `references/premium-indie.md` | 1305 | Premium and indie case studies |
 | `references/puzzle-casual.md` | 1177 | Puzzle and casual case studies |
 | `references/rpg-gacha-cards.md` | 1568 | RPG, gacha, idle and card-game case studies |
+| `references/web-and-crossplay.md` | 463 | Web-first and cross-platform case studies |
 
 ## game-feel
 
@@ -234,23 +250,32 @@ Gameplay programming codex: vector math, easing, springs, kinematic controllers,
 
 ## genre-playbooks
 
-Genre playbooks for mobile games: loops, session profile, signature mechanics, monetization mix, KPI expectations, production scope, agent-buildability score and P0 starter features per subgenre (puzzle, hybrid-casual, idle, action, RPG, strategy, PvP, casino, narrative), plus genre selection and fusion procedures. Use when choosing a genre, scoping a vertical slice, or asking what makes a merge, idle or survivor-like game work.
+Genre playbooks for games on any platform: loops, session profile, signature mechanics, monetization, KPIs, production scope, agent-buildability and P0 features per subgenre - mobile genres plus shooters, action-adventure, platformers, survival, simulation, MMO and live service, racing, sports, fighting, horror, narrative, PC strategy and deckbuilders. Use when choosing or fusing a genre or scoping a slice.
 
 | Reference | Lines | Starts with |
 |---|---|---|
+| `references/action-adventure.md` | 633 | Action-Adventure Playbooks |
 | `references/action-arcade-roguelite.md` | 662 | Action, Arcade and Roguelite Playbooks |
 | `references/competitive-pvp.md` | 792 | Competitive PvP Playbooks |
+| `references/horror-narrative.md` | 741 | Horror and Narrative Playbooks |
 | `references/hyper-hybrid-casual.md` | 785 | Hypercasual and Hybrid-Casual Playbooks |
 | `references/idle-tycoon-sim.md` | 574 | Idle, Tycoon and Simulation Playbooks |
+| `references/mmo-live-service.md` | 683 | MMO and Live-Service Playbooks |
 | `references/narrative-rhythm-edu-kids.md` | 760 | Narrative, Rhythm, Educational, Kids, Fitness and Cozy Playbooks |
+| `references/pc-strategy-cards.md` | 774 | PC Strategy and Card Playbooks |
+| `references/platformer-metroidvania.md` | 617 | Platformer and Metroidvania Playbooks |
 | `references/puzzle.md` | 966 | Puzzle Playbooks |
+| `references/racing-sports-fighting.md` | 744 | Racing, Sports and Fighting Playbooks |
 | `references/rpg-gacha.md` | 678 | RPG and Gacha Playbooks |
+| `references/shooters.md` | 794 | Shooter Playbooks (PC and Console Depth) |
+| `references/simulation-management.md` | 797 | Simulation and Management Playbooks |
 | `references/social-casino-party.md` | 681 | Social, Casino and Party Playbooks |
 | `references/strategy.md` | 727 | Strategy Playbooks |
+| `references/survival-sandbox.md` | 741 | Survival and Sandbox Playbooks |
 
 ## legal-ethics
 
-Legal and ethical risk knowledge for mobile games - clone and trade dress risk, trademarks, mechanic patents, AI content ownership and disclosure, voice and likeness, privacy (GDPR, COPPA, CCPA, age assurance), children, loot-box rules by region, open-source, font, music and asset licences, publishing contracts. Use when asked "can I copy this mechanic", "is this a clone", "disclose AI", "COPPA", "loot box legal" or "licence check".
+Legal and ethical risk knowledge for games - clone and trade dress risk, trademarks, mechanic patents, AI content ownership and disclosure, voice and likeness, privacy (GDPR, COPPA, CCPA, age assurance), children, loot-box rules by region, open-source, font, music and asset licences, publishing contracts. Use when asked "can I copy this mechanic", "is this a clone", "disclose AI", "COPPA", "loot box legal" or "licence check".
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -272,7 +297,7 @@ Level design codex: teach-test-twist-reward, kishōtenketsu, signposting, afford
 
 ## liveops
 
-Live-operations craft for mobile games - event taxonomy and design, content calendar, seasons, segmentation, CRM and push, win-back, soft launch gates, remote config, incident handling, economy hotfixes and compensation. Use when asked to plan events, build a live-ops calendar, segment players, run soft launch, ship a hotfix via remote config, or handle a live incident.
+Live-operations craft for live games - event taxonomy and design, content calendar, seasons, segmentation, CRM and push, win-back, soft launch gates, remote config, incident handling, economy hotfixes and compensation. Use when asked to plan events, build a live-ops calendar, segment players, run soft launch, ship a hotfix via remote config, or handle a live incident.
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -325,7 +350,7 @@ Encyclopedia of 250+ game mechanics in twelve families (verbs/physics, combat, p
 
 ## mobile-performance
 
-Mobile game performance codex - per-tier frame, memory, size and startup budgets, thermal behaviour, profiling toolkit (Unity, Godot, Instruments, Android Studio, Perfetto, AGI), optimization playbooks, ADPF and soak testing, perf-report schema and perf_budget.py. Use when asked "why is it slow", "set perf budgets", "profile this", "it gets hot", "reduce APK size", "soak test" or "perf gate".
+Mobile game performance codex - per-tier frame, memory, size and startup budgets, thermals, profiling (Unity, Godot, Instruments, Android Studio, Perfetto, AGI), optimisation playbooks, ADPF and soak tests, perf-report schema and perf_budget.py; PC, Steam Deck, web and console tiers are in platform-targets. Use when asked "why is it slow", "set perf budgets", "profile this", "it gets hot", "reduce APK size" or "perf gate".
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -336,7 +361,7 @@ Mobile game performance codex - per-tier frame, memory, size and startup budgets
 
 ## mobile-ux
 
-Mobile game UX codex: thumb zones, touch targets, gestures, safe areas, interruptions, HUD, hubs, shops, inventories, reward screens, pop-up hierarchy, tutorials, first-session flow, permission timing, typography, contrast and Godot/Unity UI scaling. Use when asked "design this screen", "UX review", "onboarding flow", "safe area" or "audit this layout".
+Mobile game UX codex: thumb zones, touch targets, gestures, safe areas, interruptions, HUD, hubs, shops, inventories, reward screens, pop-up hierarchy, tutorials, first-session flow, permission timing, typography, contrast and Godot/Unity UI scaling. PC, TV and web UI live in platform-targets. Use when asked "design this screen", "UX review", "onboarding flow", "safe area" or "audit this layout".
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -346,7 +371,7 @@ Mobile game UX codex: thumb zones, touch targets, gestures, safe areas, interrup
 
 ## monetization
 
-Senior monetization knowledge for mobile games - business model choice, IAP and subscription implementation (StoreKit 2, Play Billing, RevenueCat), ad mediation and placements, offer design, battle passes, loot-box law, odds disclosure, minors, and payments rules. Use when asked to pick a business model, design IAP, add ads, price offers, build a battle pass, or check monetization ethics.
+Senior monetization knowledge for games - business model choice, IAP and subscription implementation (StoreKit 2, Play Billing, RevenueCat), ad mediation and placements, offer design, battle passes, loot-box law, odds disclosure, minors, and payments rules. Use when asked to pick a business model, design IAP, add ads, price offers, build a battle pass, or check monetization ethics.
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -381,11 +406,34 @@ Takes a one-line game brief to a validated, reviewed project - intake, market sc
 
 ## operate
 
-Post-launch operations for a live mobile game - KPI review with the data analyst, live-ops calendar, A/B tests with ab_test.py, remote config changes, crash triage, store review replies and a weekly cadence. Use when the user says "how is the game doing", "weekly review", "plan an event", "run an A/B test", "triage crashes", "reply to reviews" or "live-ops calendar".
+Post-launch operations for a live game - KPI review with the data analyst, live-ops calendar, A/B tests with ab_test.py, remote config changes, crash triage, store review replies and a weekly cadence. Use when the user says "how is the game doing", "weekly review", "plan an event", "run an A/B test", "triage crashes", "reply to reviews" or "live-ops calendar".
 
 ## optimize
 
-Runs a mobile performance pass against the contract's budgets - frame time, memory, download size, cold start, thermals - with per-engine profiling, device tiers, perf_budget.py checks, a prioritized fix checklist and a perf report that sets the perf gate. Use when the user says "optimize performance", "it stutters", "too much memory", "build is too big", "check the perf budget", or "why is it hot".
+Runs a performance pass against the contract's budgets - frame time, memory, download size, cold start, thermals - with per-engine profiling, device tiers, perf_budget.py checks, a prioritized fix checklist and a perf report that sets the perf gate. Use when the user says "optimize performance", "it stutters", "too much memory", "build is too big", "check the perf budget", or "why is it hot".
+
+## pc-web-release
+
+Release knowledge for PC and web games - Steam (Steamworks, store page, wishlists, Next Fest, Playtest, SteamPipe, Deck review), itch.io and butler, web portals, self-hosted web builds, Epic, GOG, Microsoft Store, Mac App Store, and code signing for macOS, Windows and Linux. Use for "put my game on Steam", "butler push", "web export headers", "notarise my Mac build", "which store first".
+
+| Reference | Lines | Starts with |
+|---|---|---|
+| `references/itch-and-web-portals.md` | 154 | itch.io, Web Portals and Web Hosting |
+| `references/other-pc-stores.md` | 124 | Other PC Stores: Epic, GOG, Microsoft Store and Game Pass, Mac App Store |
+| `references/signing-and-packaging.md` | 206 | Signing and Packaging: macOS, Windows, Linux |
+| `references/steam.md` | 240 | Steam Release Guide |
+
+## platform-targets
+
+Platform-target codex for one game on many platforms: choosing platforms, input and controls (touch, mouse/keyboard, gamepad), platform UX, performance tiers, saves and platform rules for mobile, PC, Steam Deck, web and consoles (public info). Use when asked "which platforms", "add PC/web/console", "gamepad support", "Steam Deck", "port this game" or "set min spec".
+
+| Reference | Lines | Starts with |
+|---|---|---|
+| `references/input-and-controls.md` | 449 | Input and controls |
+| `references/performance-tiers.md` | 249 | Performance tiers |
+| `references/platform-matrix.md` | 278 | Platform matrix |
+| `references/platform-ux.md` | 319 | Platform UX |
+| `references/saves-and-platform-rules.md` | 298 | Saves and platform rules |
 
 ## player-analytics
 
@@ -414,7 +462,7 @@ Player psychology codex: motivation models (SDT/PENS, Quantic Foundry, Bartle, L
 
 ## playtest
 
-Runs and interprets playtests for a mobile game build - deterministic scripted playthroughs, bot runs, persona playtests through the player-simulator agent, visual QA, and human TestFlight/internal rounds - and writes playtest reports. Use when the user says "playtest this", "does the FTUE work", "find softlocks", "run the bots", "simulate a casual player", or "QA this build".
+Runs and interprets playtests for a game build - deterministic scripted playthroughs, bot runs, persona playtests through the player-simulator agent, visual QA, and human TestFlight/internal rounds - and writes playtest reports. Use when the user says "playtest this", "does the FTUE work", "find softlocks", "run the bots", "simulate a casual player", or "QA this build".
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -469,11 +517,11 @@ Game QA codex - game test pyramid, risk-based testing, deterministic scripted pl
 
 ## ship
 
-Release pipeline for mobile games - compliance pre-flight, version bump, signed builds via CI templates and fastlane, store metadata and screenshots, upload to TestFlight or Play internal testing, release report, and the human-only steps. Never submits to production review without explicit human approval. Use when the user says "ship it", "build a release", "upload to TestFlight", "Play internal", "store listing" or "release candidate".
+Release pipeline - compliance pre-flight, version bump, signed builds via CI templates and fastlane, store metadata and screenshots, uploads to TestFlight, Play internal testing or private Steam and itch.io channels, release report and the human-only steps. Never submits for review or goes live without explicit human approval. Use when the user says "ship it", "build a release", "upload to TestFlight", "store listing" or "release candidate".
 
 ## store-release
 
-Store release knowledge for mobile games - headless builds, signing, fastlane, TestFlight and Play tracks, CI choices, versioning, App Store and Google Play requirements (SDK floors, privacy manifests, PBL, 16 KB pages, Data safety), ASO, and the pre-flight checklist. Use when asked "how do I ship to the App Store", "Play rejected my build", "set up fastlane", "write store listing", "why was I rejected" or "release checklist".
+Mobile store release knowledge - headless builds, signing, fastlane, TestFlight and Play tracks, CI, versioning, App Store and Google Play requirements (SDK floors, privacy manifests, PBL, 16 KB pages, Data safety), ASO and the pre-flight checklist; PC and web stores are in pc-web-release, consoles in console-pathway. Use when asked "how do I ship to the App Store", "Play rejected my build", "set up fastlane" or "release checklist".
 
 | Reference | Lines | Starts with |
 |---|---|---|
@@ -487,11 +535,15 @@ Front door of the Arcosian suite. Boots the principal game developer persona and
 
 ## technical-art
 
-Technical art for mobile games - toon, rim, matcap, dissolve, flipbook and wind shaders in Godot and Unity, VFX language and particle budgets, ASTC/ETC2/KTX2 textures, polycount and LOD budgets, gltfpack, skinning limits, tile-based GPU rendering, overdraw and post-processing cost. Use when writing shaders, building VFX, compressing textures, optimizing 3D assets, or fixing GPU-bound or hot-phone frames.
+Technical art for games - toon, rim, matcap, dissolve, flipbook and wind shaders in Godot and Unity, VFX language and particle budgets, ASTC/ETC2/KTX2 textures, polycount and LOD budgets, gltfpack, skinning limits, tile-based GPU rendering, overdraw and post-processing cost. Use when writing shaders, building VFX, compressing textures, optimizing 3D assets, or fixing GPU-bound or hot-phone frames.
 
 | Reference | Lines | Starts with |
 |---|---|---|
 | `references/mobile-shaders-and-vfx.md` | 354 | Mobile Shaders and VFX |
 | `references/rendering-on-mobile.md` | 245 | Rendering on Mobile |
 | `references/texture-and-3d-pipeline.md` | 273 | Texture and 3D Pipeline for Mobile |
+
+## what-if
+
+Predicts what a proposed change will do before anyone ships it - runs the current and the changed version through the project's bots or simulators on the same seeds, then reports the difference with ranges and a verdict against the design contract's targets. Also maps what the change touches. Use when the user asks "what if we change X", "will this make it too easy", "predict the effect", or before a tuning, economy or level change.
 

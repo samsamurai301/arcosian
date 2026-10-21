@@ -1,0 +1,43 @@
+name: Connector proposal
+description: Propose an MCP server or tool integration for an adapter
+labels: [connector]
+body:
+  - type: input
+    id: tool
+    attributes:
+      label: Tool and vendor
+      placeholder: "Example: Tiled map editor (mapeditor.org)"
+    validations:
+      required: true
+  - type: input
+    id: docs
+    attributes:
+      label: Official documentation link
+      description: The vendor's own page for the server or command-line interface.
+    validations:
+      required: true
+  - type: dropdown
+    id: origin
+    attributes:
+      label: Who publishes the server
+      options: [the tool's vendor (official), a third party (community), no server, command-line recipes only]
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Exact package version or https URL
+      placeholder: "npx -y @vendor/mcp@1.4.2  or  https://mcp.vendor.com/mcp"
+    validations:
+      required: true
+  - type: textarea
+    id: access
+    attributes:
+      label: What it can read and write, and how it signs in
+      description: Tools it exposes, data it sends and where, and whether it needs an account, OAuth or an API key.
+    validations:
+      required: true
+  - type: input
+    id: licence
+    attributes:
+      label: Licence of the server

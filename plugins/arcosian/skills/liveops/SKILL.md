@@ -1,6 +1,6 @@
 ---
 name: liveops
-description: Live-operations craft for mobile games - event taxonomy and design, content calendar, seasons, segmentation, CRM and push, win-back, soft launch gates, remote config, incident handling, economy hotfixes and compensation. Use when asked to plan events, build a live-ops calendar, segment players, run soft launch, ship a hotfix via remote config, or handle a live incident.
+description: Live-operations craft for live games - event taxonomy and design, content calendar, seasons, segmentation, CRM and push, win-back, soft launch gates, remote config, incident handling, economy hotfixes and compensation. Use when asked to plan events, build a live-ops calendar, segment players, run soft launch, ship a hotfix via remote config, or handle a live incident.
 when_to_use: Planning or running a game after (or just before) launch.
 ---
 

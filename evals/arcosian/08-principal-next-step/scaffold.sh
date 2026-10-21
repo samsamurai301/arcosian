@@ -2,7 +2,7 @@
 # Runs in the fresh run directory; $0 is evals/<case>/scaffold.sh, so the plugin root is two levels up.
 set -euo pipefail
 PLUGIN="$(cd "$(dirname "$0")/../../../plugins/arcosian" && pwd)"
-python3 "$PLUGIN/scripts/gs.py" init --title "Principal Eval" --engine godot --root . >/dev/null
+python3 "$PLUGIN/scripts/gs.py" init --platforms ios,android --title "Principal Eval" --engine godot --root . >/dev/null
 echo "$PLUGIN" > plugin_root.txt
 G() { python3 "$PLUGIN/scripts/gs.py" "$@"; }
 G feature add --id F001 --title "Core merge loop" --area gameplay --priority P0 --accept "merge two tiles into one" >/dev/null

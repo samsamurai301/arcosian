@@ -27,9 +27,10 @@
     "platforms": {
       "$ref": "common.schema.json#/$defs/platform_list",
       "minItems": 1,
-      "description": "Target platforms, normally [\"ios\", \"android\"]."
+      "description": "Target platforms, any combination of mobile, desktop, web and console; the user decides (gs.py init --platforms)."
     },
     "orientation": { "$ref": "common.schema.json#/$defs/orientation", "description": "Locked screen orientation of the shipped game." },
+    "input": { "$ref": "common.schema.json#/$defs/input_list", "description": "Supported input methods (gs.py init --input; the default follows the platforms)." },
     "paths": {
       "type": "object",
       "description": "Where things live, relative to the repository root.",

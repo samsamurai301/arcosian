@@ -1,6 +1,6 @@
 ---
 name: art-direction
-description: Art direction for mobile games - style selection and style bibles, readability, shape language, value and colour (accessible palettes), asset specs, atlases, 9-slice, icons, store screenshots, key art, and a scored critique rubric with tournament selection. Use when asked to choose an art style, write a style bible, review screens, audit a palette, brief assets, or pick the best AI-generated candidate.
+description: Art direction for games - style selection and style bibles, readability, shape language, value and colour (accessible palettes), asset specs, atlases, 9-slice, icons, store screenshots, key art, and a scored critique rubric with tournament selection. Use when asked to choose an art style, write a style bible, review screens, audit a palette, brief assets, or pick the best AI-generated candidate.
 ---
 
 # Art Direction

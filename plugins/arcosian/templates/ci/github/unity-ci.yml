@@ -1,4 +1,5 @@
-# Unity CI with GameCI: tests -> Android AAB -> iOS Xcode project (Linux) -> signing/upload on macOS.
+# Unity CI with GameCI: tests -> desktop and web players -> Android AAB -> iOS Xcode project (Linux) ->
+# signing/upload on macOS. Delete the jobs for platforms you do not ship.
 # Copy to .github/workflows/unity-ci.yml. One-time human step: Unity licence activation (see README).
 name: unity-ci
 on:
@@ -15,7 +16,7 @@ env:
 
 jobs:
   core-tests-dotnet:
-    # Free and licence-less: Game.Core + EditMode tests on the .NET SDK (see unity-mobile README, "Core tests without Unity").
+    # Free and licence-less: Game.Core + EditMode tests on the .NET SDK (see unity-starter README, "Core tests without Unity").
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -50,6 +51,37 @@ jobs:
         with:
           name: test-results
           path: ${{ steps.tests.outputs.artifactsPath }}
+
+  build-desktop-web:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { targetPlatform: StandaloneWindows64, method: BuildWindows, out: Builds/Windows/Game.exe }
+          - { targetPlatform: StandaloneOSX, method: BuildMacOS, out: Builds/macOS/Game.app }
+          - { targetPlatform: StandaloneLinux64, method: BuildLinux, out: Builds/Linux/Game.x86_64 }
+          - { targetPlatform: WebGL, method: BuildWeb, out: Builds/Web }
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: true
+      - uses: actions/cache@v6
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}-${{ hashFiles('Packages/manifest.json', 'ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-${{ matrix.targetPlatform }}-
+      - uses: game-ci/unity-builder@v6
+        with:
+          targetPlatform: ${{ matrix.targetPlatform }}
+          buildMethod: Game.EditorTools.BuildScript.${{ matrix.method }}
+          customParameters: -gsOut ${{ matrix.out }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: player-${{ matrix.targetPlatform }}
+          path: Builds/
 
   build-android:
     needs: test

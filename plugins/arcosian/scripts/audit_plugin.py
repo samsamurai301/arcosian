@@ -175,6 +175,7 @@ def audit_skills(root: Path, rep: Report) -> Dict[str, Dict[str, Any]]:
 def audit_agents(root: Path, skills: Dict[str, Any], rep: Report) -> List[str]:
     names = []
     adir = root / "agents"
+    agent_chars = 0
     for f in sorted(adir.glob("*.md")) if adir.is_dir() else []:
         rel = "agents/%s" % f.name
         fm, why = parse_frontmatter(read(f))
@@ -191,6 +192,7 @@ def audit_agents(root: Path, skills: Dict[str, Any], rep: Report) -> List[str]:
             rep.err("%s: description is missing or empty" % rel)
         elif len(desc) > AGENT_DESC_MAX:
             rep.err("%s: description is %d chars (limit %d)" % (rel, len(desc), AGENT_DESC_MAX))
+        agent_chars += len(desc) if isinstance(desc, str) else 0
         pre = fm.get("skills") or []
         if not isinstance(pre, list):
             rep.err("%s: skills must be a list" % rel)
@@ -201,6 +203,7 @@ def audit_agents(root: Path, skills: Dict[str, Any], rep: Report) -> List[str]:
             if s not in skills:
                 rep.err("%s: preloaded skill %r does not exist" % (rel, s))
     rep.stats["agents"] = len(names)
+    rep.stats["agent_description_chars"] = agent_chars
     return names
 
 
@@ -216,9 +219,26 @@ def workflow_names(root: Path, rep: Report) -> List[str]:
     return names
 
 
-def audit_refs(root: Path, skills: Dict, agents: List[str], workflows: List[str], rep: Report) -> None:
+def core_names(core: Path) -> Tuple[set, set, set]:
+    """Skill, agent and workflow names of the core plugin, so an adapter's arcosian:<x> links resolve."""
+    sk = {d.name for d in (core / "skills").iterdir() if (d / "SKILL.md").is_file()} if (core / "skills").is_dir() else set()
+    ag = {f.stem for f in (core / "agents").glob("*.md")} if (core / "agents").is_dir() else set()
+    wf = set()
+    for f in (core / "workflows").glob("*.js") if (core / "workflows").is_dir() else []:
+        m = META_NAME_RE.search(read(f))
+        if m:
+            wf.add(m.group(1))
+    return sk, ag, wf
+
+
+def audit_refs(root: Path, skills: Dict, agents: List[str], workflows: List[str], rep: Report,
+               core: Optional[Path] = None) -> None:
     targets = set(skills) | set(agents)
     slash_targets = set(skills) | set(workflows)
+    if core is not None:
+        sk, ag, wf = core_names(core)
+        targets |= sk | ag
+        slash_targets |= sk | wf
     for f in walk_files(root, {".md", ".js", ".mjs", ".json"}):
         text = read(f)
         rel = f.relative_to(root).as_posix()
@@ -244,17 +264,24 @@ def audit_json(root: Path, rep: Report) -> None:
             rep.err("%s: invalid JSON: %s" % (f.relative_to(root).as_posix(), exc))
 
 
-def audit(root: Path) -> Tuple[Report, Dict[str, Dict[str, Any]]]:
+def audit(root: Path, core: Optional[Path] = None, max_chars: Optional[int] = None) -> Tuple[Report, Dict[str, Dict[str, Any]]]:
     rep = Report()
     skills = audit_skills(root, rep)
     agents = audit_agents(root, skills, rep)
     workflows = workflow_names(root, rep)
-    audit_refs(root, skills, agents, workflows, rep)
+    audit_refs(root, skills, agents, workflows, rep, core)
     audit_json(root, rep)
     scripts = [p for p in (root / "scripts").glob("*.py")] if (root / "scripts").is_dir() else []
     rep.stats["scripts"] = len(scripts)
     rep.stats["skill_md_lines"] = sum(s["lines"] for s in skills.values())
     rep.stats["lines"] = rep.stats["skill_md_lines"] + rep.stats["reference_lines"]
+    # Skill and agent descriptions sit in every session's context, so they are the always-on cost.
+    always = rep.stats.get("skill_description_chars", 0) + rep.stats.get("agent_description_chars", 0)
+    rep.stats["always_on_chars"] = always
+    rep.stats["always_on_tokens_est"] = int(round(always / 4.0))
+    if max_chars is not None and always > max_chars:
+        rep.err("always-on budget: skill and agent descriptions total %d chars (limit %d); shorten descriptions "
+                "and keep detail in references" % (always, max_chars))
     return rep, skills
 
 
@@ -340,6 +367,15 @@ def selftest() -> int:
         _w(root / "skills/delta/SKILL.md", "---\nname: delta\ndescription: %s\n---\n" % ("y" * 500))
         rep, _ = audit(root)
         assert any("skills/delta" in w and "500 chars" in w for w in rep.warnings), rep.warnings
+        rep, _ = audit(root, max_chars=100)
+        assert any("always-on budget" in e for e in rep.errors), rep.errors
+        adapter = root / "adapter"
+        _w(adapter / "skills/bridge/SKILL.md", "---\nname: bridge\ndescription: Bridge. Use when bridging.\n---\n"
+           "Hand off to arcosian:boss and /arcosian:alpha.\n")
+        rep, _ = audit(adapter)
+        assert any("arcosian:boss" in e for e in rep.errors), rep.errors
+        rep, _ = audit(adapter, core=root)
+        assert not rep.errors, rep.errors
     print("audit_plugin selftest ok")
     return 0
 
@@ -350,6 +386,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("--json", action="store_true", help="machine-readable output")
     ap.add_argument("--map", metavar="OUT.md", help="write a Markdown knowledge map")
     ap.add_argument("--selftest", action="store_true", help="run built-in tests")
+    ap.add_argument("--core", metavar="DIR", help="core plugin, so an adapter's arcosian:<x> links resolve")
+    ap.add_argument("--max-description-chars", type=int, metavar="N",
+                    help="fail when skill and agent descriptions (always in context) exceed N characters")
     args = ap.parse_args(argv)
     if args.selftest:
         return selftest()
@@ -357,7 +396,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     if not root.is_dir():
         sys.stderr.write("audit_plugin: --root %s is not a directory\n" % root)
         return 2
-    rep, skills = audit(root)
+    rep, skills = audit(root, Path(args.core).resolve() if args.core else None, args.max_description_chars)
     if args.map:
         try:
             write_map(Path(args.map), skills, rep)

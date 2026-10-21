@@ -10,7 +10,7 @@ The studio builds every game on one rule: deterministic, engine-free rules in `c
 
 ## What this skill gives you
 
-- The studio core abstraction (`apply(action) -> events`, serialisable state, seeded RNG) mapped to the real files of `templates/godot-mobile` (`core/sim.gd` and friends) and `templates/unity-mobile` (`Assets/_Game/Core`: `Sim`, `SimEvent`, `SimEventType`, `GameState`, `Rng`).
+- The studio core abstraction (`apply(action) -> events`, serialisable state, seeded RNG) mapped to the real files of `templates/godot-starter` (`core/sim.gd` and friends) and `templates/unity-starter` (`Assets/_Game/Core`: `Sim`, `SimEvent`, `SimEventType`, `GameState`, `Rng`).
 - A pattern catalogue with when-to-use and when-not-to-use: fixed timestep, FSM/HFSM/pushdown, command/undo/replay, event bus, pooling, composition vs ECS, DI, data-driven design, spatial partitioning.
 - Game AI selection and recipes: FSM, behaviour trees, utility AI, GOAP, steering, director AI.
 - Persistence and quality: versioned saves with migrations, atomic writes, cloud conflict policy, remote config layering, localisation tables, testing pyramid, allocation-aware code, review checklist.
@@ -39,7 +39,7 @@ The studio builds every game on one rule: deterministic, engine-free rules in `c
 ### Structure a new project
 
 1. Write the core contract first: list actions, events, state fields, `lookup` paths for tests, `legal_actions` for bots (see `references/sim-core-presentation.md`).
-2. Copy `templates/godot-mobile` or `templates/unity-mobile`; replace the sample mechanic; keep the tests and tools (`tests/` and `tools/` in Godot, `Assets/_Game/Tests` and `Assets/_Game/Editor` in Unity).
+2. Copy `templates/godot-starter` or `templates/unity-starter`; replace the sample mechanic; keep the tests and tools (`tests/` and `tools/` in Godot, `Assets/_Game/Tests` and `Assets/_Game/Editor` in Unity).
 3. Implement the rule as static pure functions, test them, then add `apply`.
 4. Add a scripted playthrough and a random bot run to CI before building any scene.
 5. Build the view last: one `play(events)` function, plus a snap-to-state safety net (`refresh()` calling `board.sync(grid)` in the Godot template, `BoardView.Render(state)` in Unity).
@@ -125,7 +125,7 @@ Details in `references/data-persistence-and-quality.md`.
 - Evidence for the five gates comes straight from this architecture: static and unit gates from the engine runners, the playthrough gate from `tools/playtest/runner.gd` or the Unity `Game.EditorTools.PlaytestRunner.Run` (`Assets/_Game/Editor/PlaytestRunner.cs`), bots for difficulty.
 - Event names feed `event_taxonomy.py`, which turns the event contract into analytics stubs for Godot or Unity.
 - Reference commands (Godot): `godot --headless --path <project> -s res://tools/ci/run_tests.gd -- --out=<abs>/unit.xml` and `... -s res://tools/playtest/runner.gd -- --mode=script --script=res://tests/playthroughs/smoke.json --out=<abs>/playthrough.json`.
-- Reference commands (Unity, from `${CLAUDE_PLUGIN_ROOT}/templates/unity-mobile/README.md`): `Unity -batchmode -nographics -projectPath <p> -runTests -testPlatform EditMode -testResults <abs>/unit.xml -logFile <abs>/unity.log` and `Unity -batchmode -nographics -projectPath <p> -executeMethod Game.EditorTools.PlaytestRunner.Run -gsMode script -gsScript Assets/_Game/Tests/Playthroughs/smoke.json -gsOut <abs>/playthrough.json -quit`.
+- Reference commands (Unity, from `${CLAUDE_PLUGIN_ROOT}/templates/unity-starter/README.md`): `Unity -batchmode -nographics -projectPath <p> -runTests -testPlatform EditMode -testResults <abs>/unit.xml -logFile <abs>/unity.log` and `Unity -batchmode -nographics -projectPath <p> -executeMethod Game.EditorTools.PlaytestRunner.Run -gsMode script -gsScript Assets/_Game/Tests/Playthroughs/smoke.json -gsOut <abs>/playthrough.json -quit`.
 
 ## Reference library
 

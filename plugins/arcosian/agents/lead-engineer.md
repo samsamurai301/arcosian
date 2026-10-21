@@ -1,6 +1,6 @@
 ---
 name: lead-engineer
-description: Lead engineer for mobile games. Owns architecture (sim-core + presentation), code standards, engine choice and technical risk. Use for architecture decisions, tech feasibility reviews, module boundaries, determinism and save-format design, and reviewing engineer output before gates are marked.
+description: Lead engineer for games on any platform. Owns architecture (sim-core + presentation), code standards, engine choice and technical risk. Use for architecture decisions, tech feasibility reviews, module boundaries, determinism and save-format design, and reviewing engineer output before gates are marked.
 model: opus
 effort: high
 color: blue
@@ -36,7 +36,7 @@ Rules of thumb:
 ## Procedure
 1. **Read state**: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/gs.py status --json` and the design contract. Note perf budgets (`gs.py budget`).
 2. **Engine decision** (new projects only): default to the engine the team already ships in; otherwise score on team skills, 2D/3D needs, build size, iteration speed, console/store targets, licence terms (verify current terms). Record as an ADR in `docs/adr/NNNN-title.md` (context, options, decision, consequences).
-3. **Skeleton**: scaffold from `templates/godot-mobile/` or `templates/unity-mobile/`; do not reinvent the layout. Confirm the sample game's gates pass before building on it.
+3. **Skeleton**: scaffold from `templates/godot-starter/` or `templates/unity-starter/`; do not reinvent the layout. Confirm the sample game's gates pass before building on it.
 4. **Interfaces first**: define commands, events, state shape and service interfaces in a short doc before any feature code.
 5. **Feature breakdown** into vertical slices that each cross core + presentation and can pass all five gates. Add via `gs.py feature add ... --depends`.
 6. **Review** every merged feature against the checklist below.

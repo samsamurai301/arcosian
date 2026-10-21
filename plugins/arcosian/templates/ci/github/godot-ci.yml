@@ -1,4 +1,5 @@
-# Godot CI: validate -> Android AAB -> iOS Xcode project -> fastlane TestFlight.
+# Godot CI: validate -> desktop and web exports (launched on Windows, macOS and Linux) -> Android AAB ->
+# iOS Xcode project -> fastlane TestFlight. Delete the jobs for platforms you do not ship.
 # Copy to .github/workflows/godot-ci.yml. Project lives at repo root (project.godot).
 name: godot-ci
 on:
@@ -10,6 +11,7 @@ on:
 env:
   GODOT_VERSION: "4.7.2"
   GODOT_IMAGE: barichello/godot-ci:4.7.2   # tag confirmed on Docker Hub (Oct 2026); keep it equal to GODOT_VERSION
+  GAME_NAME: MergeFive                     # file name used by the desktop export paths in export_presets.cfg
 
 jobs:
   validate:
@@ -44,6 +46,54 @@ jobs:
             unit.xml
             playthrough.json
             perf.json
+
+  desktop-web:
+    # Godot exports every desktop platform from Linux, so one job builds all four.
+    needs: validate
+    runs-on: ubuntu-latest
+    container: barichello/godot-ci:4.7.2
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install export templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates
+          mv /root/.local/share/godot/export_templates/* ~/.local/share/godot/export_templates/ || true
+      - name: Export Windows, macOS, Linux and Web
+        run: |
+          godot --headless --path . --import || true
+          mkdir -p build/windows build/macos build/linux build/web
+          godot --headless --path . --export-release "Windows Desktop" "$PWD/build/windows/${GAME_NAME}.exe"
+          godot --headless --path . --export-release "macOS" "$PWD/build/macos/${GAME_NAME}.zip"
+          godot --headless --path . --export-release "Linux" "$PWD/build/linux/${GAME_NAME}.x86_64"
+          godot --headless --path . --export-release "Web" "$PWD/build/web/index.html"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: desktop-web-builds
+          path: build/
+
+  desktop-smoke:
+    # Launch each desktop build on its own OS: --smoke loads the menu and game scenes, plays a move, exits 0.
+    needs: desktop-web
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: desktop-web-builds
+          path: build
+      - name: Smoke-test the exported build
+        shell: bash
+        run: |
+          case "$RUNNER_OS" in
+            Linux) exe="build/linux/${GAME_NAME}.x86_64"; chmod +x "$exe" ;;
+            Windows) exe="build/windows/${GAME_NAME}.exe" ;;
+            macOS) (cd build/macos && unzip -q "${GAME_NAME}.zip"); app=$(ls -d build/macos/*.app | head -1)
+                   exe="$app/Contents/MacOS/$(ls "$app/Contents/MacOS" | head -1)" ;;
+          esac
+          "$exe" --headless -- --smoke
 
   android:
     needs: validate

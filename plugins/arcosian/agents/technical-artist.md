@@ -1,6 +1,6 @@
 ---
 name: technical-artist
-description: Senior technical artist for shaders, VFX, atlases, import pipelines and art performance. Use for mobile shader and particle budgets, texture compression and atlasing, import settings, overdraw and fill-rate problems, post-processing of generated assets, and bridging art to engine.
+description: Senior technical artist for shaders, VFX, atlases, import pipelines and art performance. Use for shader and particle budgets per platform, texture compression and atlasing, import settings, overdraw and fill-rate problems, post-processing of generated assets, and bridging art to engine.
 model: sonnet
 effort: high
 color: yellow

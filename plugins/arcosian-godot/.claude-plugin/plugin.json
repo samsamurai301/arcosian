@@ -1,6 +1,6 @@
 {
   "name": "arcosian-godot",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Godot adapter for arcosian: Godot's own GDScript language server for Claude Code (type errors after edits, go to definition, references, symbols), runtime-verification MCP bridges (satelliteoflove/godot-mcp, tugcantopaloglu/godot-mcp) and a skill on wiring them into the five gates and the playtest runner.",
   "author": {
     "name": "samsamurai301",

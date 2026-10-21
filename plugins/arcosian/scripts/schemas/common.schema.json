@@ -97,7 +97,7 @@
     "platform": {
       "type": "string",
       "enum": ["ios", "android", "web", "windows", "macos", "linux", "switch", "playstation", "xbox", "other"],
-      "description": "Target or shipped platform. Mobile projects use \"ios\" and \"android\"; the others exist so deconstructions of non-mobile games validate."
+      "description": "Target or shipped platform: phones (ios, android), desktop (windows, macos, linux), browsers (web) and consoles (switch, playstation, xbox). Any combination; the user decides."
     },
     "platform_list": {
       "type": "array",
@@ -108,7 +108,19 @@
     "orientation": {
       "type": "string",
       "enum": ["portrait", "landscape", "both"],
-      "description": "Screen orientation. Portrait suits one-handed casual play; landscape suits two-thumb action; \"both\" doubles UI layout and QA cost."
+      "description": "Screen orientation. Phones: portrait suits one-handed casual play, landscape two-thumb action. Desktop, web and console games are landscape; \"both\" means the layout adapts to any window or device shape, which doubles UI layout and QA cost."
+    },
+    "input": {
+      "type": "string",
+      "enum": ["touch", "mouse_keyboard", "gamepad", "motion", "other"],
+      "description": "Input method: touch screen, mouse and keyboard, gamepad (including handheld PCs and consoles), motion controls, or other."
+    },
+    "input_list": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/input" },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Input methods the game supports; every core action must work with each one."
     },
     "engine": {
       "type": "string",

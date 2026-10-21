@@ -1,8 +1,8 @@
 # Playbooks
 
-Four end-to-end procedures. Each lists the exact commands, skills, agents and workflows in order, the human checkpoints, and the exit test. `P` below means the plugin root; in a session use `${CLAUDE_PLUGIN_ROOT}`. Workflow arguments are shown in the form the workflow reads (`args.feature_id`, `args.topic`, and so on); the skills pass them for you, so you normally type the slash command and answer questions.
+Five end-to-end procedures. Each lists the exact commands, skills, agents and workflows in order, the human checkpoints, and the exit test. `P` below means the plugin root; in a session use `${CLAUDE_PLUGIN_ROOT}`. Workflow arguments are shown in the form the workflow reads (`args.feature_id`, `args.topic`, and so on); the skills pass them for you, so you normally type the slash command and answer questions.
 
-Rule for all four: humans sign off on style, fun and store submission. Everything between those checkpoints is automatic.
+Rule for all five: humans sign off on style, fun and store submission. Everything between those checkpoints is automatic.
 
 ---
 
@@ -18,7 +18,7 @@ Goal: from a one-line idea to a signed build on TestFlight internal testing, wit
 | 4 | Contract | `game-designer` writes `.gamestudio/contract.json`: pillars, verbs, core loop, FTUE, must/should/won't, kill criteria | `gs.py validate --all` clean |
 | 5 | `/arcosian:design-review` | `design-review` workflow (args.contract_path); edits proposed, not applied | You apply or reject each proposed edit |
 | 6 | `python3 P/scripts/gs.py init --title "<title>" --engine godot --tier prototype --monetization iap --budget 25` | Creates `.gamestudio/` (the `new-game` skill does this for you) | `gs.py status` prints a summary |
-| 7 | Copy `P/templates/godot-mobile/` (or `unity-mobile/`) into the project | `lead-engineer` confirms sim-core plus presentation split | Template tests run |
+| 7 | Copy `P/templates/godot-starter/` (or `unity-starter/`) into the project | `lead-engineer` confirms sim-core plus presentation split | Template tests run |
 | 8 | Feature plan | `producer` fills `features.json` via `gs.py feature add`; first feature is the core loop in grey boxes | `gs.py feature next` returns the core loop |
 | 9 | `/arcosian:build-feature F001` | `build-feature` workflow (args.feature_id): engineer builds sim-core with tests, then presentation; gates run; `critic` tries to refute; up to 3 fix rounds | `gs.py feature pass F001` succeeds |
 | 10 | Play it | `/arcosian:playtest` runs `playtest-sweep`; then you play on a device for ten minutes | Checkpoint 2: is it fun? If not, iterate the loop, do not add content |
@@ -139,6 +139,18 @@ Goal: validate retention and monetization in a small market, fix, then go global
 Exit test: a written go decision with evidence, a live-ops calendar for the next eight weeks, and a postmortem entry for the soft launch.
 
 ---
+
+## Playbook 5: Change something safely
+
+For a tuning change, a balance fix or a refactor in a project whose features already passed their gates.
+
+1. **Refresh the map.** `python3 P/scripts/gs.py map`, then read `.gamestudio/map/MAP.md`.
+2. **See what the change touches.** `python3 P/scripts/gs.py impact <file | class | tuning key>`: dependent scenes, scripts and tests, done features to re-check, and the gates to run again.
+3. **Predict it (tuning, economy, levels).** `/arcosian:what-if KEY=VALUE`, or `python3 P/scripts/gs.py whatif --set KEY=VALUE`. Compare options with one run each. Apply only `improves`; take `mixed` to the human with the trade-off; never apply `reject`.
+4. **Apply through the gates.** `/arcosian:build-feature F0xx` with the change; re-run every gate `impact` named for every listed feature.
+5. **Show the result.** `python3 P/scripts/gs.py dashboard` and share `.gamestudio/reports/dashboard.html` at the checkpoint.
+
+Exit test: the what-if result is saved, every gate `impact` named passes again with fresh evidence, and the progress log records the decision.
 
 ## Volatile facts (as of Oct 2026 — verify)
 

@@ -162,16 +162,27 @@ Rationale: vision, core loop, economy, style, architecture, monetization ethics 
 
 Limits to be honest about: hooks operate on patterns and can be evaded by an agent determined to; they catch accidents. Keep real signing keys out of the dev machine and in CI secrets.
 
-## 9. Evals and audit
+## 9. Understanding layer
+
+| Command | Writes | What it is for |
+|---|---|---|
+| `gs.py map` (`scripts/project_map.py`) | `.gamestudio/map/map.json`, `MAP.md` | A graph of files (kind, language, size) and edges: scene attaches script, scene instances scene, script extends, loads, imports or uses a class or autoload, reads a tuning key or an input action. Godot via `project.godot`, `.tscn`/`.tres` and GDScript; Unity via `.meta` GUIDs, scene and prefab YAML, C# and asmdefs; other engines via imports and quoted paths. Unchanged files (size and mtime) are not parsed again. `MAP.md` is the compact summary agents read before opening files |
+| `gs.py impact <target>` | nothing | Reverse dependencies of a file, folder, glob, class, autoload, tuning key, input action or feature (`paths` globs), the tests that reach it, done features to re-check, and the gates to run again with reasons |
+| `gs.py whatif --set K=V` (`scripts/whatif.py`) | `.gamestudio/whatif/*.json` | Paired runs of the current and proposed version on the same seeds (Godot bots through `runner.gd --tuning`, `economy_sim.py`, `match3_sim.py`); Wilson intervals for win rates, Student t across seeds otherwise; verdict against `progression.difficulty.target_win_rate`, `analytics.kpi_targets.session_len_sec` or the economy model's `targets` |
+| `gs.py dashboard` (`scripts/dashboard.py`) | `.gamestudio/reports/dashboard.html` | One offline page: features and gates, loops, economy flow, trends, what-if results, dependency graph, assets, budget |
+
+## 10. Evals and audit
 
 - `scripts/audit_plugin.py --root .`: frontmatter validity (allowed keys, name equals directory), references and scripts listed and present, preloaded skills existing, counts. `--map FILE` regenerates `docs/KNOWLEDGE-MAP.md`.
 - `evals/arcosian/` (repository root; not shipped with the plugin): eight cases for `claude plugin eval` (concepts, contract, five gates, deconstruction, economy sim, compliance preflight, gateway mock, principal next step). See `evals/arcosian/README.md` for flags and cost caps.
 - Self-tests: `gs.py --selftest`, each script's `--selftest`, hook tests, gateway tests.
+- `audit_plugin.py --max-description-chars N` fails when skill and agent descriptions (loaded into every session) pass N characters; `--core DIR` lets an adapter's audit resolve core skill and agent names. `scripts/addon.py check` applies the add-on rules; `tools/check_connectors.py` (repository) keeps `docs/CONNECTORS.md` in step with every `.mcp.json`.
 
-## 10. Extending
+## 11. Extending
 
 1. New codex skill: directory name equals `name`; short SKILL.md; every file in `references/` listed in it; run the audit.
 2. New agent: pick the model by the rule in section 7; list preloaded skills that exist.
 3. New workflow: `meta.name` equals the file name; read-only unless it must write; add a bounded retry.
 4. New schema: add to `scripts/schemas/` with a valid example; wire into `validate_json.py`.
 5. New provider: add `providers/<name>.mjs`, a `pricing.json` entry, a userConfig key, and a mock path.
+6. New add-on (genre pack, engine adapter, tool connector): `scripts/addon.py new`, then the `extend` skill; the repository's `docs/EXTENDING.md` has the full guide.

@@ -6,7 +6,7 @@ argument-hint: "[economy | difficulty | gacha | progression | all]"
 
 # Balance
 
-Model it, simulate it, compare to targets, change one thing, repeat. Numbers in the contract are hypotheses until a simulator and then real telemetry agree.
+Model it, simulate it, compare to targets, change one thing, repeat. Numbers in the contract are hypotheses until a simulator and then real telemetry agree. To predict one proposed change against the targets before applying it, use `what-if` (`gs.py whatif --set KEY=VALUE`).
 
 ## When to use
 
@@ -108,4 +108,4 @@ All plugin scripts live at `${CLAUDE_PLUGIN_ROOT}/scripts/`; skill-local tools a
 
 ## Related skills
 
-`economy-design`, `progression-difficulty`, `level-design`, `monetization`, `player-analytics`, `legal-ethics`, `playtest`.
+`what-if`, `economy-design`, `progression-difficulty`, `level-design`, `monetization`, `player-analytics`, `legal-ethics`, `playtest`.

@@ -3,16 +3,18 @@
   "owner": {
     "name": "samsamurai301"
   },
-  "description": "Arcosian: a principal game developer and full studio for Claude Code, plus optional adapters for engines, asset vendors and commerce services.",
+  "description": "Arcosian: a principal game developer and full studio for Claude Code, for any game on any platform, plus optional adapters for engines, art, levels, audio, asset vendors, commerce, team and community tools.",
   "plugins": [
     {
       "name": "arcosian",
       "source": "./plugins/arcosian",
-      "description": "Core plugin: codex, ontology, agents, workflows, tools, gateway, templates and five-gate enforcement.",
+      "description": "Core plugin: codex, ontology, agents, workflows, simulators, project map, change impact, what-if predictions, dashboard, gateway, templates for phones, desktop and web, and five-gate enforcement.",
       "category": "development",
       "tags": [
         "game-development",
         "mobile",
+        "pc",
+        "web",
         "design",
         "liveops"
       ]
@@ -73,6 +75,56 @@
         "analytics",
         "release",
         "mcp"
+      ]
+    },
+    {
+      "name": "arcosian-art",
+      "source": "./plugins/arcosian-art",
+      "description": "2D art, animation and UI tools: Aseprite, Krita, Spine, Rive, Figma's official MCP server, sprite sheets into Godot and Unity, and notes on Substance and Houdini.",
+      "category": "development",
+      "tags": [
+        "game-development",
+        "art",
+        "animation",
+        "ui",
+        "figma"
+      ]
+    },
+    {
+      "name": "arcosian-levels",
+      "source": "./plugins/arcosian-levels",
+      "description": "Tiled and LDtk level editing: a converter to one level format, reachability and pacing checks that feed the core level audit, and importers for Godot and Unity.",
+      "category": "development",
+      "tags": [
+        "game-development",
+        "level-design",
+        "tiled",
+        "ldtk"
+      ]
+    },
+    {
+      "name": "arcosian-audio",
+      "source": "./plugins/arcosian-audio",
+      "description": "FMOD Studio and Wwise for any game: events, banks, engine integration, bank builds in CI, a minimal WAAPI client, and when engine-native audio is enough.",
+      "category": "development",
+      "tags": [
+        "game-development",
+        "audio",
+        "fmod",
+        "wwise"
+      ]
+    },
+    {
+      "name": "arcosian-community",
+      "source": "./plugins/arcosian-community",
+      "description": "Team, community and store-page operations: GitHub's and Sentry's official MCP servers, Discord and devlogs, Steam and itch.io community pages, crash triage; every post human-approved.",
+      "category": "development",
+      "tags": [
+        "game-development",
+        "community",
+        "github",
+        "sentry",
+        "steam"
       ]
     }
   ]

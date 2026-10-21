@@ -1,6 +1,6 @@
 ---
 name: engine-alternatives
-description: Engine selection and quick-starts beyond Godot and Unity for mobile - Unreal, Defold, Cocos Creator, web stacks (Phaser, PixiJS, three.js, Babylon, PlayCanvas, Capacitor), Bevy, GameMaker, Construct, GDevelop, Solar2D, Flame, native. Use when asked which engine to use, whether to pick Unreal or Defold, how to ship a web game as an app, how to make a playable ad, or to compare engines.
+description: Engine selection and quick-starts beyond Godot and Unity - Unreal, Defold, Cocos Creator, web stacks (Phaser, PixiJS, three.js, Babylon, PlayCanvas, Capacitor), Bevy, GameMaker, Construct, GDevelop, Solar2D, Flame, native. Use when asked which engine to use, whether to pick Unreal or Defold, how to ship a web game as an app, how to make a playable ad, or to compare engines.
 ---
 
 # Engine Selection and Alternatives

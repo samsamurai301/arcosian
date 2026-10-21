@@ -13,7 +13,7 @@ from pathlib import Path
 
 PLUGIN = Path(__file__).resolve().parents[2]
 SCRIPTS = PLUGIN / "hooks" / "scripts"
-TEMPLATE = PLUGIN / "templates" / "godot-mobile"
+TEMPLATE = PLUGIN / "templates" / "godot-starter"
 sys.path.insert(0, str(PLUGIN / "scripts"))
 sys.path.insert(0, str(SCRIPTS))
 import gslib  # noqa: E402
@@ -54,7 +54,7 @@ class HookTest(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp(prefix="gshooks-")).resolve()
         self.root = self.tmp / "game"
         self.root.mkdir()
-        gslib.init_project(self.root, "Hook Test", None, "puzzle")
+        gslib.init_project(self.root, "Hook Test", None, "puzzle", platforms=["ios", "android"])
         self.features = self.root / ".gamestudio" / "features.json"
 
     def tearDown(self):
@@ -141,6 +141,22 @@ class HookTest(unittest.TestCase):
         self.assertEqual(self.decision(out), "ask")
         _, out, _ = self.bash("fastlane ios beta")
         self.assertIsNone(out)
+
+    def test_pc_store_uploads_ask(self):
+        for cmd in ("steamcmd +login builder +run_app_build ../scripts/app_build_1000.vdf +quit",
+                    "./steamcmd.sh +login builder +run_app_build_http app.vdf +quit",
+                    "steamcmd +login builder +run_workshop_build item.vdf +quit",
+                    "butler push build/web studio/game:html5 --userversion 1.0.0",
+                    "BuildPatchTool.exe -mode=UploadBinary -OrganizationId=o -ProductId=p",
+                    "msstore publish ./build/msix"):
+            _, out, _ = self.bash(cmd)
+            self.assertEqual(self.decision(out), "ask", cmd)
+        _, out, _ = self.ps("steamcmd.exe +login builder +run_app_build C:\\build\\app.vdf +quit")
+        self.assertEqual(self.decision(out), "ask")
+        for cmd in ("steamcmd +login anonymous +app_update 1007 +quit", "butler status studio/game",
+                    "butler validate build/web", "msstore apps list"):
+            _, out, _ = self.bash(cmd)
+            self.assertIsNone(out, cmd)
 
     def test_keystore_read_denied(self):
         _, out, _ = self.bash("cat release.keystore")

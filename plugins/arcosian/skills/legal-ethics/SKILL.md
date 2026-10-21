@@ -1,6 +1,6 @@
 ---
 name: legal-ethics
-description: Legal and ethical risk knowledge for mobile games - clone and trade dress risk, trademarks, mechanic patents, AI content ownership and disclosure, voice and likeness, privacy (GDPR, COPPA, CCPA, age assurance), children, loot-box rules by region, open-source, font, music and asset licences, publishing contracts. Use when asked "can I copy this mechanic", "is this a clone", "disclose AI", "COPPA", "loot box legal" or "licence check".
+description: Legal and ethical risk knowledge for games - clone and trade dress risk, trademarks, mechanic patents, AI content ownership and disclosure, voice and likeness, privacy (GDPR, COPPA, CCPA, age assurance), children, loot-box rules by region, open-source, font, music and asset licences, publishing contracts. Use when asked "can I copy this mechanic", "is this a clone", "disclose AI", "COPPA", "loot box legal" or "licence check".
 ---
 
 # Legal and Ethics

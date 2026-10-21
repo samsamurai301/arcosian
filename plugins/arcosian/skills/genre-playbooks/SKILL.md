@@ -1,12 +1,12 @@
 ---
 name: genre-playbooks
-description: "Genre playbooks for mobile games: loops, session profile, signature mechanics, monetization mix, KPI expectations, production scope, agent-buildability score and P0 starter features per subgenre (puzzle, hybrid-casual, idle, action, RPG, strategy, PvP, casino, narrative), plus genre selection and fusion procedures. Use when choosing a genre, scoping a vertical slice, or asking what makes a merge, idle or survivor-like game work."
+description: "Genre playbooks for games on any platform: loops, session profile, signature mechanics, monetization, KPIs, production scope, agent-buildability and P0 features per subgenre - mobile genres plus shooters, action-adventure, platformers, survival, simulation, MMO and live service, racing, sports, fighting, horror, narrative, PC strategy and deckbuilders. Use when choosing or fusing a genre or scoping a slice."
 when_to_use: Picking or fusing a genre, writing contract.meta.genre/subgenre, sizing a slice, or sanity-checking a concept against genre norms.
 ---
 
 # Genre Playbooks
 
-A genre is a contract with the player. It sets which verbs they expect, how long a session lasts, how the game makes money and what "good" feels like in the first 90 seconds. This skill holds one playbook per mobile subgenre, all in the same 14-part format, plus the procedures a principal designer uses to pick a genre, fuse two of them and turn the result into a scoped vertical slice.
+A genre is a contract with the player. It sets which verbs they expect, how long a session lasts, how the game makes money and what "good" feels like in the first 90 seconds. This skill holds one playbook per subgenre, from mobile casual to PC and console shooters, sims, MMOs and strategy, all in the same 14-part format (PC and console files add platform notes), plus the procedures a principal designer uses to pick a genre, fuse two of them and turn the result into a scoped vertical slice.
 
 ## What this skill gives you
 
@@ -332,6 +332,15 @@ Most mobile hits of the last decade are fusions. A proven core is paired with a 
 | `references/competitive-pvp.md` | MOBA, battle royale, hero shooter, brawler, CCG / card games, competitive sports, racing; shared ratings, matchmaking, netcode and integrity | Any synchronous or asynchronous PvP |
 | `references/social-casino-party.md` | Social casino / slots, Coin Master-likes, board-game casual, party and social deduction, bingo, casual sports (golf, pool); shared simulated-gambling law and chance math | Casino, board, party and social-deduction concepts; compliance-heavy designs |
 | `references/narrative-rhythm-edu-kids.md` | Interactive stories / visual novels, rhythm, educational, kids (COPPA), fitness and location-based, cozy; shared branching-narrative, audio-latency, child-compliance and location-data foundations | Story-led, music-led, learning, under-13, outdoor or comfort-led concepts |
+| `references/shooters.md` | Campaign FPS/TPS, arena/boomer shooter, hero shooter (PC/console), battle royale (PC/console), extraction shooter, co-op PvE/horde, twin-stick/top-down; shared TTK maths, hitscan vs projectile, aim assist and input fairness, encounter design | Shooter concepts on PC/console; weapon feel and TTK tuning; mouse/gamepad fairness |
+| `references/action-adventure.md` | Zelda-like/open-world action-adventure, character action, soulslike, immersive sim, stealth; shared frame data, stamina and poise, telegraphs, gating and keys, camera | Melee/combo, boss, exploration-gating or stealth concepts; premium PC/console action |
+| `references/platformer-metroidvania.md` | Precision 2D platformer, 3D collectathon, metroidvania, puzzle platformer, roguelite platformer; shared jump physics formulas, ability-gating graph, map and backtracking design | Platformer or metroidvania concepts; jump tuning; world-graph solvability |
+| `references/racing-sports-fighting.md` | Arcade racing, sim racing, kart racing, team sports simulation, extreme sports / skate, fighting games (2D, 3D, platform fighter); shared vehicle handling, catch-up fairness, sports AI, frame data and rollback netcode, input buffers | PC or console racing, sports or fighting concepts; feel-driven, frame-exact or physics-led designs |
+| `references/horror-narrative.md` | Survival horror, psychological horror / walking sim, co-op horror with proximity voice, visual novel, narrative adventure / point-and-click, choice-based interactive fiction (Ink, Twine, Yarn Spinner); shared tension pacing, sound for fear, branching and state tracking, text localisation | Horror, story-led or text-heavy concepts on PC, console or web; premium narrative scoping |
+| `references/pc-strategy-cards.md` | RTS, turn-based 4X (PC), grand strategy, roguelike deckbuilder, digital CCG / LCG, tactics RPG (PC/console); shared AI opponents, deep-complexity UI, card maths, determinism and replays, mod support | PC or console strategy and card concepts; deckbuilders and tactics as agent-friendly first projects |
+| `references/survival-sandbox.md` | Open-world survival-crafting, co-op survival, creative / voxel sandbox, colony sim, survival roguelite; shared needs-meter decay, crafting-tree gating, resource respawn, day-night and weather, PvP raiding, procedural worlds, save size and streaming | Survival, crafting, base-building and sandbox concepts; PC and console depth; early-access scoping |
+| `references/simulation-management.md` | City builder, PC management / tycoon, factory and automation, life sim and farming (PC/console), job and vehicle sims, god games, sports management; shared production ratios, throughput and queues, agent-sim cost, dense UI, large-state saves | Management, automation, simulation and cosy-sim concepts; PC and console depth |
+| `references/mmo-live-service.md` | MMORPG, survival MMO, live-service looter shooter / ARPG, creator platforms (Roblox, UEFN), seasonal live games; shared CCU and server cost maths, content cadence, trading economies, moderation, anti-cheat, end-of-service planning | Persistent-world and live-service concepts; any game whose product is an ongoing operation |
 
 ## Related skills
 

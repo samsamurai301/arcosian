@@ -1,6 +1,6 @@
 ---
 name: monetization
-description: Senior monetization knowledge for mobile games - business model choice, IAP and subscription implementation (StoreKit 2, Play Billing, RevenueCat), ad mediation and placements, offer design, battle passes, loot-box law, odds disclosure, minors, and payments rules. Use when asked to pick a business model, design IAP, add ads, price offers, build a battle pass, or check monetization ethics.
+description: Senior monetization knowledge for games - business model choice, IAP and subscription implementation (StoreKit 2, Play Billing, RevenueCat), ad mediation and placements, offer design, battle passes, loot-box law, odds disclosure, minors, and payments rules. Use when asked to pick a business model, design IAP, add ads, price offers, build a battle pass, or check monetization ethics.
 when_to_use: Choosing, implementing, tuning or auditing how a mobile game earns money.
 ---
 

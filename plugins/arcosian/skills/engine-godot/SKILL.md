@@ -1,12 +1,12 @@
 ---
 name: engine-godot
-description: Senior Godot 4 practice for mobile games - typed GDScript, project layout, autoloads, signals, Resources, mobile renderer and export (Android gradle, iOS), headless CLI gates, testing, perf and plugin options. Use when asked to build, fix, export, test or optimize a Godot project, write GDScript, set up Android/iOS builds, or choose Godot plugins.
+description: Senior Godot 4 practice - typed GDScript, project layout, autoloads, signals, Resources, renderers and export (Android gradle, iOS; desktop and web in pc-web-release), headless CLI gates, testing, perf and plugin options. Use when asked to build, fix, export, test or optimize a Godot project, write GDScript, set up Android/iOS builds, or choose Godot plugins.
 ---
 
 # Godot 4 for Mobile
 
 ## What this skill gives you
-- A house style for statically typed GDScript and a project layout that keeps rules out of nodes (sim-core + presentation), matching `templates/godot-mobile/`.
+- A house style for statically typed GDScript and a project layout that keeps rules out of nodes (sim-core + presentation), matching `templates/godot-starter/`.
 - A checklist of mistakes AI agents make in Godot (invented `uid://` values, Python idioms, space indentation, wrong signal syntax) and how to prevent them.
 - Mobile project settings, export procedures for Android and iOS, and the headless commands that give an agent verifiable evidence.
 - Testing and performance recipes (unit tests, deterministic playthroughs, movie capture, renderer choices, cost model).
@@ -35,7 +35,7 @@ The agent reads text but cannot see a scene tree work. Every change ends with th
 ## Decision procedures
 
 ### A. Starting a new Godot project
-1. Copy `templates/godot-mobile/` (see its README: rename, `--import`, run all gates green first).
+1. Copy `templates/godot-starter/` (see its README: rename, `--import`, run all gates green first).
 2. Set orientation, base size (1080x1920 portrait is the template default), stretch `canvas_items` + `expand`.
 3. Pick the renderer with the table below; record it in the design contract's tech section.
 4. Write the sim-core rule first with unit tests, then the playthrough JSON, then the views.

@@ -30,6 +30,12 @@ Remote OAuth servers do not break the session when unconfigured: they simply wai
 - **Fetches:** `@meshy-ai/meshy-mcp-server@0.6.4` from npm on first start (exact version), and the files the vendors generate.
 - **Costs:** these calls bill your vendor accounts and sit outside the core gateway's budget cap; record every output with `manifest_update`.
 
+## Security
+
+- API keys live only in the plugin's sensitive options (`pixellab_api_key`, `meshy_api_key`), which Claude Code keeps in your system keychain; they never go into project files or prompts.
+- OAuth servers (ElevenLabs, Scenario) hold no key here: you authorize them through `/mcp` and can revoke access in the vendor's account settings.
+- Each call spends your vendor credit. Keep the core budget cap on and register every result with `manifest_update` so cost and licence stay on record.
+
 ## Important: provenance and budgets
 
 Vendor MCP calls bypass the gateway. Only `studio-gateway` enforces the per-project spending cap, style lock and provenance records. If you use a vendor MCP directly:

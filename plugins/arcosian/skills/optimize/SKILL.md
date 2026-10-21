@@ -1,6 +1,6 @@
 ---
 name: optimize
-description: Runs a mobile performance pass against the contract's budgets - frame time, memory, download size, cold start, thermals - with per-engine profiling, device tiers, perf_budget.py checks, a prioritized fix checklist and a perf report that sets the perf gate. Use when the user says "optimize performance", "it stutters", "too much memory", "build is too big", "check the perf budget", or "why is it hot".
+description: Runs a performance pass against the contract's budgets - frame time, memory, download size, cold start, thermals - with per-engine profiling, device tiers, perf_budget.py checks, a prioritized fix checklist and a perf report that sets the perf gate. Use when the user says "optimize performance", "it stutters", "too much memory", "build is too big", "check the perf budget", or "why is it hot".
 argument-hint: "[F### | scenario | device tier]"
 ---
 

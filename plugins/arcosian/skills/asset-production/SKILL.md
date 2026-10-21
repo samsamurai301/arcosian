@@ -1,6 +1,6 @@
 ---
 name: asset-production
-description: Runs the visual asset pipeline for a mobile game - style bible, asset list from the contract, style lock, generation through the studio-gateway tools, post-processing, engine import, manifest status flow and licence checks. Use when the user says "make the art", "generate sprites", "asset batch", "lock the style", "build the asset list" or "import these assets".
+description: Runs the visual asset pipeline for a game - style bible, asset list from the contract, style lock, generation through the studio-gateway tools, post-processing, engine import, manifest status flow and licence checks. Use when the user says "make the art", "generate sprites", "asset batch", "lock the style", "build the asset list" or "import these assets".
 argument-hint: "[asset kind or list]"
 ---
 

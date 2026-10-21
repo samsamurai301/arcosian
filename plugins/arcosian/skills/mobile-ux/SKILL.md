@@ -1,6 +1,6 @@
 ---
 name: mobile-ux
-description: 'Mobile game UX codex: thumb zones, touch targets, gestures, safe areas, interruptions, HUD, hubs, shops, inventories, reward screens, pop-up hierarchy, tutorials, first-session flow, permission timing, typography, contrast and Godot/Unity UI scaling. Use when asked "design this screen", "UX review", "onboarding flow", "safe area" or "audit this layout".'
+description: 'Mobile game UX codex: thumb zones, touch targets, gestures, safe areas, interruptions, HUD, hubs, shops, inventories, reward screens, pop-up hierarchy, tutorials, first-session flow, permission timing, typography, contrast and Godot/Unity UI scaling. PC, TV and web UI live in platform-targets. Use when asked "design this screen", "UX review", "onboarding flow", "safe area" or "audit this layout".'
 when_to_use: 'Screen and flow design, HUD and menu layout, onboarding UX, pop-up and permission timing, UI scaling, UX acceptance criteria.'
 ---
 

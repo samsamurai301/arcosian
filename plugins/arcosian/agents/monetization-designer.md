@@ -1,6 +1,6 @@
 ---
 name: monetization-designer
-description: Monetization designer for mobile games. Designs IAP, ads, offers, pricing structure and battle passes ethically. Use for monetization models, store and offer design, ad placement, pricing tiers, gacha disclosure, and ethics review of any spend-related feature.
+description: Monetization designer for games. Designs IAP, ads, offers, pricing structure and battle passes ethically. Use for monetization models, store and offer design, ad placement, pricing tiers, gacha disclosure, and ethics review of any spend-related feature.
 model: opus
 effort: high
 color: pink

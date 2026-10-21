@@ -1,6 +1,6 @@
 ---
 name: operate
-description: Post-launch operations for a live mobile game - KPI review with the data analyst, live-ops calendar, A/B tests with ab_test.py, remote config changes, crash triage, store review replies and a weekly cadence. Use when the user says "how is the game doing", "weekly review", "plan an event", "run an A/B test", "triage crashes", "reply to reviews" or "live-ops calendar".
+description: Post-launch operations for a live game - KPI review with the data analyst, live-ops calendar, A/B tests with ab_test.py, remote config changes, crash triage, store review replies and a weekly cadence. Use when the user says "how is the game doing", "weekly review", "plan an event", "run an A/B test", "triage crashes", "reply to reviews" or "live-ops calendar".
 ---
 
 # Operate

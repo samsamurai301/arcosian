@@ -1,6 +1,6 @@
 ---
 name: engine-unity
-description: Senior Unity 6 mobile practice - C# project layout with asmdefs and a pure core assembly, URP and Player settings for phones, Addressables, Input System, editor automation (Unity CLI, batchmode, SceneBuilder/BuildScript), tests, CI and SDKs. Use when asked to build, fix, test, automate or ship a Unity mobile game, write C# for Unity, configure URP, or set up IAP, ads or CI.
+description: Senior Unity 6 practice - C# project layout with asmdefs and a pure core assembly, URP and Player settings for phones, Addressables, Input System, editor automation (Unity CLI, batchmode, SceneBuilder/BuildScript), tests, CI and SDKs. Use when asked to build, fix, test, automate or ship a Unity game, write C# for Unity, configure URP, or set up IAP, ads or CI.
 ---
 
 # Unity 6 for Mobile
@@ -35,7 +35,7 @@ Editor frame times mean little. Profile on a development build with the Profiler
 ## Decision procedures
 
 ### A. Start a project
-1. Copy `${CLAUDE_PLUGIN_ROOT}/templates/unity-mobile/` into the game repo. It ships with this plugin: Unity 6 LTS, the `Game.Core` / `Game.Presentation` / `Game.Editor` assemblies under `Assets/_Game/`, a deterministic merge-puzzle sample, `PlaytestRunner`, `SceneBuilder`, `BuildScript` and `ScreenshotCapture` editor entry points, and a `manifest.json` that already lists URP, Input System, Test Framework, Performance Testing, Addressables and Localization. `references/csharp-project-and-urp.md` explains the layout when you extend it.
+1. Copy `${CLAUDE_PLUGIN_ROOT}/templates/unity-starter/` into the game repo. It ships with this plugin: Unity 6 LTS, the `Game.Core` / `Game.Presentation` / `Game.Editor` assemblies under `Assets/_Game/`, a deterministic merge-puzzle sample, `PlaytestRunner`, `SceneBuilder`, `BuildScript` and `ScreenshotCapture` editor entry points, and a `manifest.json` that already lists URP, Input System, Test Framework, Performance Testing, Addressables and Localization. `references/csharp-project-and-urp.md` explains the layout when you extend it.
 2. Open it once in Unity 6 (Unity Hub rewrites `ProjectVersion.txt` and generates the `.meta` files; commit them), then run the template's three first-open checks: `Game > Build Scene and Settings` (or the `SceneBuilder.BuildAll` batch command below), the EditMode tests, and the smoke playthrough. The template was written without Unity installed, so fix anything the compiler reports before building features and note the result in `.gamestudio/progress.md`. Core and the EditMode tests also run without a Unity licence through `tools/dotnet-harness/build_harness.py`.
 3. Set the platform to Android or iOS early; add Input System, Addressables and Performance Testing usage as the game needs them (all are already in the manifest).
 4. Replace the sample mechanic in `Core/` with EditMode tests first (see the template README, "Add a mechanic"), then extend `SceneBuilder` so the scenes stay reproducible.
@@ -53,7 +53,7 @@ Editor frame times mean little. Profile on a development build with the Profiler
 | iOS | `Unity -batchmode -nographics -projectPath <p> -executeMethod Game.EditorTools.BuildScript.BuildIOS -gsOut Builds/iOS -quit` | 0 built, 1 failed |
 | visual | `Unity -batchmode -projectPath <p> -executeMethod Game.EditorTools.ScreenshotCapture.Run -gsOut <abs dir>` (no `-nographics`) | 0 ok, 1 failed, 2 usage |
 
-Run them in this order and stop on the first failure: unit, playthrough, bots, scene, build, visual. Full notes, CI and signing variables are in `${CLAUDE_PLUGIN_ROOT}/templates/unity-mobile/README.md`.
+Run them in this order and stop on the first failure: unit, playthrough, bots, scene, build, visual. Full notes, CI and signing variables are in `${CLAUDE_PLUGIN_ROOT}/templates/unity-starter/README.md`.
 
 ### B. Choose an automation channel
 | Need | Channel |

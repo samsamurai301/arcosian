@@ -1,6 +1,6 @@
 ---
 name: store-release
-description: Store release knowledge for mobile games - headless builds, signing, fastlane, TestFlight and Play tracks, CI choices, versioning, App Store and Google Play requirements (SDK floors, privacy manifests, PBL, 16 KB pages, Data safety), ASO, and the pre-flight checklist. Use when asked "how do I ship to the App Store", "Play rejected my build", "set up fastlane", "write store listing", "why was I rejected" or "release checklist".
+description: Mobile store release knowledge - headless builds, signing, fastlane, TestFlight and Play tracks, CI, versioning, App Store and Google Play requirements (SDK floors, privacy manifests, PBL, 16 KB pages, Data safety), ASO and the pre-flight checklist; PC and web stores are in pc-web-release, consoles in console-pathway. Use when asked "how do I ship to the App Store", "Play rejected my build", "set up fastlane" or "release checklist".
 ---
 
 # Store Release

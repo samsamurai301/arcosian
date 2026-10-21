@@ -1,6 +1,6 @@
 ---
 name: game-case-studies
-description: Deconstructions of about 90 landmark games (puzzle, hyper/hybrid-casual, midcore strategy, RPG/gacha/cards, casual-social-sim, premium indie) in one 16-lens format, plus the method to deconstruct any game into deconstruction.schema.json and use precedents for decisions and analogies. Use when asked "how does X do it", "deconstruct X", "which games did this", "comparables", "X meets Y", or before choosing a loop, economy or offer.
+description: Deconstructions of about 113 landmark games (mobile genres, premium indie, PC and console, web and cross-play) in one 16-lens format, plus the method to deconstruct any game into deconstruction.schema.json and use precedents for decisions and analogies. Use when asked "how does X do it", "deconstruct X", "which games did this", "comparables" or "X meets Y", or before choosing a loop, economy or offer.
 when_to_use: Before a design decision a shipped game already faced, when filling contract.meta.comparables or analogy, or when deconstructing a competitor.
 ---
 
@@ -10,7 +10,7 @@ Precedent is the cheapest playtest. This skill holds deconstructions of landmark
 
 ## What this skill gives you
 
-- **About 90 case studies** across six reference files, each in the same 16 lenses: snapshot, core loop, meta, economy, monetization, live-ops, retention, social, UX, art and audio, psychology, innovations, weaknesses, lessons, analogy hooks, and an ontology encoding.
+- **About 113 case studies** across eight reference files, each in the same 16 lenses: snapshot, core loop, meta, economy, monetization, live-ops, retention, social, UX, art and audio, psychology, innovations, weaknesses, lessons, analogy hooks, and an ontology encoding.
 - **A deconstruction method**: lenses, sources with evidence grades, a 1–2 day procedure, and a field-by-field encoding into `deconstruction.schema.json`.
 - **Precedent search and analogy procedures** that turn cases into contract decisions (`contract.meta.comparables`, `analogy`, mechanics, economy).
 - **A master index** with controlled genre tags (aligned with the `genre-playbooks` genre slugs) and a "study it for" column.
@@ -299,6 +299,8 @@ For the top 3–5 competitors, list each case's "Weaknesses" plus the clusters f
 | `references/rpg-gacha-cards.md` | 15 cases: gacha RPGs, idle RPGs, CCGs, location-based, trainer sims | Collection, gacha, card and hero designs; pity and banner decisions |
 | `references/casual-social-sim.md` | 16 cases: social casino-adjacent, farming, merge, life sim, UGC platforms, social deduction, async word and sports, gamified apps | Social loops, timers, merge, narrative choice, sports PvP |
 | `references/premium-indie.md` | 15 cases: premium and indie mobile and cross-platform landmarks | Premium pricing, authored experiences, roguelite and deckbuilder design |
+| `references/pc-console.md` | 15 cases: Hollow Knight, Factorio, RimWorld, Valheim, Baldur's Gate 3, Elden Ring, Helldivers 2, Lethal Company, Rocket League, Street Fighter 6, Cities: Skylines, Civilization VI, Fortnite, Final Fantasy XIV, Forza Horizon 5; business models, ports and platforms, team scope, four clocks, early-access table | PC or console concepts; choosing a model; port and platform planning |
+| `references/web-and-crossplay.md` | 8 cases: Agar.io, Slither.io, Krunker, Cookie Clicker, A Dark Room, Universal Paperclips, GeoGuessr, Fall Guys; web-first launch playbook, native-platform triggers, crossplay and cross-progression decisions | Browser-first launches; adding native platforms; crossplay design |
 | `references/cross-game-patterns.md` | 59 pattern cards (P01–P59) in seven families (core loop and feel, run structure, meta and progression, economy and randomness, social, live-ops and time, identity and positioning), each with definition, mechanism, games, risks, ontology tags and apply/avoid; a pattern index with ethics risk ratings; stacks of patterns by game archetype; a conflicts and interactions table; a procedure for selecting patterns for a concept; and an ethics screen | When a design question spans genres, as a checklist after picking comparables, or to turn chosen patterns into contract entries |
 
 ## Master index of case studies

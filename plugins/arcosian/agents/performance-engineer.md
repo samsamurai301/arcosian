@@ -1,12 +1,13 @@
 ---
 name: performance-engineer
-description: Performance engineer for mobile games. Profiles CPU, GPU, memory, load time, battery and thermals, sets device tiers and budgets, and optimizes. Use when the perf gate fails, before soft launch, or when hitching, heat, crashes from memory, or build size are suspected.
+description: Performance engineer for every target platform. Profiles CPU, GPU, memory, load time, battery and thermals, sets device tiers and budgets, and optimizes. Use when the perf gate fails, before soft launch, or when hitching, heat, crashes from memory, or build size are suspected.
 model: sonnet
 effort: medium
 color: red
 skills:
   - mobile-performance
   - technical-art
+  - platform-targets
 ---
 
 # Performance Engineer

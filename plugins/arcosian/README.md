@@ -1,6 +1,6 @@
 # Arcosian (core plugin)
 
-The core of the Arcosian suite: a principal game developer persona, a game-dev codex, a shared ontology, 24 agents, 9 workflows, simulators and solvers, an asset and audio gateway, mobile project templates and enforcement hooks. Targets mobile games on Godot 4 and Unity 6; other engines are covered at the advice level by `engine-alternatives`.
+The core of the Arcosian suite: a principal game developer persona, a game-dev codex, a shared ontology, 24 agents, 9 workflows, simulators and solvers, an understanding layer (project map, change impact, what-if predictions, dashboard), an asset and audio gateway, project templates and enforcement hooks. Any genre on any platform the user picks: phones, PC, Steam Deck, web and consoles (guidance only). Templates and bridges for Godot 4 and Unity 6; other engines are covered at the advice level by `engine-alternatives`, and add-ons can add more (`extend`).
 
 Install: `/plugin marketplace add <path or repo>` then `/plugin install arcosian@arcosian`. Deeper docs are in `docs/`.
 
@@ -21,19 +21,22 @@ Everything is a skill; user-facing ones are slash commands of the form `/arcosia
 | `build-feature` | One feature through the five gates | build-feature |
 | `playtest` | Deterministic playthroughs, bots, persona playtests, visual QA | playtest-sweep |
 | `balance` | Economy and difficulty tuning with simulators | balance-pass |
-| `optimize` | Mobile performance pass against budgets | none |
+| `what-if` | Predict a tuning, economy or level change with bots and simulators against the contract's targets | none |
+| `optimize` | Performance pass against budgets on the target platforms | none |
 | `asset-production` | Visual assets via the gateway with style lock | asset-batch |
 | `audio-production` | Music, SFX, voice with loop and loudness QC | none |
 | `ship` | Compliance pre-flight, signed builds, metadata, internal tracks; never submits for review | release-candidate |
 | `operate` | Post-launch analytics, live-ops calendar, A/B tests, remote config, crash triage | none |
 | `postmortem` | Structured postmortem and knowledge capture | none |
+| `extend` | Scaffold and check an add-on: genre pack, engine adapter or tool connector | none |
 
-## Codex skills (38 on disk)
+## Codex skills (41 on disk)
 
 Loaded on demand by agents and by you. Groups:
 
 - Design: `game-ontology`, `design-theory`, `design-philosophies`, `mechanics-codex`, `genre-playbooks`, `game-case-studies`, `analogy-engine`, `player-psychology`, `progression-difficulty`, `level-design`, `procedural-generation`, `narrative-design`
 - Data and economy: `player-analytics`, `economy-design`, `monetization`, `liveops`, `market-intel`, `marketing-ua`
+- Platforms: `platform-targets` (input, platform UX, performance tiers, saves), `pc-web-release` (Steam, itch.io, web portals, signing, packaging), `console-pathway` (programmes, certification, ratings)
 - Craft: `mobile-ux`, `game-feel`, `art-direction`, `technical-art`, `audio-direction`, `ai-asset-pipeline`, `ai-audio-pipeline`
 - Engineering: `game-architecture`, `gameplay-programming`, `multiplayer-backend`, `mobile-performance`, `engine-godot`, `engine-unity`, `engine-alternatives`, `qa-testing`
 - Ship and govern: `store-release`, `production`, `legal-ethics`, `accessibility-localization`, `game-glossary`
@@ -69,7 +72,11 @@ Python scripts (stdlib only) in `scripts/`:
 
 | Script | Use |
 |---|---|
-| `gs.py` | Project-state CLI: `init`, `status`, `summary`, `validate`, `feature` (list, add, next, show, start, gate, pass, block), `evidence-dir`, `progress`, `budget`, `kb`; `--selftest` |
+| `gs.py` | Project-state CLI: `init`, `status`, `summary`, `validate`, `feature` (list, add, next, show, start, gate, pass, block), `evidence-dir`, `progress`, `budget`, `kb`, `map`, `impact`, `whatif`, `dashboard`; `--selftest` |
+| `project_map.py` | Project map (`.gamestudio/map/MAP.md` and `map.json`: scenes, scripts, classes, signals, autoloads, input actions, tuning keys, assets, tests) and change impact; incremental |
+| `whatif.py` | What-if predictions: current vs proposed on the same seeds through the Godot bots, `economy_sim.py` or `match3_sim.py`, with intervals and a verdict |
+| `dashboard.py` | One offline HTML page: features and gates, loops, economy, trends, what-if results, dependencies, assets, budget |
+| `addon.py` | Scaffold an add-on from `templates/addon/` and check it against the house rules |
 | `gslib.py` | Shared library for the CLI, hooks and tests |
 | `validate_json.py` | Schema validation against `scripts/schemas/` |
 | `economy_sim.py`, `progression_calc.py`, `gacha_calc.py` | Economy, progression curves, gacha odds and pity |
@@ -85,7 +92,7 @@ Run any script with `--help`; most support `--selftest` or a documented demo mod
 
 **Project state.** `gs.py init` creates `.gamestudio/` in the game project: `config.json`, `contract.json`, `features.json`, `progress.md`, `budget.json`, `assets/manifest.json`, and the directories `design/`, `art/`, `audio/`, `concepts/`, `research/`, `economy/`, `levels/`, `analytics/`, `evidence/<FEATURE-ID>/`, `playtests/`, `reports/` and `snapshots/`. The full table with contents and schemas is in `docs/ARCHITECTURE.md` section 2.
 
-**Templates.** `templates/godot-mobile`, `templates/unity-mobile`, `templates/ci` (GitHub Actions, fastlane, Codemagic), `templates/docs` (GDD one-pager, style bible, audio bible, playtest plan, soft-launch plan, postmortem, pitch outline, risk register, store listing, live-ops calendar, and more).
+**Templates.** `templates/godot-starter` and `templates/unity-starter` (sim-core + presentation; builds for Android, iOS, Windows, macOS, Linux and the web; touch, mouse, keyboard and gamepad input), `templates/ci` (GitHub Actions with desktop and web export jobs, fastlane, Codemagic), `templates/addon` (add-on skeleton), `templates/docs` (GDD one-pager, style bible, audio bible, playtest plan, soft-launch plan, postmortem, pitch outline, risk register, store listing, live-ops calendar, and more).
 
 **Hooks.** SessionStart (project summary), PreToolUse (release and secret guards, feature-list gate check), PostToolUse (edited-file check), Stop and SubagentStop (done features must pass gates), TaskCompleted, PreCompact (state snapshot). See `docs/ARCHITECTURE.md`.
 
@@ -105,7 +112,7 @@ Set in the plugin's user configuration (all optional, sensitive values are store
 
 ## Adapters
 
-`arcosian-godot`, `arcosian-unity`, `arcosian-blender`, `arcosian-vendors`, `arcosian-commerce`. Each depends on this plugin and adds MCP bridges plus one skill that says when to use them. The Godot and Unity adapters also give Claude Code a language server for their language: Godot's own GDScript server, and csharp-ls set up for Unity projects (errors after each edit, go to definition, references, symbols).
+`arcosian-godot`, `arcosian-unity`, `arcosian-blender`, `arcosian-vendors`, `arcosian-commerce`, `arcosian-art`, `arcosian-levels`, `arcosian-audio`, `arcosian-community`. Each depends on this plugin and adds one skill, plus MCP bridges or scripts where they help. Every registered MCP server is listed with its trust level in the repository's `docs/CONNECTORS.md`. The Godot and Unity adapters also give Claude Code a language server for their language: Godot's own GDScript server, and csharp-ls set up for Unity projects (errors after each edit, go to definition, references, symbols).
 
 ## Verify your install
 

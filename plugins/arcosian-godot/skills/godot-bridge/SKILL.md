@@ -1,6 +1,6 @@
 ---
 name: godot-bridge
-description: Guides use of the GDScript language server (diagnostics after edits, LSP go to definition, references, symbols) and the Godot MCP bridges (satelliteoflove/godot-mcp, tugcantopaloglu/godot-mcp) for runtime verification of a Godot 4 game, and how they plug into the five gates and the playtest runner. Use when asked to "find where this GDScript function is defined", "find all references", "check this script for errors", "GDScript language server not working", "verify in the running game", "step the game and check state", "simulate a touch", "validate GDScript headless", "which Godot MCP tool should I use", or "godot mcp not connecting".
+description: Uses the GDScript language server (diagnostics, go to definition, references) and the Godot MCP bridges to check and drive a running Godot 4 game, wired into the five gates and the playtest runner. Use when asked to "find where this function is defined", "check this script for errors", "verify in the running game", "simulate input" or "which Godot MCP tool should I use", or when the language server or MCP will not connect.
 ---
 
 # Godot bridge

@@ -59,10 +59,11 @@ Licence reminder: output rights differ by vendor and plan, and free tiers are of
 | Tool | Why | Config |
 |---|---|---|
 | Godot 4.x | Default engine | `arcosian-godot` userConfig `godot_bin` (path to the executable; pin to your project's version). The adapter's GDScript language server uses the same binary (or `GODOT_BIN`, PATH, `/Applications/Godot.app`) and needs Node 18+ |
-| Unity 6 and Unity Hub | Alternative engine | The template pins Unity 6.3 LTS (6000.3.26f1). `arcosian-unity` expects the `unity` CLI on PATH; CI builds need a Unity licence, but the core tests also run licence-free on the .NET SDK (`templates/unity-mobile/tools/dotnet-harness/`) |
+| Unity 6 and Unity Hub | Alternative engine | The template pins Unity 6.3 LTS (6000.3.26f1). `arcosian-unity` expects the `unity` CLI on PATH; CI builds need a Unity licence, but the core tests also run licence-free on the .NET SDK (`templates/unity-starter/tools/dotnet-harness/`) |
 | .NET 10 SDK and csharp-ls | C# language server for Unity projects | `dotnet tool install --global csharp-ls` (tested 0.28.0). Covers `Game.Core` without Unity; every script once Unity has written its project files (see the `arcosian-unity` README) |
 | Xcode | iOS export and signing | macOS only |
 | Android SDK, JDK | Android export | Install through Android Studio or `sdkmanager` (you accept Google's SDK licence yourself). For Godot 4.7.2: JDK 17, platform 36, build-tools 36.1.0, NDK 29.0.14206865 (verified with a real signed AAB export, 2026-10-21). The Godot CI uses `--install-android-build-template` because the preset builds with Gradle |
+| Godot export templates | Desktop and web builds of the Godot template, `gs.py whatif` with the Godot bots | Editor > Manage Export Templates for your exact version (or unzip the official `.tpz` into the editor's `export_templates/<version>.stable/`). `gs.py whatif` and `sprite_sheet.py --verify` find Godot through `GODOT_BIN`, then PATH, then `/Applications/Godot.app` |
 | Node, Python 3 | Gateway and scripts | Python stdlib only; no pip installs |
 
 ### Windows

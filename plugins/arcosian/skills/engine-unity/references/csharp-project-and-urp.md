@@ -41,7 +41,7 @@ Packages/manifest.json
 ProjectSettings/
 ```
 
-`${CLAUDE_PLUGIN_ROOT}/templates/unity-mobile/` implements this layout with a flat `Core/` (`Sim.cs`, `GameState.cs`, `Rng.cs`, `Tuning.cs`, `SaveData.cs`, `Playthrough.cs`), `Presentation/` (`Bootstrap.cs`, `BoardView.cs`, `SwipeInput.cs`, `ScreenShake.cs`, `Services/`), `Editor/`, `Tests/EditMode`, `Tests/Playthroughs` and `Data/tuning.json`. The `Rules/ State/ Rng/ Save/ Tuning/` sub-folders above are an optional split for larger games, and `PlayMode/`, `Art/`, `Audio/`, `Prefabs/` and `Addressable/` are not created until you need them.
+`${CLAUDE_PLUGIN_ROOT}/templates/unity-starter/` implements this layout with a flat `Core/` (`Sim.cs`, `GameState.cs`, `Rng.cs`, `Tuning.cs`, `SaveData.cs`, `Playthrough.cs`), `Presentation/` (`Bootstrap.cs`, `BoardView.cs`, `SwipeInput.cs`, `ScreenShake.cs`, `Services/`), `Editor/`, `Tests/EditMode`, `Tests/Playthroughs` and `Data/tuning.json`. The `Rules/ State/ Rng/ Save/ Tuning/` sub-folders above are an optional split for larger games, and `PlayMode/`, `Art/`, `Audio/`, `Prefabs/` and `Addressable/` are not created until you need them.
 
 Rules:
 - Group by layer first, feature second inside the layer. Keep the number of top-level folders small.

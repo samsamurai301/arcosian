@@ -280,7 +280,7 @@ If refuted: <what we will do>.
 
 | Mechanism | Where | What it enforces |
 |---|---|---|
-| Engine templates and CI | `templates/godot-mobile/`, `templates/unity-mobile/`, `templates/ci/` (GitHub Actions, fastlane, Codemagic) | Standard engine projects and reproducible native builds |
+| Engine templates and CI | `templates/godot-starter/`, `templates/unity-starter/`, `templates/ci/` (GitHub Actions, fastlane, Codemagic) | Standard engine projects and reproducible native builds |
 | Provenance | `assets/manifest.json` (`provider`, `model`, `prompt`, `seed`, `licence` {`terms`, `plan_tier`, `commercial_ok`, `attribution`, `restrictions`}, `sha256`, `approved_by`) | Every generated or imported asset is traceable |
 | Licence checks | Gateway `licence_check`; `config.licence_allowlist`; `config.revenue` thresholds | Flags non-commercial terms, free-tier ownership problems and revenue-threshold licences |
 | Untracked assets | `post_tool_check.py` reminder for new binary assets not in the manifest | Nothing slips in unrecorded |

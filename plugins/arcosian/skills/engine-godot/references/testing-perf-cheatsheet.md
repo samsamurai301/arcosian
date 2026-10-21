@@ -1,6 +1,6 @@
 # Godot Testing, Verification, Performance and API Recipes
 
-Summary: how an agent proves a Godot change works without a human. It covers the gates shipped in `templates/godot-mobile/` (static check, unit runner, scripted playthrough, bots, screenshots, perf probe), adding GdUnit4 for richer tests, deterministic stepping and movie capture, community MCP bridges for runtime inspection, a mobile performance model with measurement procedure and optimization table, and short API recipes for the things that are most often written wrongly.
+Summary: how an agent proves a Godot change works without a human. It covers the gates shipped in `templates/godot-starter/` (static check, unit runner, scripted playthrough, bots, screenshots, perf probe), adding GdUnit4 for richer tests, deterministic stepping and movie capture, community MCP bridges for runtime inspection, a mobile performance model with measurement procedure and optimization table, and short API recipes for the things that are most often written wrongly.
 
 ## Contents
 1. The verification ladder
@@ -35,7 +35,7 @@ An agent that stops at "no parse errors" has verified almost nothing. At minimum
 
 ## 2. Template gates in detail
 
-From `templates/godot-mobile/README.md` (exact commands; `<abs>` is an absolute path):
+From `templates/godot-starter/README.md` (exact commands; `<abs>` is an absolute path):
 
 ```
 godot --headless --path <project> --import     # once per fresh checkout (editor binary only; exits 0 when done)

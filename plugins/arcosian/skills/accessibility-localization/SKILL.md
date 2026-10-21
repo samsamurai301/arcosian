@@ -1,6 +1,6 @@
 ---
 name: accessibility-localization
-description: Accessibility and localization knowledge for mobile games - Game Accessibility Guidelines, colour-blind, motor, cognitive, hearing and photosensitivity design, Godot and Unity recipes, i18n architecture, ICU plurals, CJK and RTL fonts, text expansion, LQA, machine translation with review, market languages. Use when asked "make it accessible", "colour-blind mode", "add languages", "localize the game" or "RTL support".
+description: Accessibility and localization knowledge for games on any platform - Game Accessibility Guidelines, colour-blind, motor, cognitive, hearing and photosensitivity design, Godot and Unity recipes, i18n architecture, ICU plurals, CJK and RTL fonts, text expansion, LQA, machine translation with review, market languages. Use when asked "make it accessible", "colour-blind mode", "add languages", "localize the game" or "RTL support".
 ---
 
 # Accessibility and Localization

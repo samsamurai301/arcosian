@@ -1,6 +1,6 @@
 ---
 name: playtest
-description: Runs and interprets playtests for a mobile game build - deterministic scripted playthroughs, bot runs, persona playtests through the player-simulator agent, visual QA, and human TestFlight/internal rounds - and writes playtest reports. Use when the user says "playtest this", "does the FTUE work", "find softlocks", "run the bots", "simulate a casual player", or "QA this build".
+description: Runs and interprets playtests for a game build - deterministic scripted playthroughs, bot runs, persona playtests through the player-simulator agent, visual QA, and human TestFlight/internal rounds - and writes playtest reports. Use when the user says "playtest this", "does the FTUE work", "find softlocks", "run the bots", "simulate a casual player", or "QA this build".
 argument-hint: "[feature id | build | persona names]"
 ---
 

@@ -1,0 +1,29 @@
+{
+  "format": "arcosian-connectors/1",
+  "trust_levels": {
+    "first-party": "Written and tested in this repository.",
+    "official": "Published by the tool's own vendor; URL or package taken from the vendor's documentation.",
+    "community": "Third-party bridge, pinned to an exact version, documented and opt-in. Check its maintenance before depending on it."
+  },
+  "connectors": [
+    {"plugin": "arcosian", "server": "studio-gateway", "transport": "stdio", "source": "node ${CLAUDE_PLUGIN_ROOT}/mcp/studio-gateway/server.mjs", "vendor": "Arcosian", "trust": "first-party", "auth": "optional API keys in plugin options; mock assets without keys", "verified": "2026-10-21"},
+    {"plugin": "arcosian-art", "server": "figma", "transport": "http", "source": "https://mcp.figma.com/mcp", "vendor": "Figma", "trust": "official", "auth": "OAuth through /mcp", "verified": "2026-10-21"},
+    {"plugin": "arcosian-blender", "server": "blender", "transport": "stdio", "source": "uvx blender-mcp==2.0.0", "vendor": "ahujasid/blender-mcp (MIT)", "trust": "community", "auth": "none; talks to a local Blender add-on", "verified": "2026-10-21"},
+    {"plugin": "arcosian-commerce", "server": "revenuecat", "transport": "http", "source": "https://mcp.revenuecat.ai/mcp", "vendor": "RevenueCat", "trust": "official", "auth": "OAuth through /mcp", "verified": "2026-10-21"},
+    {"plugin": "arcosian-commerce", "server": "firebase", "transport": "stdio", "source": "npx -y firebase-tools@15.34.0 mcp", "vendor": "Google (Firebase CLI)", "trust": "official", "auth": "Firebase CLI login or Application Default Credentials", "verified": "2026-10-21"},
+    {"plugin": "arcosian-commerce", "server": "adjust", "transport": "http", "source": "https://mcp.adjust.com/mcpo", "vendor": "Adjust", "trust": "official", "auth": "sign in through /mcp", "verified": "2026-10-21"},
+    {"plugin": "arcosian-community", "server": "github", "transport": "http", "source": "https://api.githubcopilot.com/mcp/readonly", "vendor": "GitHub", "trust": "official", "auth": "personal access token in the sensitive github_token option; read-only endpoint", "verified": "2026-10-21"},
+    {"plugin": "arcosian-community", "server": "sentry", "transport": "http", "source": "https://mcp.sentry.dev/mcp", "vendor": "Sentry", "trust": "official", "auth": "OAuth through /mcp", "verified": "2026-10-21"},
+    {"plugin": "arcosian-godot", "server": "godot-satelliteoflove", "transport": "stdio", "source": "npx -y @satelliteoflove/godot-mcp@4.1.11", "vendor": "satelliteoflove/godot-mcp", "trust": "community", "auth": "none; talks to a local Godot editor add-on", "verified": "2026-10-21"},
+    {"plugin": "arcosian-unity", "server": "unity-cli", "transport": "stdio", "source": "unity mcp", "vendor": "Unity (official Unity CLI, installed separately)", "trust": "official", "auth": "Unity account sign-in in the CLI", "verified": "2026-10-21"},
+    {"plugin": "arcosian-vendors", "server": "pixellab", "transport": "http", "source": "https://api.pixellab.ai/mcp", "vendor": "PixelLab", "trust": "official", "auth": "bearer token in the sensitive pixellab_api_key option", "verified": "2026-10-21"},
+    {"plugin": "arcosian-vendors", "server": "meshy", "transport": "stdio", "source": "npx -y @meshy-ai/meshy-mcp-server@0.6.4", "vendor": "Meshy", "trust": "official", "auth": "API key in the sensitive meshy_api_key option", "verified": "2026-10-21"},
+    {"plugin": "arcosian-vendors", "server": "elevenlabs", "transport": "http", "source": "https://api.elevenlabs.io/v1/mcp", "vendor": "ElevenLabs", "trust": "official", "auth": "OAuth through /mcp", "verified": "2026-10-21"},
+    {"plugin": "arcosian-vendors", "server": "scenario", "transport": "http", "source": "https://mcp.scenario.com/mcp", "vendor": "Scenario", "trust": "official", "auth": "OAuth through /mcp", "verified": "2026-10-21"}
+  ],
+  "documented_only": [
+    {"plugin": "arcosian-community", "server": "sentry (stdio)", "source": "npx -y @sentry/mcp-server@0.42.0", "why": "Sentry calls the stdio server a work in progress; the hosted server is registered instead."},
+    {"plugin": "arcosian-godot", "server": "tugcantopaloglu/godot-mcp", "source": "see the godot-bridge skill", "why": "An alternative bridge; documented, not registered."},
+    {"plugin": "arcosian-unity", "server": "CoplayDev/unity-mcp", "source": "see the unity-bridge skill", "why": "Community Unity bridge; documented, not registered."}
+  ]
+}

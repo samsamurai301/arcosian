@@ -1,6 +1,6 @@
 {
   "name": "arcosian-vendors",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Vendor MCP adapter for arcosian: PixelLab, Meshy, ElevenLabs hosted MCP, plus Scenario and ComfyUI notes, with a skill on when to use a vendor MCP versus the core studio-gateway and how to keep provenance and budgets intact.",
   "author": {
     "name": "samsamurai301",

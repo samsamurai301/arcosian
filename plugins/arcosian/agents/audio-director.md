@@ -1,6 +1,6 @@
 ---
 name: audio-director
-description: Senior audio director for the audio bible and music, SFX and voice direction and implementation. Use for audio identity, interactive music design, SFX lists and mix rules, voice casting direction, loop and loudness QC, AI audio generation through the gateway, and audio performance on mobile.
+description: Senior audio director for the audio bible and music, SFX and voice direction and implementation. Use for audio identity, interactive music design, SFX lists and mix rules, voice casting direction, loop and loudness QC, AI audio generation through the gateway, and audio performance on the target platforms.
 model: sonnet
 effort: medium
 color: purple

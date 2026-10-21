@@ -26,7 +26,7 @@ One feature, five gates, evidence on disk. A feature is done when `gs.py feature
    python3 ${CLAUDE_PLUGIN_ROOT}/scripts/gs.py feature start F012
    python3 ${CLAUDE_PLUGIN_ROOT}/scripts/gs.py evidence-dir F012        # prints the absolute evidence dir; call it EV
    ```
-   Read `.gamestudio/config.json` (engine, paths), the feature entry, and the contract sections it touches (`mechanics`, `loops`, `ux`, `technical.perf_budgets`).
+   Read `.gamestudio/config.json` (engine, paths, platforms, input), the feature entry, and the contract sections it touches (`mechanics`, `loops`, `ux`, `technical.perf_budgets`). Read `.gamestudio/map/MAP.md` to find the files involved (`gs.py map` refreshes it); record the feature's files with `gs.py feature add --path <glob>` when you create follow-ups.
 2. **Write the feature contract (before code).** Three short blocks in the progress note or a scratch file: *Behavior* (rules, parameters by contract key, never hardcoded numbers), *Acceptance criteria* (each testable and mapped to a gate: rule -> unit, flow -> playthrough, look -> visual, cost -> perf), *Out of scope*. If an acceptance string is vague ("feels good"), rewrite it as a measurable check and update features.json via the producer, not silently.
 3. **Delegate to the engine specialist.** Engine from config: `arcosian:godot-engineer` or `arcosian:unity-engineer`; others route to `arcosian:gameplay-engineer`. Hand over the feature contract, the file boundaries, and the gate commands below. Architecture questions go to `arcosian:lead-engineer`. Load `game-architecture` and `gameplay-programming` if you implement inline.
 4. **Sim-core first, with unit tests.** Implement rules in the engine-free core (no nodes, no `UnityEngine`), driven by a seeded RNG and explicit inputs, returning state. Write unit tests that cover each rule and edge case in the acceptance list before wiring presentation. Presentation only reads state and sends intents.
@@ -62,6 +62,14 @@ One feature, five gates, evidence on disk. A feature is done when `gs.py feature
    Exit 0 -> `gate F012 perf pass --evidence .../perf.json`. Exit 1 -> fix or run `optimize`. Use `n/a` plus a note only for features that cannot affect runtime (pure data).
 10. **Pass.** `gs.py feature pass F012`. It refuses unless every gate is `pass` or `n/a` (with a note) and every evidence path exists. Never edit features.json by hand to get around it.
 11. **Progress note.** `gs.py progress "F012 done: <what changed>, <decisions>, <follow-ups>"`. Add follow-up features via `gs.py feature add`.
+
+## Re-running gates after a change
+
+When code, scenes, assets or tuning change after features have passed, find what the change touches:
+```
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/gs.py impact <changed files, classes or tuning keys>
+```
+It lists dependent scenes, scripts and tests, the done features whose `paths` cover them, and the gates to run again with a reason for each. Re-run every gate it names for every listed feature. A gate it does not name may be skipped for that re-check only, never for a new feature. A tuning or economy change gets a prediction first (`/arcosian:what-if`). A project-settings change re-runs all five gates.
 
 ## Regenerate vs patch
 

@@ -37,7 +37,7 @@ jobs:
       - name: Python self-tests
         run: |
           root="$(pwd)"; cd "$RUNNER_TEMP"; fail=0
-          for f in "$root"/plugins/arcosian/scripts/*.py "$root"/plugins/arcosian/skills/*/scripts/*.py; do
+          for f in "$root"/plugins/*/scripts/*.py "$root"/plugins/*/skills/*/scripts/*.py "$root"/tools/*.py; do
             if ! out=$(python "$f" --selftest 2>&1); then echo "FAIL ${f#$root/}"; echo "$out" | tail -20; fail=1; fi
           done
           exit $fail
@@ -68,8 +68,16 @@ jobs:
           print("\n".join(bad) or "all JSON parses"); sys.exit(1 if bad else 0)
           PY
 
-      - name: Plugin audit
-        run: python plugins/arcosian/scripts/audit_plugin.py --root plugins/arcosian
+      - name: Plugin audit and always-on budget
+        # Skill and agent descriptions load into every session; the cap keeps the suite cheap to have installed.
+        run: python plugins/arcosian/scripts/audit_plugin.py --root plugins/arcosian --max-description-chars 34000
+
+      - name: Adapter checks (house rules for add-ons)
+        run: |
+          for d in plugins/arcosian-*/; do python plugins/arcosian/scripts/addon.py check "$d" || exit 1; done
+
+      - name: Connector catalog
+        run: python tools/check_connectors.py
 
       - name: Hook launcher with the runner's Python
         run: |
@@ -154,7 +162,7 @@ jobs:
       - name: GDScript language server self-test
         run: |
           ws="$(pwd)"; proj="$RUNNER_TEMP/godot proj"
-          cp -R plugins/arcosian/templates/godot-mobile "$proj"; cd "$proj"
+          cp -R plugins/arcosian/templates/godot-starter "$proj"; cd "$proj"
           GS_GODOT_BIN="$RUNNER_TEMP/godot/${{ matrix.godot_bin }}" node "$ws/plugins/arcosian-godot/lsp/lsp-selftest.mjs" \
             --file core/sim.gd --also presentation/game.gd --definition GameState --timeout 300 \
             -- node "$ws/plugins/arcosian-godot/lsp/gdscript-bridge.mjs"
@@ -162,7 +170,7 @@ jobs:
       - name: C# language server self-test (engine-free mode)
         run: |
           ws="$(pwd)"; proj="$RUNNER_TEMP/unity proj"
-          cp -R plugins/arcosian/templates/unity-mobile "$proj"; cd "$proj"
+          cp -R plugins/arcosian/templates/unity-starter "$proj"; cd "$proj"
           node "$ws/plugins/arcosian-unity/lsp/lsp-selftest.mjs" \
             --file Assets/_Game/Core/Sim.cs --also Assets/_Game/Presentation/BoardView.cs --definition GameState --timeout 300 \
             -- node "$ws/plugins/arcosian-unity/lsp/unity-csharp-lsp.mjs"
@@ -171,3 +179,108 @@ jobs:
         run: |
           bin="$RUNNER_TEMP/godot/${{ matrix.godot_bin }}"; [ "$RUNNER_OS" = Windows ] && bin="$(cygpath -m "$bin")"
           GODOT_BIN="$bin" python plugins/arcosian/hooks/tests/test_hooks.py
+
+  godot-template:
+    # The Godot template's gates plus real Windows, macOS, Linux and Web exports with the official 4.7.2 editor and
+    # export templates (both checked against Godot's published SHA-512 sums).
+    name: godot template and exports
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Download Godot 4.7.2 and its export templates, verify checksums
+        run: |
+          cd "$RUNNER_TEMP"
+          base=https://github.com/godotengine/godot/releases/download/4.7.2-stable
+          for f in Godot_v4.7.2-stable_linux.x86_64.zip Godot_v4.7.2-stable_export_templates.tpz SHA512-SUMS.txt; do
+            curl -fsSLO "$base/$f"
+          done
+          python - <<'PY'
+          import hashlib, os, zipfile
+          sums = {l.split()[-1].lstrip("*"): l.split()[0] for l in open("SHA512-SUMS.txt", encoding="utf-8") if l.split()}
+          for name in ("Godot_v4.7.2-stable_linux.x86_64.zip", "Godot_v4.7.2-stable_export_templates.tpz"):
+              h = hashlib.sha512()
+              with open(name, "rb") as fh:
+                  for chunk in iter(lambda: fh.read(1 << 20), b""):
+                      h.update(chunk)
+              if h.hexdigest() != sums[name]:
+                  raise SystemExit("checksum mismatch for " + name)
+          zipfile.ZipFile("Godot_v4.7.2-stable_linux.x86_64.zip").extractall("godot")
+          dest = os.path.expanduser("~/.local/share/godot/export_templates/4.7.2.stable")
+          os.makedirs(dest, exist_ok=True)
+          wanted = {"version.txt", "linux_release.x86_64", "windows_release_x86_64.exe", "macos.zip", "web_nothreads_release.zip"}
+          with zipfile.ZipFile("Godot_v4.7.2-stable_export_templates.tpz") as z:
+              for m in z.namelist():
+                  if m.rsplit("/", 1)[-1] in wanted:
+                      with z.open(m) as src, open(os.path.join(dest, m.rsplit("/", 1)[-1]), "wb") as out:
+                          out.write(src.read())
+          print("checksums ok; editor and export templates installed")
+          PY
+          chmod +x godot/*
+          echo "GODOT=$RUNNER_TEMP/godot/Godot_v4.7.2-stable_linux.x86_64" >> "$GITHUB_ENV"
+
+      - name: Template gates (static, unit, scripted playthrough, bots)
+        run: |
+          proj="$RUNNER_TEMP/proj"; cp -R plugins/arcosian/templates/godot-starter "$proj"; cd "$proj"
+          "$GODOT" --headless --path . --import || true
+          "$GODOT" --headless --path . -s res://tools/ci/check_all.gd -- --out="$RUNNER_TEMP/static.log"
+          "$GODOT" --headless --path . -s res://tools/ci/run_tests.gd -- --out="$RUNNER_TEMP/unit.xml"
+          "$GODOT" --headless --path . -s res://tools/playtest/runner.gd -- --mode=script \
+            --script=res://tests/playthroughs/smoke.json --out="$RUNNER_TEMP/playthrough.json"
+          "$GODOT" --headless --path . -s res://tools/playtest/runner.gd -- --mode=bot --bot=greedy --runs=100 --seed=1 \
+            --out="$RUNNER_TEMP/bots.json"
+
+      - name: Export Windows, macOS, Linux and Web
+        run: |
+          cd "$RUNNER_TEMP/proj"; mkdir -p out/windows out/macos out/linux out/web
+          "$GODOT" --headless --path . --export-release "Windows Desktop" "$PWD/out/windows/MergeFive.exe"
+          "$GODOT" --headless --path . --export-release "macOS" "$PWD/out/macos/MergeFive.zip"
+          "$GODOT" --headless --path . --export-release "Linux" "$PWD/out/linux/MergeFive.x86_64"
+          "$GODOT" --headless --path . --export-release "Web" "$PWD/out/web/index.html"
+          for f in out/windows/MergeFive.exe out/windows/MergeFive.pck out/macos/MergeFive.zip out/linux/MergeFive.x86_64 \
+                   out/linux/MergeFive.pck out/web/index.html out/web/index.wasm out/web/index.pck; do
+            test -s "$f" || { echo "missing export output: $f"; exit 1; }
+          done
+          out/linux/MergeFive.x86_64 --headless -- --smoke
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: godot-desktop-builds
+          path: |
+            ${{ runner.temp }}/proj/out/windows
+            ${{ runner.temp }}/proj/out/macos
+            ${{ runner.temp }}/proj/out/linux
+          retention-days: 3
+
+  desktop-smoke:
+    # Launch each exported desktop build on its own OS. --smoke loads the menu and game scenes, plays one move, exits 0.
+    name: desktop build smoke (${{ matrix.os }})
+    needs: godot-template
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: godot-desktop-builds
+          path: out
+      - name: Launch the exported build
+        run: |
+          case "$RUNNER_OS" in
+            Linux) exe=out/linux/MergeFive.x86_64; chmod +x "$exe" ;;
+            Windows) exe=out/windows/MergeFive.exe ;;
+            macOS) (cd out/macos && unzip -q MergeFive.zip); app=$(ls -d out/macos/*.app | head -1)
+                   exe="$app/Contents/MacOS/$(ls "$app/Contents/MacOS" | head -1)" ;;
+          esac
+          "$exe" --headless -- --smoke

@@ -1,6 +1,6 @@
 # Data, persistence and code quality
 
-How to store, version, sync and configure game data without corrupting players' progress, and how to keep a mobile codebase testable and fast: versioned saves with migration chains, cloud save conflict policy, remote config layering, localisation tables, module boundaries, a testing strategy that matches the sim-core split, allocation-aware coding, and a review checklist. It assumes the `sim-core + presentation` structure from `references/sim-core-presentation.md` and reuses the save approach of `templates/godot-mobile` (`core/save_data.gd`, `services/save_service.gd`).
+How to store, version, sync and configure game data without corrupting players' progress, and how to keep a mobile codebase testable and fast: versioned saves with migration chains, cloud save conflict policy, remote config layering, localisation tables, module boundaries, a testing strategy that matches the sim-core split, allocation-aware coding, and a review checklist. It assumes the `sim-core + presentation` structure from `references/sim-core-presentation.md` and reuses the save approach of `templates/godot-starter` (`core/save_data.gd`, `services/save_service.gd`).
 
 ## Contents
 

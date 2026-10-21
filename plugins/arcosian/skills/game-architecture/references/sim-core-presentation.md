@@ -1,6 +1,6 @@
 # Sim-core + presentation: the studio core abstraction
 
-This is the one architectural idea the whole studio standardises on: game rules live in a deterministic, engine-free simulation core that accepts actions and returns events; everything visible, audible or platform-specific lives outside it and only reads state, sends actions and animates events. It is what makes headless tests, scripted playthroughs, bots, replays, balance sims and save/restore cheap, and it is what lets the same design move between Godot and Unity. This file defines the contract, maps it onto the two reference templates (`templates/godot-mobile` and `templates/unity-mobile`, which implement the same sample game with the same event vocabulary and the same PCG32 stream), gives worked sketches in GDScript and C# that quote the real file and member names, and ends with a migration recipe and review checklist.
+This is the one architectural idea the whole studio standardises on: game rules live in a deterministic, engine-free simulation core that accepts actions and returns events; everything visible, audible or platform-specific lives outside it and only reads state, sends actions and animates events. It is what makes headless tests, scripted playthroughs, bots, replays, balance sims and save/restore cheap, and it is what lets the same design move between Godot and Unity. This file defines the contract, maps it onto the two reference templates (`templates/godot-starter` and `templates/unity-starter`, which implement the same sample game with the same event vocabulary and the same PCG32 stream), gives worked sketches in GDScript and C# that quote the real file and member names, and ends with a migration recipe and review checklist.
 
 ## Contents
 
@@ -61,7 +61,7 @@ Invariants worth writing tests for:
 
 The fourth invariant is the one teams skip and regret: if the view needs to peek into state to know what happened, the event vocabulary is too thin.
 
-## 3. Godot mapping (templates/godot-mobile)
+## 3. Godot mapping (templates/godot-starter)
 
 The sample game is a deterministic 5x5 merge puzzle. Names below are real files in the template.
 
@@ -109,7 +109,7 @@ Rules the template follows that you should keep: core scripts `extends RefCounte
 
 Adding a mechanic to the template, in order: write the rule as a static pure function; write a unit test with `set_grid`-style helpers; add the action and events to `apply`; extend `lookup` paths so playthroughs can assert; extend `board_view.play` for the new events; add a playthrough step. Never start in the view.
 
-## 4. Unity mapping (templates/unity-mobile)
+## 4. Unity mapping (templates/unity-starter)
 
 The Unity template mirrors the same split with assemblies instead of folders (BLUEPRINT section 6 and 13). The files below are real; the C# block that follows is abridged from `Assets/_Game/Core/Sim.cs`, `GameState.cs` and `Rng.cs` and keeps their member names and signatures. Status (see the template README): the Core and EditMode tests compile and pass on the plain .NET SDK through `tools/dotnet-harness`, while the Presentation and Editor code was written without Unity installed and still needs a first open in Unity 6.
 
@@ -286,7 +286,7 @@ Because core is engine-free, these run in milliseconds without a renderer (comma
 | Balance sims | core run thousands of times | feed `economy_sim.py` assumptions or direct distributions |
 | Replay verification | action log + seed | pass/fail on divergence |
 
-Playthrough format (shared by both engines): `{"schema_version":"1.0","seed":1,"steps":[{"action":{"type":"move","dir":"left"},"expect":{"status":"playing","moves":{"op":">=","value":0}}}]}`. To make a new game testable you implement `lookup(path)` on the state and a legality query (`legal_actions()`, or per-action `slide_grid`-style checks as in the sample); nothing else. The Unity commands are in `templates/unity-mobile/README.md`: `Game.EditorTools.PlaytestRunner.Run` with `-gsMode script -gsScript Assets/_Game/Tests/Playthroughs/smoke.json -gsOut <abs>/playthrough.json`, or `-gsMode bot -gsBot greedy -gsRuns 200 -gsSeed 1`.
+Playthrough format (shared by both engines): `{"schema_version":"1.0","seed":1,"steps":[{"action":{"type":"move","dir":"left"},"expect":{"status":"playing","moves":{"op":">=","value":0}}}]}`. To make a new game testable you implement `lookup(path)` on the state and a legality query (`legal_actions()`, or per-action `slide_grid`-style checks as in the sample); nothing else. The Unity commands are in `templates/unity-starter/README.md`: `Game.EditorTools.PlaytestRunner.Run` with `-gsMode script -gsScript Assets/_Game/Tests/Playthroughs/smoke.json -gsOut <abs>/playthrough.json`, or `-gsMode bot -gsBot greedy -gsRuns 200 -gsSeed 1`.
 
 Bot time metrics in the template are estimates (a fixed per-move cost, 0.8 s per accepted move), not measurements; do not quote them as perf data. Measured frame cost comes from the Godot template's separate perf probe (`tools/perf/perf_probe.gd`, which drives the real scene rather than `core/` alone and writes a perf-report JSON); the Unity template has no equivalent.
 

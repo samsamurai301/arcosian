@@ -1,6 +1,6 @@
 ---
 name: commerce-mcps
-description: Operates monetization and store services through MCP: RevenueCat for products, entitlements and offerings, Firebase for Remote Config and Crashlytics, Adjust for attribution, and community App Store Connect and Google Play MCPs for metadata and TestFlight, with a hard rule against submitting for review or changing prices without explicit human approval. Use when asked to "set up IAP products", "check crashes", "change a remote config value", "look at attribution", "upload to TestFlight", "update store metadata" or "which commerce MCP should I use".
+description: Operates store and monetisation services through MCP: RevenueCat products and offerings, Firebase Remote Config and Crashlytics, Adjust attribution, and store metadata and TestFlight tools, never submitting for review or changing prices without human approval. Use when asked to "set up IAP products", "check crashes", "change a remote config value", "look at attribution", "upload to TestFlight" or "update store metadata".
 ---
 
 # Commerce MCPs

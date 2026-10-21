@@ -1,6 +1,6 @@
 ---
 name: ai-asset-pipeline
-description: AI visual asset pipeline for mobile games - 2D and 3D model landscape and licences, style lock and prompt templates, tournament selection, background removal, upscaling, palette and sprite-sheet post chains, 3D cleanup, manifest provenance, disclosure, and studio-gateway usage with budgets. Use when generating sprites, icons, key art or 3D props with AI, keeping a style consistent, choosing a provider, or preparing provenance and AI disclosure.
+description: AI visual asset pipeline for games - 2D and 3D model landscape and licences, style lock and prompt templates, tournament selection, background removal, upscaling, palette and sprite-sheet post chains, 3D cleanup, manifest provenance, disclosure, and studio-gateway usage with budgets. Use when generating sprites, icons, key art or 3D props with AI, keeping a style consistent, choosing a provider, or preparing provenance and AI disclosure.
 ---
 
 # AI Asset Pipeline

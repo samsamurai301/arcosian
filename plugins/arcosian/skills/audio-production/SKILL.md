@@ -1,6 +1,6 @@
 ---
 name: audio-production
-description: Runs the music, SFX and voice pipeline for a mobile game - audio bible, cue list, generation via studio-gateway audio tools, audio_post.py normalize/loop/convert/qc, engine implementation with buses and adaptive music, QC and licence revenue thresholds. Use when the user says "make the music", "add sound effects", "generate voice lines", "loop this track", "check loudness" or "audio pass".
+description: Runs the music, SFX and voice pipeline for a game - audio bible, cue list, generation via studio-gateway audio tools, audio_post.py normalize/loop/convert/qc, engine implementation with buses and adaptive music, QC and licence revenue thresholds. Use when the user says "make the music", "add sound effects", "generate voice lines", "loop this track", "check loudness" or "audio pass".
 ---
 
 # Audio Production

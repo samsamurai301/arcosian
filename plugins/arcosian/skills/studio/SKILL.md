@@ -98,9 +98,9 @@ Gates for every feature (`gs.py feature gate`): static, unit, playthrough, visua
 1. Confirm engine and version from `project.godot` (`config/features`) or `ProjectSettings/ProjectVersion.txt`. Note platforms from export presets or build settings.
 2. Initialise state without touching game files:
    ```
-   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/gs.py init --title "<Name>" --engine godot|unity|other --genre "<genre>" --root .
+   python3 ${CLAUDE_PLUGIN_ROOT}/scripts/gs.py init --title "<Name>" --engine godot|unity|other --genre "<genre>" --platforms <list> --root .
    ```
-3. Inventory: scenes/scripts/assets counts, tests present or absent, CI present or absent, and what runs headless. Do not refactor yet.
+3. Inventory: `gs.py map`, then read `.gamestudio/map/MAP.md` (scenes, scripts, classes, autoloads, tuning keys, tests, assets, most depended-on files). Note tests present or absent, CI present or absent, and what runs headless. Do not refactor yet.
 4. Deconstruct the project into a contract: read the code and scenes, then write `.gamestudio/contract.json` describing what the game is today (verbs, mechanics, loops, economy, FTUE), flagging unknowns as `risks`. Validate: `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/gs.py validate --all`. Use `arcosian:game-designer` for the contract and `arcosian:lead-engineer` for the technical section.
 5. Seed `features.json` with what exists: each shipped capability as a feature with `status: done`, `passes: false` until gates are run. Add the missing items as `todo`.
 6. Run the gates once (see `build-feature`) to get a baseline; record failures as features, not as vague notes.
@@ -113,6 +113,7 @@ Humans sign off on taste, fun and store submission. At each checkpoint:
 1. Stop and present: what was built, evidence paths (screenshots, playthrough report, perf report), and the one question to answer.
 2. Offer a default and a reason ("approve the neon-flat style; the alternative costs two more asset rounds").
 3. Record the answer: `gs.py progress "checkpoint <name>: approved/rejected, <why>"`.
+   For a whole-project view, write the dashboard (`gs.py dashboard`) and point the human at `.gamestudio/reports/dashboard.html`: features and gates, loops, economy, trends, what-if results, dependencies, assets and budget on one offline page.
 4. Never infer approval from silence. Never batch two checkpoints into one question.
 
 | Checkpoint | Evidence to show | Question |

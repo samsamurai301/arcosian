@@ -2,6 +2,54 @@
 
 Versions before 0.3.0 were internal builds under the working name `game-studio`; their entries keep the names those builds had.
 
+## 0.4.0 (2026-10-21): any game, any platform, and an understanding layer
+
+Core, `arcosian-godot`, `arcosian-unity`, `arcosian-vendors` and `arcosian-commerce` are at 0.4.0; four new adapters start at 0.4.0; `arcosian-blender` is unchanged at 0.3.1.
+
+### Any game, any platform
+- Platforms, input and orientation are the user's choice. `gs.py init` now requires `--platforms` (any of ios, android, windows, macos, linux, web, switch, playstation, xbox, other), takes `--input` (touch, mouse_keyboard, gamepad, motion, other; default from the platforms) and defaults orientation to portrait only for phone-only games. The contract and config record `input`; `new-game` asks for platforms and input instead of assuming iOS and Android.
+- New codex skills: `platform-targets` (input and controls, platform UX, performance tiers, saves and platform rules, a platform matrix), `pc-web-release` (Steam, itch.io, web portals, other PC stores, signing and packaging) and `console-pathway` (programmes and access, certification and ratings, porting plans; public information only, console SDKs are under NDA).
+- Nine new genre playbook files: shooters, action-adventure, platformer and metroidvania, survival and sandbox, simulation and management, MMO and live service, racing, sports and fighting, horror and narrative, PC strategy and card games. Two new case-study files: 15 PC and console games, 8 web and cross-play games.
+- Skill and agent descriptions no longer assume mobile where the knowledge is general; mobile-specific skills point to the platform skills. Doctrine 6 is now "platform-native".
+- Templates renamed `godot-mobile` to `godot-starter` and `unity-mobile` to `unity-starter`. The Godot template gains Windows, macOS, Linux and Web export presets (web without threads, so any static host works), keyboard (arrows, WASD) and gamepad (D-pad, left stick) input actions, pause and fullscreen actions, focus for keyboard and gamepad menus, a Quit button on desktop, and `<build> --headless -- --smoke` to check any exported build. The Unity template gains Windows, macOS, Linux and Web build methods and WASD and gamepad input.
+- CI templates: desktop and web export jobs, and a smoke test of each desktop build on its own OS (Godot); a desktop and web build matrix (Unity).
+- The release guard also asks before `steamcmd ... +run_app_build`, `+run_workshop_build`, `butler push`, Epic `BuildPatchTool -mode=UploadBinary|LabelBinary` and `msstore publish`.
+
+### Understanding layer
+- `gs.py map` indexes the project into `.gamestudio/map/MAP.md` (a compact summary to read before opening files) and `map.json`: scenes and nodes, scripts, classes, signals, autoloads, input actions, tuning keys, assets, tests and design documents. Godot and Unity in depth (Unity through .meta GUIDs), other engines by files and imports. Rebuilds re-parse only changed files; the session summary points at the map.
+- `gs.py impact <file|class|autoload|tuning key|input action|feature>` lists the scenes, scripts and tests that depend on it, the done features whose new `paths` globs cover them, and which of the five gates to run again, with reasons. `build-feature` uses it for re-checks.
+- `gs.py whatif --set KEY=VALUE` and the new `what-if` skill: the current and the proposed version on the same seeds through the Godot template's bots (`runner.gd --tuning=<overrides>`), `economy_sim.py` or `match3_sim.py`, with Wilson and Student t intervals and a verdict (improves, mixed, worsens, no clear effect, reject) against the contract's targets. Results are saved to `.gamestudio/whatif/`.
+- `gs.py dashboard` writes `.gamestudio/reports/dashboard.html`: features and the five gates, loops as diagrams, the economy as a flow, bot win-rate and frame-time trends, what-if results, the dependency graph by folder, the asset gallery with licences and provenance, and the budget. One file, no external requests, light and dark themes.
+- `gs.py feature add --path <glob>` records which code a feature owns.
+
+### New adapters
+- `arcosian-art`: skill `art-tools` (Aseprite, LibreSprite, Pixelorama, Krita; Spine, Rive, DragonBones; sheets, atlases and texture compression; Figma and Penpot; Substance and Houdini notes), `sprite_sheet.py` (inspect and check sheets per platform; Aseprite JSON to a Godot SpriteFrames `.tres`) and Figma's official remote MCP server.
+- `arcosian-levels`: skill `level-editors` (Tiled, LDtk, Godot and Unity importers, level checks) and `level_import.py` (TMJ, TMX with CSV, base64, zlib or gzip, LDtk single-file and external levels into one format; reachability for top-down and platformer levels, dead ends and pacing; output for the core level audit).
+- `arcosian-audio`: skill `audio-middleware` (FMOD Studio, Wwise, engine-native audio, adaptive music and mixing) and `waapi.py`, a minimal Wwise WAAPI HTTP client. No MCP server: neither vendor publishes one.
+- `arcosian-community`: skill `community-ops` (GitHub for game teams, Discord and devlogs, Steam and itch.io community pages, crash and feedback triage) and GitHub's (read-only) and Sentry's official remote MCP servers. Every post stays human-approved.
+
+### Community kit
+- `extend` skill and `scripts/addon.py`: scaffold an add-on from `templates/addon/` and check it against the house rules (manifest, skill format, README disclosure, licence, pinned MCP launchers, secrets only through placeholders, self-tested scripts, the directory's file rules).
+- `docs/EXTENDING.md`, `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1 by reference), issue forms (bug, feature, connector proposal) and a pull-request template.
+- `docs/CONNECTORS.md`, generated from `docs/connectors.json`: all 14 registered MCP servers with source, vendor, authentication and trust level (first-party, official, community). `tools/check_connectors.py` fails CI when a plugin registers a server that is not catalogued, unpinned or holding a literal secret.
+- `audit_plugin.py --core` resolves an adapter's links to core skills and agents; `--max-description-chars` fails when skill and agent descriptions, which load into every session, pass a budget (CI: 34,000 characters; now 30,409, about 7,600 tokens). Four adapter skill descriptions were shortened to fit the 450-character target.
+
+### Fixed
+- Godot template: swipes and drags never reached the game on any platform. The swipe detector called `set_anchors_preset()` in `_ready`, which keeps a 0x0 rectangle once the node has a parent; `Ui.full_rect()` had the same trap. Both now use `set_anchors_and_offsets_preset()`. The scripted playthroughs and bots drive the simulation directly, so no earlier gate could see it. `tests/unit/test_input.gd` now fails on the old code and passes on the fix, and `run_tests.gd` runs tests on the first frame so tests can add nodes to the tree.
+- The art adapter's `sprite_sheet.py --verify` now imports the texture before loading the `.tres`.
+
+### Verified
+- Godot 4.7.2 on macOS: Windows, macOS (universal, ad-hoc signed), Linux and Web exports of the template; the macOS build passes `--smoke`; the web build in a browser (menu by Enter and by click, arrow keys, mouse drags merging tiles); 34 unit tests and the static gate pass.
+- What-if with the real template bots: `win_tile` 1024 to 512 gives MIXED (sessions fall from 561 s to 282 s, into a 240-360 s target; win rate rises from 0.85 to 1.0, out of a 0.80-0.90 band).
+- Project map and impact on both templates (48 and 34 files); the dashboard rendered and checked in a browser in dark mode.
+- A SpriteFrames `.tres` from `sprite_sheet.py` loads in Godot 4.7.2 with the expected animations, speeds and per-frame durations; `level_import.py` fails a Tiled map whose exit is walled off and passes it once a door is opened.
+- Every self-test, the hook tests (40) and the gateway tests pass; all ten plugins pass `claude plugin validate`, and all nine adapters pass `addon.py check`.
+
+### Not verified
+- Unity changes (desktop and web build methods, WASD and gamepad input) are not compiled in the Unity Editor here; the engine-free core still builds and passes on .NET.
+- Desktop builds launched on Windows and Linux, and the CI template jobs, run only in GitHub Actions.
+- New adapter content was researched in October 2026; each file lists what could not be checked against the vendor's own pages (for example itch.io and Discord help pages that refused automated fetches).
+
 ## 0.3.2 (2026-10-21): ready for Anthropic's plugin directory (core 0.3.2, adapters 0.3.1)
 
 ### Fixed

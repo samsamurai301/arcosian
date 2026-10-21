@@ -218,6 +218,11 @@
           "$ref": "#/$defs/gate_notes",
           "description": "Notes per gate; required for \"n/a\"."
         },
+        "paths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Globs of the code and content this feature owns (project-relative, e.g. \"core/combat/*\"). gs.py impact uses them to name the features a change touches."
+        },
         "owner": {
           "type": [
             "string",

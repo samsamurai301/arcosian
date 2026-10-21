@@ -133,6 +133,7 @@
         "subgenre": { "type": "string", "description": "Market subgenre, e.g. \"merge tower defense\", \"match-3 with renovation meta\"." },
         "platforms": { "$ref": "common.schema.json#/$defs/platform_list", "description": "Target platforms." },
         "orientation": { "$ref": "common.schema.json#/$defs/orientation", "description": "Screen orientation." },
+        "input": { "$ref": "common.schema.json#/$defs/input_list", "description": "How players control the game; every core action must work with each listed method." },
         "engine": { "$ref": "common.schema.json#/$defs/engine", "description": "Engine; must match config.json." },
         "target_audience": { "$ref": "common.schema.json#/$defs/target_audience", "description": "Who the game is for." },
         "session_length_target_sec": { "type": "number", "minimum": 10, "maximum": 7200, "description": "Intended typical session length in seconds; mobile casual usually 60-300." },

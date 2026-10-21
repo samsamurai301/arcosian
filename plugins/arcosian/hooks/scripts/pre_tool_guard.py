@@ -24,7 +24,12 @@ STORE_RE = re.compile(
     r"|\bxcrun\s+altool\b[^;&|\n]*--upload|\baltool\b[^;&|\n]*--upload"
     r"|\bnotarytool\s+(submit|store-credentials)\b"
     r"|\bTransporter\b[^;&|\n]*-m\s+upload|\bgradlew?\b[^;&|\n]*\bpublish\w*(Bundle|Apk|Release)\w*"
-    r"|\bandroidpublisher\b", re.I)
+    r"|\bandroidpublisher\b"
+    # PC stores: Steam (SteamPipe builds and Workshop items), itch.io, Epic, Microsoft Store
+    r"|\bsteamcmd(\.exe|\.sh)?\b[^;&|\n]*\+run_(app|workshop)_build(_http)?\b"
+    r"|\bbutler(\.exe)?\s+push\b"
+    r"|\bBuildPatchTool(\.exe)?\b[^;&|\n]*-mode=(UploadBinary|LabelBinary)\b"
+    r"|\bmsstore(\.exe)?\s+publish\b", re.I)
 KEYCHAIN_RE = re.compile(r"\bsecurity\s+(find-generic-password|find-internet-password|dump-keychain|"
                          r"export)\b|\bsecurity\s+cms\s+-D\b|\bGet-StoredCredential\b|\bvaultcmd(\.exe)?\s+/listcreds",
                          re.I)
@@ -40,8 +45,9 @@ PROTECTED_DIRS = {".gamestudio", "assets"}
 DENY_SECRET = ("Reading or printing a signing secret (keystore, .p12, .mobileprovision, .p8 or .env) is blocked. "
                "Reference secrets by name and load them in CI.")
 DENY_KEYCHAIN = "Reading keychain secrets is blocked. Signing credentials must come from CI secrets."
-ASK_STORE = ("This command submits or promotes a build in a store. Confirm that release-manager pre-flight and the "
-             "human release checkpoint are complete.")
+ASK_STORE = ("This command uploads, submits or promotes a build in a store (App Store, Google Play, Steam, itch.io, "
+             "Epic, Microsoft Store). Confirm that release-manager pre-flight and the human release checkpoint "
+             "are complete.")
 
 
 def segments(command: str) -> List[List[str]]:

@@ -1,0 +1,38 @@
+{
+  "name": "arcosian-community",
+  "version": "0.4.0",
+  "description": "Community and team-tools adapter for arcosian: GitHub's official MCP server (read-only by default) and Sentry's official remote MCP server, with a skill on GitHub for game teams, Discord and devlogs, Steam and itch.io community pages, and crash and feedback triage. Nothing is posted without human approval.",
+  "author": {
+    "name": "samsamurai301",
+    "url": "https://github.com/samsamurai301"
+  },
+  "homepage": "https://github.com/samsamurai301/arcosian/tree/main/plugins/arcosian-community",
+  "repository": "https://github.com/samsamurai301/arcosian",
+  "license": "MIT",
+  "icon": "./icon.png",
+  "documentationUrl": "https://github.com/samsamurai301/arcosian/blob/main/plugins/arcosian-community/README.md",
+  "supportUrl": "https://github.com/samsamurai301/arcosian/issues",
+  "privacyPolicyUrl": "https://github.com/samsamurai301/arcosian/blob/main/PRIVACY.md",
+  "keywords": [
+    "github",
+    "sentry",
+    "discord",
+    "steam",
+    "itch.io",
+    "community",
+    "crash-reporting",
+    "mcp"
+  ],
+  "dependencies": [
+    "arcosian"
+  ],
+  "userConfig": {
+    "github_token": {
+      "type": "string",
+      "title": "GitHub personal access token",
+      "description": "Fine-grained personal access token sent as a Bearer header to GitHub's remote MCP server. Grant read-only repository permissions unless you also switch the server to write mode.",
+      "sensitive": true,
+      "required": false
+    }
+  }
+}

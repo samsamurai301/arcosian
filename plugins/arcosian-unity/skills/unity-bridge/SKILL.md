@@ -1,6 +1,6 @@
 ---
 name: unity-bridge
-description: Drives a Unity 6 project through the C# language server (diagnostics after edits, LSP go to definition, references, symbols), the Unity CLI (unity command, unity eval, unity mcp) and CoplayDev unity-mcp for compile checks, EditMode and PlayMode tests, play mode control, screenshots, headless builds and procedural scene building. Use when asked to "find where this C# class is defined", "find all references", "C# language server not working", "run the Unity tests", "build the Android player", "screenshot the game in play mode", "create the scene from code", "unity mcp not connecting" or "which Unity automation tool should I use".
+description: Drives a Unity 6 project through the C# language server (diagnostics, go to definition, references), the Unity CLI and unity-mcp: compile checks, EditMode and PlayMode tests, play mode, screenshots, headless builds and scene building. Use when asked to "find where this class is defined", "run the Unity tests", "build the player", "screenshot play mode" or "which Unity automation tool should I use", or when a tool will not connect.
 ---
 
 # Unity bridge
@@ -47,7 +47,7 @@ It prints PASS or FAIL per check; add `--also <file>` for files that must report
 
 **Compile gate.** Trigger a script refresh, wait for the domain reload to finish, read the console. Pass means zero errors; warnings are listed, not ignored. Never proceed on a stale console read.
 
-**Tests.** The template in `arcosian/templates/unity-mobile/` splits Core (pure C#), Presentation and Editor assemblies. Run EditMode tests first (sim-core, fast, deterministic), PlayMode second. Report counts, failing test names and the first stack frame in project code. A flaky test is a bug in the test or in the determinism seam; do not retry until green without saying so.
+**Tests.** The template in `arcosian/templates/unity-starter/` splits Core (pure C#), Presentation and Editor assemblies. Run EditMode tests first (sim-core, fast, deterministic), PlayMode second. Report counts, failing test names and the first stack frame in project code. A flaky test is a bug in the test or in the determinism seam; do not retry until green without saying so.
 
 **Play mode and screenshots.** Enter play mode, run the scripted playthrough (seeded RNG, fixed timestep), capture frames at named checkpoints (main menu, first level start, a win state, a fail state), exit play mode. Save images under the project's `.gamestudio/` evidence folder so the critic agent can open them. If a screenshot is black, the usual causes are: capture before the first rendered frame, UI on a camera not in the capture path, or a Game view at zero size.
 

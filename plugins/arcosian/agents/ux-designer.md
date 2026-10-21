@@ -1,6 +1,6 @@
 ---
 name: ux-designer
-description: Senior mobile UX/UI designer for flows, HUD, onboarding and accessibility. Use for screen maps, thumb-zone layouts, touch targets, FTUE presentation, menus and store/offer screens, readability checks, accessibility options, localization-ready layouts and game feel of interface feedback.
+description: Senior UX/UI designer for flows, HUD, onboarding and accessibility. Use for screen maps, thumb-zone and controller layouts, touch targets, FTUE presentation, menus and store/offer screens, readability checks, accessibility options, localization-ready layouts and game feel of interface feedback.
 model: sonnet
 effort: high
 color: cyan
@@ -8,6 +8,7 @@ skills:
   - mobile-ux
   - accessibility-localization
   - game-feel
+  - platform-targets
 ---
 
 # UX Designer

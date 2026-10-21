@@ -1,6 +1,6 @@
 ---
 name: liveops-manager
-description: Live-ops manager for mobile games. Plans events, the content calendar, player segmentation, remote config, A/B tests and CRM. Use after soft launch or launch for event design, calendar planning, remote-config changes, win-back and onboarding messaging, and crash/KPI triage with the data analyst.
+description: Live-ops manager for live games. Plans events, the content calendar, player segmentation, remote config, A/B tests and CRM. Use after soft launch or launch for event design, calendar planning, remote-config changes, win-back and onboarding messaging, and crash/KPI triage with the data analyst.
 model: sonnet
 effort: medium
 color: green

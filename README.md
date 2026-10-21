@@ -4,7 +4,7 @@
 
 [![ci](https://github.com/samsamurai301/arcosian/actions/workflows/ci.yml/badge.svg)](https://github.com/samsamurai301/arcosian/actions/workflows/ci.yml) [![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
-A Claude Code plugin suite that gives Claude the working habits of a principal game developer and a full studio behind them: a deep game-dev codex, a shared ontology with JSON schemas, 24 specialist agents, nine multi-agent workflows, simulators and solvers, an asset and audio gateway with budgets and provenance, Godot and Unity mobile templates, language servers for GDScript and C#, and hooks that enforce a five-gate definition of done.
+A Claude Code plugin suite that gives Claude the working habits of a principal game developer and a full studio behind them, for any genre on any platform you choose: phones, PC, Steam Deck, the web and consoles. It brings a deep game-dev codex, a shared ontology with JSON schemas, 24 specialist agents, nine multi-agent workflows, simulators and solvers, a project map with change impact and what-if predictions, an offline project dashboard, an asset and audio gateway with budgets and provenance, Godot and Unity templates that build for phones, desktop and web, language servers for GDScript and C#, adapters for art, level, audio, team and community tools, and hooks that enforce a five-gate definition of done.
 
 It is not an engine wrapper. The value is in five layers, and each one is built to stand on its own.
 
@@ -12,7 +12,9 @@ It is not an engine wrapper. The value is in five layers, and each one is built 
 
 | Typical "AI game dev" setup | Arcosian |
 |---|---|
-| Prompts and a few snippets | A codex of 38 skills with about 160 reference files, written as procedures, formulas, decision tables and worked examples |
+| Prompts and a few snippets | A codex of 41 skills with 183 reference files, written as procedures, formulas, decision tables and worked examples |
+| Mobile-only or engine-only | Platforms, input and orientation are the user's choice in the contract; genre playbooks and case studies cover mobile, PC, console and web |
+| Edits in the dark | A project map Claude reads before opening files, change impact that names the gates to re-run, and what-if predictions on the same seeds before a change ships |
 | "Looks done" | Done means five gates (static, unit, playthrough, visual, perf) with evidence on disk, checked by hooks that block the stop |
 | One generalist | A principal agent plus 23 specialists, each with a model tier matched to the work |
 | Free-form assets | Style lock, per-project budget, provenance and licence records for every generated asset |
@@ -39,6 +41,10 @@ claude plugin install arcosian-unity@arcosian      # Unity-aware C# language ser
 claude plugin install arcosian-blender@arcosian    # Blender MCP
 claude plugin install arcosian-vendors@arcosian    # PixelLab, Meshy, ElevenLabs, Scenario
 claude plugin install arcosian-commerce@arcosian   # RevenueCat, Firebase, Adjust
+claude plugin install arcosian-art@arcosian        # Aseprite, Krita, Spine, Rive, Figma MCP, sprite sheets
+claude plugin install arcosian-levels@arcosian     # Tiled and LDtk, level converter and checks
+claude plugin install arcosian-audio@arcosian      # FMOD Studio, Wwise, WAAPI client
+claude plugin install arcosian-community@arcosian  # GitHub and Sentry MCP, Discord, Steam and itch.io pages
 ```
 
 Get new versions with `claude plugin update arcosian@arcosian`, or turn on auto-update for the marketplace in `/plugin`.
@@ -48,9 +54,10 @@ Requirements: Node 18+ and Python 3 (scripts use the standard library only). Wor
 ## Quick start
 
 1. `/arcosian:studio` boots the principal persona, detects project state (greenfield, existing engine project, mid-build) and tells you the next step.
-2. Have an idea: `/arcosian:new-game a cozy merge game for commuters`. It runs market scan, concept tournament, design contract, feature plan and `gs.py init`.
+2. Have an idea: `/arcosian:new-game a cozy merge game for commuters`. It asks which platforms and inputs you want, then runs market scan, concept tournament, design contract, feature plan and `gs.py init`.
 3. Build: `/arcosian:build-feature F001`. A feature is done only when all five gates hold.
-4. Ship: `/arcosian:ship` prepares signed builds and internal-track uploads. You approve store submission yourself.
+4. Predict before you change: `/arcosian:what-if win_tile=512` runs the bots on the current and the changed tuning and reports the difference against your targets. `gs.py impact <file>` lists what an edit touches; `gs.py dashboard` writes one offline page with the whole project.
+5. Ship: `/arcosian:ship` prepares signed builds and internal-track or private-channel uploads. You approve store submission yourself.
 
 Full walkthroughs with exact commands: [PLAYBOOKS.md](plugins/arcosian/docs/PLAYBOOKS.md).
 
@@ -58,19 +65,23 @@ Full walkthroughs with exact commands: [PLAYBOOKS.md](plugins/arcosian/docs/PLAY
 
 | Plugin | Contents |
 |---|---|
-| `arcosian` (core) | 53 skills (15 process, 38 codex), 24 agents, 9 workflows, 19 Python scripts, 14 JSON schemas, `studio-gateway` MCP server, 6 hook handlers, Godot and Unity mobile templates, CI templates |
+| `arcosian` (core) | 58 skills (17 process, 41 codex), 24 agents, 9 workflows, 23 Python scripts, 14 JSON schemas, `studio-gateway` MCP server, 6 hook handlers, Godot and Unity templates for phones, desktop and web, CI templates, add-on template |
 | `arcosian-godot` | GDScript language server (Godot's own, through a stdio bridge), skill `godot-bridge` and two community Godot MCP bridges |
 | `arcosian-unity` | Unity-aware C# language server (csharp-ls), skill `unity-bridge` and a Unity CLI bridge |
 | `arcosian-blender` | Skill `blender-bridge` and a Blender MCP |
 | `arcosian-vendors` | Skill `vendor-mcps` and PixelLab, Meshy, ElevenLabs and Scenario servers |
 | `arcosian-commerce` | Skill `commerce-mcps` and RevenueCat, Firebase and Adjust servers (store tooling is covered in the skill) |
+| `arcosian-art` | Skill `art-tools` (Aseprite, Krita, Spine, Rive, DragonBones, Figma, Substance and Houdini notes), `sprite_sheet.py` (Aseprite sheets to Godot SpriteFrames, platform checks) and Figma's official MCP server |
+| `arcosian-levels` | Skill `level-editors` (Tiled, LDtk, engine importers) and `level_import.py` (one level format, reachability and pacing checks, core level-audit output) |
+| `arcosian-audio` | Skill `audio-middleware` (FMOD Studio, Wwise, engine-native audio, adaptive music and mix) and `waapi.py`, a minimal Wwise WAAPI client |
+| `arcosian-community` | Skill `community-ops` (GitHub for game teams, Discord and devlogs, Steam and itch.io community, crash triage) and GitHub's and Sentry's official MCP servers |
 
-Counts come from `scripts/audit_plugin.py --root plugins/arcosian`; rerun it if you extend the suite. Eight eval cases live in `evals/arcosian/`, outside the plugin, so installs stay small.
+Counts come from `scripts/audit_plugin.py --root plugins/arcosian`; rerun it if you extend the suite. Every MCP server is listed with its source and trust level in [CONNECTORS.md](docs/CONNECTORS.md). Eight eval cases live in `evals/arcosian/`, outside the plugin, so installs stay small.
 
 ## What it runs, sends and fetches
 
 - **Runs on your machine:** the hooks (Python, started by a small Node launcher), the Python tools when Claude calls them, the `studio-gateway` MCP server (Node), and with the adapters a headless Godot editor or csharp-ls for code checks plus the MCP servers you enable.
-- **Sends:** generation requests only to the providers whose API keys you add (Google, OpenAI, Recraft, fal, Tripo, Meshy, ElevenLabs, Stability AI), within your budget cap; without keys nothing is sent. Adapter MCP servers talk to their own vendors once you enable them.
+- **Sends:** generation requests only to the providers whose API keys you add (Google, OpenAI, Recraft, fal, Tripo, Meshy, ElevenLabs, Stability AI), within your budget cap; without keys nothing is sent. Adapter MCP servers talk to their own vendors (for example Figma, GitHub, Sentry) only after you sign in or add a key.
 - **Fetches:** the exact-version npm and PyPI packages that adapter MCP servers run, and NuGet packages for the C# language server's generated project.
 - **Never:** no telemetry, nothing sent to the authors, no automatic store submission; the hooks block reading signing keys and `.env` files.
 
@@ -93,7 +104,7 @@ In priority order:
 3. Verify by playing: deterministic playthrough, perf budget and visual critique before "done".
 4. Data-informed, not data-driven: hypothesis first, telemetry to confirm.
 5. Scope ruthlessly: one-page contract, must/should/won't, kill criteria.
-6. Mobile-native: thumb reach, 1 to 5 minute sessions, interruptions, low-end devices, battery and heat.
+6. Platform-native: design for the devices and inputs you ship on (thumb reach and short sessions on phones; mouse, keyboard and gamepad on PC; controller-only TV play on consoles; download size on the web), and for interruptions, low-end hardware, battery and heat.
 7. Readability over detail; juice what the player touches.
 8. Ethical monetization: no dark patterns, transparent odds, respect for minors.
 9. Own the output: native builds you own, no runtime lock-in, licences checked.
@@ -106,6 +117,7 @@ In priority order:
 plugins/arcosian/                 core plugin (README, docs/, skills/, agents/, ...)
 plugins/arcosian-*/               five optional adapters
 evals/arcosian/                   eval cases for claude plugin eval
+tools/check_connectors.py         connector catalog check (CI)
 docs/BLUEPRINT.md                 binding design spec
 docs/research/                    the October 2026 research behind the design
 .github/workflows/ci.yml          checks on macOS, Linux and Windows
@@ -119,14 +131,17 @@ docs/research/                    the October 2026 research behind the design
 - [PLAYBOOKS.md](plugins/arcosian/docs/PLAYBOOKS.md): four end-to-end procedures
 - [KNOWLEDGE-MAP.md](plugins/arcosian/docs/KNOWLEDGE-MAP.md): generated map of every skill and reference
 - [CHANGELOG.md](plugins/arcosian/docs/CHANGELOG.md): what changed, what is verified and what is not
+- [EXTENDING.md](docs/EXTENDING.md): build your own add-on (genre pack, engine adapter, tool connector)
+- [CONNECTORS.md](docs/CONNECTORS.md): every MCP server, its source and trust level
+- [ROADMAP.md](docs/ROADMAP.md): what shipped and what is next
 
 ## Status and limits
 
-The core plugin is at 0.3.2 and the adapters at 0.3.1 (the first public release was 0.3.0). What has and has not been verified is listed in the CHANGELOG; CI runs the checks on macOS, Linux and Windows. The adapters wrap community MCP servers whose maintenance you should verify before depending on them. Generated art and audio carry licence terms from the vendor; the gateway records provenance but you remain responsible for checking terms before shipping.
+The core plugin and most adapters are at 0.4.0; `arcosian-blender` is unchanged at 0.3.1 (the first public release was 0.3.0). What has and has not been verified is listed in the CHANGELOG; CI runs the checks on macOS, Linux and Windows. The adapters wrap community MCP servers whose maintenance you should verify before depending on them. Generated art and audio carry licence terms from the vendor; the gateway records provenance but you remain responsible for checking terms before shipping.
 
 ## Contributing and security
 
-Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). Report security problems privately as described in [SECURITY.md](SECURITY.md).
+Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md), [EXTENDING.md](docs/EXTENDING.md) and the [code of conduct](CODE_OF_CONDUCT.md). Report security problems privately as described in [SECURITY.md](SECURITY.md).
 
 Arcosian is an independent project. It is not affiliated with or endorsed by Anthropic, the Godot Foundation, Unity Technologies, Apple, Google or any vendor named here; product names belong to their owners.
 
